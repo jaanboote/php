@@ -59,6 +59,7 @@
   <div class="banner-actions">
     <?php if ($pendents > 0): ?><a class="btn primary" href="index.php?p=repte&amp;mode=repas">🔁 Repassar ara</a><?php endif; ?>
     <a class="btn" href="index.php?p=reptes">Veure els reptes</a>
+    <a class="btn" href="index.php?p=progres">🗺️ Mapa i insígnies</a>
   </div>
 </section>
 
@@ -97,5 +98,5 @@
 
 <section class="card soon">
   <h2>Properament</h2>
-  <p class="muted">Mapa de temes, insígnies i estadístiques · Més exercicis d'Exercicis 01 · Laboratoris web amb formularis (Activitat de Nadal).</p>
+  <p class="muted">Més exercicis d'Exercicis 01 · Laboratoris web amb formularis (Activitat de Nadal).</p>
 </section>

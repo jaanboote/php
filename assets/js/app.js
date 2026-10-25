@@ -18,7 +18,25 @@ const PHPLab = (() => {
       if (res.status === 401) { location.href = 'index.php?p=login'; }
       throw new Error(json.error || 'Error ' + res.status);
     }
+    if (json.insignies?.length) showBadges(json.insignies);
     return json;
+  }
+
+  /** Avís d'insígnia nova (després del de l'XP, una darrere l'altra). */
+  function showBadges(list) {
+    const box = document.getElementById('badge-pop');
+    if (!box) return;
+    // La primera vegada se'n poden aconseguir moltes de cop (feina feta abans de les insígnies): no les ensenyem totes
+    if (list.length > 3) list = [...list.slice(0, 2), { icona: '🏆', titol: 'I ' + (list.length - 2) + ' insígnies més', descripcio: 'Mira-les totes a la pàgina Progrés.' }];
+    list.forEach((b, i) => setTimeout(() => {
+      box.innerHTML = '<span class="badge-pop-icon">' + esc(b.icona) + '</span><div><small>Insígnia nova!</small>' +
+        '<strong>' + esc(b.titol) + '</strong><span>' + esc(b.descripcio) + '</span></div>';
+      box.classList.remove('show');
+      void box.offsetWidth;   // reinicia l'animació
+      box.classList.add('show');
+      clearTimeout(box._timer);
+      box._timer = setTimeout(() => box.classList.remove('show'), 4200);
+    }, 1800 + i * 4600));
   }
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

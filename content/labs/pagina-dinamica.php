@@ -72,7 +72,7 @@ $hola = fn(string $h, string $text) => ['nom' => "A les $h h", 'args' => [$h], '
 
 return [
     'id' => 'pagina-dinamica',
-    'ordre' => 1,
+    'ordre' => 3,
     'titol' => 'Pàgina dinàmica: Bon dia, bona tarda, bona nit',
     'fitxer' => 'salutacio.php',
     'tema' => 'Tema 1 – Introducció al desenvolupament web',

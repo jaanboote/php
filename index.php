@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, View, Labs, Lessons, Indexer, Uploader, Progress, Tutor, Db, Config, Reptes, Review};
+use PhpLab\{Auth, View, Labs, Lessons, Indexer, Uploader, Progress, Tutor, Db, Config, Reptes, Review, Badges, Stats};
 
 $page = $_GET['p'] ?? 'inici';
 
@@ -183,6 +183,20 @@ switch ($page) {
             exit('Mode de repte desconegut');
         }
         View::render('repte', $common + ['title' => Reptes::MODES[$mode]['titol'], 'mode' => $mode, 'tema' => (string) ($_GET['tema'] ?? '')]);
+        break;
+
+    case 'progres':
+        Badges::check();   // per si n'hi ha alguna de nova (p. ex. feta abans que existissin les insígnies)
+        View::render('progres', $common + [
+            'title' => 'Progrés',
+            'temes' => Stats::temaMap(),
+            'insignies' => Badges::all(),
+            'xpDies' => Stats::xpByDay(30),
+            'xpFonts' => Stats::xpBySource(),
+            'reptes' => Stats::reptesByMode(),
+            'dies' => Stats::days(),
+            'fluixos' => Stats::weak(8),
+        ]);
         break;
 
     case 'diagnostic':

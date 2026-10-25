@@ -2,12 +2,13 @@
 /**
  * API JSON per al JavaScript de les pàgines: api.php?a=accio
  * Totes les accions: POST, sessió iniciada i capçalera X-CSRF-Token.
+ * Les respostes que poden fer guanyar insígnies hi afegeixen 'insignies' (les noves); app.js les mostra.
  */
 declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes};
+use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes, Badges};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -61,7 +62,7 @@ try {
         case 'lesson_answer':
             $lesson = Lessons::get((string) ($in['lesson'] ?? '')) ?? respond(['error' => 'Lliçó no trobada'], 404);
             $res = Lessons::answer($lesson, (string) ($in['q'] ?? ''), (string) ($in['answer'] ?? ''));
-            respond($res + ['progress' => Progress::summary()]);
+            respond($res + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_save':
             Labs::saveCode(lab($in)['id'], $code);
@@ -69,7 +70,7 @@ try {
 
         case 'lab_check':
             $res = Labs::check(lab($in), (int) ($in['step'] ?? 0), $code);
-            respond($res + ['progress' => Progress::summary()]);
+            respond($res + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_hint':
             respond(Labs::hint(lab($in), (int) ($in['step'] ?? 0), (int) ($in['level'] ?? 1)));
@@ -91,7 +92,7 @@ try {
             respond(Reptes::answer((int) ($in['session'] ?? 0), (string) ($in['item'] ?? ''), (string) ($in['answer'] ?? '')));
 
         case 'repte_finish':
-            respond(Reptes::finish((int) ($in['session'] ?? 0)) + ['progress' => Progress::summary()]);
+            respond(Reptes::finish((int) ($in['session'] ?? 0)) + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_summary':
             respond(Labs::summary(lab($in)));

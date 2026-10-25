@@ -12,6 +12,7 @@ perquè també puguis llegir i entendre com funciona per dins.
 - **Laboratori:** 14 exercicis guiats pas a pas (basats en Exercicis 01 i 02 i les activitats dels temes), amb proves
   automàtiques, pistes de 3 nivells, solució després de 3 intents i un tutor socràtic (IA de Claude o sense connexió).
 - **Reptes:** contrarellotge, «Troba l'error», «Què imprimeix?», «Ordena el codi» i repàs espaciat.
+- **Progrés:** mapa de temes, insígnies i estadístiques.
 - **Sandbox** segur per executar el codi, amb fitxers que es conserven per laboratori.
 - XP, nivells i ratxa diària.
 
@@ -274,8 +275,18 @@ Quan l'encertes a la caixa 5, surt del repàs. Inici avisa quan tens preguntes p
 Els reptes donen com a molt 80 XP al dia (el repàs no té límit). Les preguntes són a `content/reptes/temaN.php` i
 `eines/verifica-contingut.php` les comprova totes.
 
-## 7. Properes fases
+## 7. Progrés: mapa de temes, insígnies i estadístiques
 
-- **Fase 4:** mapa de temes, insígnies i estadístiques.
+La pàgina **Progrés** té tres parts:
+
+- **Mapa de temes:** cada tema amb les lliçons i els laboratoris en ordre (fet, en curs o per començar), el percentatge
+  d'encerts als reptes del tema i el domini de cada concepte: ● dominat (80 % d'encerts o més), ◐ practicant, ◔ per reforçar.
+- **Insígnies:** 22 fites (acabar lliçons i laboratoris, un laboratori sense pistes, trobar les errates del temari, una
+  contrarellotge perfecta, ratxes de dies, superar cada tema...). Les que encara no tens mostren quant et falta. Quan n'aconsegueixes
+  una, surt un avís a qualsevol pàgina. Una insígnia aconseguida no es perd mai. Les definicions són a `src/Badges.php`.
+- **Estadístiques:** XP de cada dia dels últims 30 dies, d'on ve l'XP, partides i encert per mode de repte, i els conceptes que més costen.
+
+## 8. Properes fases
+
 - **Fase 5:** laboratoris web (formularis `$_GET`/`$_POST`, pujada de fitxers, sessions, cookies i MySQL) executats amb `php-cgi.exe`.
 - Més exercicis d'Exercicis 01 com a laboratoris.

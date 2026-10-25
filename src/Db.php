@@ -208,6 +208,14 @@ final class Db
                     SELECT 'lesson:' || lesson_id || '#' || question_id, 1, date('now','localtime'), attempts - correct
                     FROM lesson_answers WHERE attempts > correct;
                 SQL,
+
+            // Fase 4: insígnies aconseguides
+            3 => <<<'SQL'
+                CREATE TABLE badges (
+                    id TEXT PRIMARY KEY,         -- identificador de l'insígnia (mira src/Badges.php)
+                    unlocked_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+                );
+                SQL,
         ];
 
         $pdo->exec('CREATE TABLE IF NOT EXISTS schema_version (version INTEGER NOT NULL)');
