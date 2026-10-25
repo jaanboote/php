@@ -1,0 +1,19 @@
+{
+    "name": "phplab/phplab",
+    "description": "PHPLab: aplicació web per aprendre PHP a partir del temari de classe (M0376 ASIX2)",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "anthropic-ai/sdk": "^1.3",
+        "smalot/pdfparser": "^2.13",
+        "guzzlehttp/guzzle": "^8.3"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.12"
+        },
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
+    }
+}
