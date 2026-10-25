@@ -16,9 +16,9 @@ $origen = 'Exercicis_02.Arguments_per_consola_Enunciat.pdf';
 
 return [
     'id' => 'arguments-consola',
-    'ordre' => 1,
+    'ordre' => 60,
     'titol' => 'Arguments per consola: $argv i $argc',
-    'tema' => 'Tema 2 – Fonaments PHP',
+    'tema' => 'Tema 2 – Fonaments de PHP',
     'apartat' => '2.7 Arguments per consola',
     'origen' => $origen,
     'minuts' => 15,
@@ -117,6 +117,7 @@ return [
             'conceptes' => ['$argv i $argc', 'concatenació'],
             'pregunta' => 'Executem <code>php suma.php 3 4</code>. Què imprimeix?',
             'codi' => "<?php\necho \$argv[1] . \$argv[2];",
+            'args' => '3 4',
             'resposta' => '34',
             'explicacio' => 'El punt (.) concatena textos: "3" . "4" és "34". Per sumar caldria fer servir + (i millor validar abans amb is_numeric()).',
         ],

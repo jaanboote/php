@@ -60,7 +60,7 @@ $maxPost = ini_get('post_max_size');
         <tbody>
           <?php foreach ($files as $f): ?>
             <tr>
-              <td><?= e($f['topic_name']) ?></td>
+              <td><a href="index.php?p=llegir&amp;tema=<?= e(urlencode($f['topic_name'])) ?>"><?= e($f['topic_name']) ?></a></td>
               <td class="path"><?= e($f['path']) ?></td>
               <td><?= e($f['kind']) ?></td>
               <td class="small"><?= number_format((int) $f['chars'], 0, ',', '.') ?> car.</td>

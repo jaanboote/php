@@ -106,10 +106,10 @@ $errorArgs0 = "ERROR: s'esperava 1 argument i se n'han rebut 0.";
 
 return [
     'id' => 'permisos',
-    'ordre' => 1,
+    'ordre' => 50,
     'titol' => 'Traductor de permisos Linux',
     'fitxer' => 'permisos.php',
-    'tema' => 'Tema 2 – Fonaments PHP',
+    'tema' => 'Tema 2 – Fonaments de PHP',
     'apartat' => '2.7 Arguments per consola ($argv, $argc)',
     'origen' => [
         'fitxer' => 'Exercicis_02.Arguments_per_consola_Enunciat.pdf',

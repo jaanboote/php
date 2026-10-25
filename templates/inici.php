@@ -15,11 +15,12 @@
 <div class="grid-2">
   <section class="card">
     <h2><span class="tag">Aprendre</span> Lliçons</h2>
-    <?php foreach ($lessons as $l): $p = $l['progres']; ?>
+    <?php $temaActual = null; foreach ($lessons as $l): $p = $l['progres']; ?>
+      <?php if ($l['tema'] !== $temaActual): $temaActual = $l['tema']; ?><h3 class="group-title"><?= e($temaActual) ?></h3><?php endif; ?>
       <a class="item" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
         <div>
           <div class="item-title"><?= e($l['titol']) ?></div>
-          <div class="muted small"><?= e($l['tema']) ?> · <?= e($l['minuts']) ?> min</div>
+          <div class="muted small"><?= e($l['apartat']) ?> · <?= e($l['minuts']) ?> min</div>
         </div>
         <span class="pill <?= $p['acabada'] ? 'ok' : ($p['encertades'] ? 'doing' : '') ?>">
           <?= $p['acabada'] ? '✔ Feta' : e($p['encertades'] . '/' . $p['total']) ?>
@@ -30,7 +31,8 @@
 
   <section class="card">
     <h2><span class="tag tag-lab">Laboratori</span> Exercicis guiats</h2>
-    <?php foreach ($labs as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
+    <?php $temaActual = null; foreach ($labs as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
+      <?php if ($lab['tema'] !== $temaActual): $temaActual = $lab['tema']; ?><h3 class="group-title"><?= e($temaActual) ?></h3><?php endif; ?>
       <a class="item" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
         <div>
           <div class="item-title"><?= e($lab['titol']) ?></div>
@@ -54,7 +56,7 @@
       <ul class="topics">
         <?php foreach ($topics as $t): ?>
           <li><span class="topic-num"><?= $t['topic_num'] !== null ? e($t['topic_num']) : '·' ?></span>
-            <span class="topic-name"><?= e($t['topic_name']) ?></span>
+            <a class="topic-name" href="index.php?p=llegir&amp;tema=<?= e(urlencode($t['topic_name'])) ?>"><?= e($t['topic_name']) ?></a>
             <span class="muted small"><?= e($t['n']) ?> fitxer<?= $t['n'] > 1 ? 's' : '' ?></span></li>
         <?php endforeach; ?>
       </ul>
@@ -80,5 +82,5 @@
 
 <section class="card soon">
   <h2>Properament</h2>
-  <p class="muted">Fase 2: lliçons i laboratoris generats a partir del teu temari · Fase 3: reptes contrarellotge, «Troba l'error» i repàs espaciat · Fase 4: mapa de temes, insígnies i estadístiques · Fase 5: laboratoris web amb formularis.</p>
+  <p class="muted">Temes 3, 4 i 1: lliçons i laboratoris a partir del temari · Més exercicis d'Exercicis 01 · Reptes contrarellotge, «Troba l'error» i repàs espaciat · Mapa de temes, insígnies i estadístiques · Laboratoris web amb formularis (Activitat de Nadal).</p>
 </section>
