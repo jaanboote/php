@@ -120,9 +120,9 @@ final class Lessons
         return ['total' => $total, 'encertades' => $ok, 'acabada' => (bool) Db::value('SELECT completed_at FROM lesson_state WHERE lesson_id = ?', [$lesson['id']])];
     }
 
-    /** Per comparar codi curt: sense espais i en minúscules ("!= " == "!="). */
+    /** Per comparar codi curt sense tenir en compte els espais ("!= " == "!="). Les majúscules sí que compten (N no és n). */
     private static function squash(string $s): string
     {
-        return mb_strtolower(preg_replace('/\s+/', '', $s));
+        return preg_replace('/\s+/', '', $s);
     }
 }

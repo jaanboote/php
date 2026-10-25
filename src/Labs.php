@@ -169,6 +169,10 @@ final class Labs
         if (trim($r['stderr']) !== '' && empty($t['permet_avisos'])) {
             return ['ok' => false, 'motiu' => 'PHP ha mostrat un error o un avís. El programa no ha de mostrar mai avisos de PHP.'] + $res;
         }
+        // Codi de sortida: exit(1), exit(2)... (0 = tot bé)
+        if (isset($t['codi_sortida']) && $r['exit_code'] !== $t['codi_sortida']) {
+            return ['ok' => false, 'motiu' => "El programa ha acabat amb el codi de sortida {$r['exit_code']} i s'esperava exit({$t['codi_sortida']})."] + $res;
+        }
         if (isset($t['exacte']) && $out !== self::normalize($t['exacte'])) {
             return ['ok' => false, 'motiu' => 'La sortida no coincideix amb l\'esperada.'] + $res;
         }

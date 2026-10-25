@@ -383,6 +383,7 @@ return [
         // ---------------------------------------------------------------- PAS 7
         [
             'titol' => 'Prova final (com la del professor)',
+            'repas' => true,   // revisió final: si tot ja funcionava, es supera directament
             'conceptes' => ['validació de dades', '$argv i $argc'],
             'xp' => 20,
             'explicacio' => <<<'HTML'

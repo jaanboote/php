@@ -1,7 +1,8 @@
 <?php
 /**
  * Eina per a qui escriu contingut: comprova totes les lliçons i laboratoris.
- *  - Laboratoris: la solució de referència de cada pas ha de superar les proves d'aquell pas.
+ *  - Laboratoris: la solució de referència de cada pas ha de superar les proves d'aquell pas,
+ *    i la del pas anterior no (si no, les proves del pas no comproven res de nou).
  *  - Lliçons: els exemples «prova-ho» s'han d'executar sense errors fatals, i les preguntes
  *    «què imprimeix?» han de donar exactament la resposta indicada.
  *
@@ -24,6 +25,13 @@ foreach (Labs::all() as $lab) {
         $r = Labs::evaluate($lab, $i, $step['solucio']);
         $label = "LAB {$lab['id']} · pas " . ($i + 1) . " ({$step['titol']})";
         if ($r['superat']) {
+            // La solució del pas anterior NO ha de superar aquest pas: si ho fa, les proves no comproven res de nou
+            $anterior = $i === 0 ? $lab['codi_inicial'] : $lab['passos'][$i - 1]['solucio'];
+            if (empty($step['repas']) && Labs::evaluate($lab, $i, $anterior)['superat']) {
+                $errors++;
+                echo "FALLA $label: el codi del pas anterior també supera aquest pas (les proves són massa fluixes)\n";
+                continue;
+            }
             echo "  ok  $label\n";
             continue;
         }
