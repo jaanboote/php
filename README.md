@@ -129,6 +129,8 @@ C:\xampp\php\php.exe eines\canvia-contrasenya.php
 3. En acabar, et diu quins fitxers són nous i si han aparegut **temes nous**.
 4. Si un fitxer ja existia amb el mateix contingut, no es duplica (es compara el hash SHA-256).
 
+Des de la pàgina d'**Inici** o de **Temari**, fes clic en un tema per **llegir-ne el text** dins de l'app.
+
 El botó **Actualitzar temari** torna a revisar la carpeta i només processa els fitxers nous o modificats.
 També pots copiar fitxers directament a `C:\xampp\phplab-data\temari` i després prémer aquest botó.
 
@@ -180,6 +182,10 @@ phplab-data/
 `lab.js` → `api.php?a=lab_check` → `Labs::check()` → per a cada prova, `Sandbox::run()` executa el
 teu codi amb uns arguments → es compara la sortida amb l'esperada → es guarda l'intent i, si
 l'has superat, l'XP.
+
+**Comprovar el contingut:** després de crear o modificar lliçons i laboratoris, executa
+`C:\xampp\php\php.exe eines\verifica-contingut.php`. Comprova que la solució de cada pas supera les
+seves proves i que les respostes de les preguntes «què imprimeix?» són correctes.
 
 **Afegir un laboratori nou a mà:** copia `content/labs/permisos.php` amb un altre nom, canvia
 `id`, `fitxer` i els passos. Cada pas té `proves` amb `args` i el que ha de sortir (`conte`,

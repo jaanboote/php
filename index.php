@@ -157,6 +157,12 @@ switch ($page) {
         View::render('temari', $common + ['title' => 'Temari', 'files' => $files, 'flash' => View::flash()]);
         break;
 
+    case 'llegir':
+        $tema = (string) ($_GET['tema'] ?? '');
+        $files = Db::all("SELECT path, kind, text FROM files WHERE topic_name = ? AND status = 'ok' ORDER BY kind = 'teoria' DESC, kind, path", [$tema]);
+        View::render('llegir', $common + ['title' => $tema ?: 'Temari', 'tema' => $tema, 'files' => $files]);
+        break;
+
     case 'diagnostic':
         View::render('diagnostic', $common + ['title' => 'Diagnòstic']);
         break;

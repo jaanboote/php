@@ -119,6 +119,17 @@ pre { overflow-x: auto; }
 .topic-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-2); display: grid; place-items: center; font-weight: 800; font-size: .85rem; flex: none; }
 .topic-name { flex: 1; }
 .soon { opacity: .85; }
+.group-title { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 12px 4px; }
+.group-title:first-of-type { margin-top: 4px; }
+a.topic-name { color: var(--text); text-decoration: none; }
+a.topic-name:hover { color: var(--accent-2); text-decoration: underline; }
+
+/* ---------- Llegir temari ---------- */
+.reading-file { margin-bottom: 14px; }
+.reading-file > summary { cursor: pointer; font-weight: 700; padding: 4px 0; }
+.reading { white-space: pre-wrap; font-size: .92rem; line-height: 1.6; max-height: 70vh; overflow-y: auto;
+  background: var(--surface-2); border-radius: 10px; padding: 14px 16px; margin-top: 8px; }
+.reading .page-mark { display: block; color: var(--accent-2); font-weight: 700; font-size: .8rem; margin-top: 10px; }
 
 /* ---------- Formularis ---------- */
 .form { display: grid; gap: 12px; }

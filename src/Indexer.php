@@ -41,6 +41,8 @@ final class Indexer
             $hash = hash_file('sha256', $abs);
 
             if (isset($known[$rel]) && $known[$rel]['hash'] === $hash) {
+                // El contingut no ha canviat, però la detecció del tema pot haver millorat en una versió nova
+                self::refreshTopic((int) $known[$rel]['id'], $rel);
                 $report['sense_canvis']++;
                 continue;
             }
@@ -93,9 +95,36 @@ final class Indexer
             }
         }
 
+        self::unifyTopicNames();
         $topicsAfter = array_column(Db::all('SELECT DISTINCT topic_name FROM files'), 'topic_name');
         $report['temes_nous'] = array_values(array_diff($topicsAfter, $topicsBefore));
         return $report;
+    }
+
+    /** Torna a calcular el tema i el tipus d'un fitxer ja indexat a partir del text desat. */
+    private static function refreshTopic(int $id, string $rel): void
+    {
+        $text = (string) Db::value('SELECT substr(text, 1, 4000) FROM files WHERE id = ?', [$id]);
+        [$num, $name] = self::detectTopic($text, $rel);
+        Db::run('UPDATE files SET topic_num = ?, topic_name = ?, kind = ? WHERE id = ?', [$num, $name, self::detectKind($text, $rel), $id]);
+    }
+
+    /**
+     * Un mateix tema pot sortir amb noms una mica diferents segons el fitxer
+     * ("Fonaments PHP" a l'enunciat i "Fonaments de PHP" a la teoria). Es deixa el nom
+     * del fitxer de teoria (o del primer que es va indexar) per a tots els del mateix número.
+     */
+    private static function unifyTopicNames(): void
+    {
+        $rows = Db::all("SELECT topic_num, topic_name FROM files WHERE topic_num IS NOT NULL AND topic_name LIKE '%–%'
+                         ORDER BY kind = 'teoria' DESC, id");
+        $names = [];
+        foreach ($rows as $r) {
+            $names[$r['topic_num']] ??= $r['topic_name'];
+        }
+        foreach ($names as $num => $name) {
+            Db::run('UPDATE files SET topic_name = ? WHERE topic_num = ?', [$name, $num]);
+        }
     }
 
     /** Llista recursiva de fitxers amb extensió suportada. */
@@ -121,7 +150,8 @@ final class Indexer
     public static function detectTopic(string $text, string $relPath): array
     {
         $head = mb_substr($text, 0, 4000);
-        if (preg_match('/Tema\s*(\d{1,2})\s*[–—\-:.]\s*([^\n]{3,60})/u', $head, $m)) {
+        // "Tema 2 – Fonaments PHP" (enunciats) o "Tema 2 · Fonaments de PHP · David Porti" (teoria): el nom acaba al següent «·»
+        if (preg_match('/\bTema\s+(\d{1,2})\s*[–—\-:.·]\s*([^\n·]{3,60})/u', $head, $m)) {
             $name = trim(preg_replace('/\s+/', ' ', $m[2]));
             return [(int) $m[1], 'Tema ' . (int) $m[1] . ' – ' . $name];
         }

@@ -72,21 +72,7 @@ final class Labs
         $step = $lab['passos'][$stepIdx] ?? throw new \InvalidArgumentException('Pas inexistent');
         self::saveCode($lab['id'], $code);
 
-        // 1) Comprovacions sobre el codi (sense executar-lo)
-        $codeChecks = [];
-        $clean = self::stripComments($code);
-        foreach ($step['codi'] ?? [] as $chk) {
-            $ok = isset($chk['regex']) ? (bool) preg_match($chk['regex'], $clean) : !preg_match($chk['no_regex'], $clean);
-            $codeChecks[] = ['ok' => $ok, 'missatge' => $chk['missatge']];
-        }
-
-        // 2) Proves executant el programa
-        $tests = [];
-        foreach ($step['proves'] as $t) {
-            $tests[] = self::runTest($lab, $t, $code);
-        }
-
-        $passed = !in_array(false, array_column($codeChecks, 'ok'), true) && !in_array(false, array_column($tests, 'ok'), true);
+        ['codi' => $codeChecks, 'proves' => $tests, 'superat' => $passed] = self::evaluate($lab, $stepIdx, $code);
 
         $row = self::stepRow($lab['id'], $stepIdx);
         Db::run('UPDATE lab_steps SET attempts = attempts + 1, fails = fails + ? WHERE lab_id = ? AND step = ?', [$passed ? 0 : 1, $lab['id'], $stepIdx]);
@@ -122,6 +108,32 @@ final class Labs
         }
 
         return ['superat' => $passed, 'codi' => $codeChecks, 'proves' => $tests, 'xp' => $xp, 'seguent' => $next, 'acabat' => $finished];
+    }
+
+    /**
+     * Avalua el codi contra un pas sense desar res: comprovacions sobre el codi i proves executant-lo.
+     * També el fa servir eines/verifica-contingut.php per comprovar les solucions de referència.
+     */
+    public static function evaluate(array $lab, int $stepIdx, string $code): array
+    {
+        $step = $lab['passos'][$stepIdx];
+
+        // 1) Comprovacions sobre el codi (sense executar-lo)
+        $codeChecks = [];
+        $clean = self::stripComments($code);
+        foreach ($step['codi'] ?? [] as $chk) {
+            $ok = isset($chk['regex']) ? (bool) preg_match($chk['regex'], $clean) : !preg_match($chk['no_regex'], $clean);
+            $codeChecks[] = ['ok' => $ok, 'missatge' => $chk['missatge']];
+        }
+
+        // 2) Proves executant el programa
+        $tests = [];
+        foreach ($step['proves'] as $t) {
+            $tests[] = self::runTest($lab, $t, $code);
+        }
+
+        $passed = !in_array(false, array_column($codeChecks, 'ok'), true) && !in_array(false, array_column($tests, 'ok'), true);
+        return ['codi' => $codeChecks, 'proves' => $tests, 'superat' => $passed];
     }
 
     /** XP d'un pas: el valor base menys 5 per cada nivell de pista. Amb la solució vista, només 2. */
