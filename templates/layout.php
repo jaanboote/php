@@ -4,7 +4,7 @@ use PhpLab\Auth;
 $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress['needed']) : 0;
 ?>
 <!doctype html>
-<html lang="ca">
+<html lang="ca" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +16,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=3">
+  <link rel="stylesheet" href="assets/css/app.css?v=4">
 </head>
 <body>
 <header class="topbar">
