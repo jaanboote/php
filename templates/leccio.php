@@ -2,7 +2,7 @@
 /** @var array $lesson @var array $answers @var array $progres */
 ?>
 <div class="crumbs"><a href="index.php">Inici</a> › Aprendre › <?= e($lesson['tema']) ?></div>
-<article class="lesson" data-lesson="<?= e($lesson['id']) ?>">
+<article class="lesson <?= e(tema_class($lesson['tema'])) ?>" data-lesson="<?= e($lesson['id']) ?>">
   <header class="lesson-head">
     <h1><?= e($lesson['titol']) ?></h1>
     <p class="muted"><?= e($lesson['resum']) ?></p>

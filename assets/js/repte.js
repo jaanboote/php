@@ -163,6 +163,8 @@
     fb.innerHTML = html;
     fb.className = 'feedback ' + (r.correcte ? 'right' : 'wrong');
     fb.hidden = false;
+    if (r.correcte) PHPLab.celebrate(card.querySelector('.option.right, .code-lines li.right') || fb, 18);
+    else PHPLab.shake(card);
 
     const nextRow = card.querySelector('.next-row');
     nextRow.hidden = false;
@@ -182,7 +184,6 @@
     clearInterval(st.timer);
     try {
       const r = await api('repte_finish', { session: st.session });
-      updateProgress(r.progress, r.xp);
       const pct = r.total ? Math.round((r.encerts * 100) / r.total) : 0;
       const tema = root.dataset.tema ? '&tema=' + encodeURIComponent(root.dataset.tema) : '';
       card.innerHTML = '<div class="result">' +
@@ -196,6 +197,19 @@
         (r.repas_pendent && root.dataset.mode !== 'repas' ? '<a class="btn" href="index.php?p=repte&mode=repas">Repassar</a>' : '') +
         '<a class="btn" href="index.php?p=reptes">Tornar als reptes</a></div></div>';
       document.getElementById('r-progress').textContent = 'Acabat';
+      // La puntuació compta des de 0 i, si és rècord o partida perfecta, confeti
+      const score = card.querySelector('.result-score');
+      const target = r.score;
+      score.firstChild.textContent = '0';
+      const t0 = performance.now();
+      const tick = (t) => {
+        const k = Math.min(1, (t - t0) / 900);
+        score.firstChild.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(tick);
+        else if (r.record || (r.total && r.encerts === r.total)) PHPLab.celebrate(score, 50);
+      };
+      requestAnimationFrame(tick);
+      updateProgress(r.progress, r.xp, score);
     } catch (e) {
       card.innerHTML = '<p>' + esc(e.message) + '</p>';
     }

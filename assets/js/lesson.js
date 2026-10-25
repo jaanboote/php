@@ -49,14 +49,18 @@
         optionBtn?.classList.add('right');
         const c = document.getElementById('lesson-count');
         c.textContent = +c.textContent + 1;
+        c.parentElement.classList.remove('bump'); void c.offsetWidth; c.parentElement.classList.add('bump');
+        PHPLab.celebrate(optionBtn || fb, 22);
       } else {
         fb.textContent = '✖ No és correcte. Torna-ho a provar (pots fer servir els exemples de dalt per comprovar-ho).';
         if (optionBtn) {
           optionBtn.classList.add('wrong');
           setTimeout(() => optionBtn.classList.remove('wrong'), 600);
+        } else {
+          PHPLab.shake(quiz);
         }
       }
-      PHPLab.updateProgress(r.progress, r.xp);
+      PHPLab.updateProgress(r.progress, r.xp, optionBtn || fb);
       if (r.leccio_acabada && r.xp >= 20) setTimeout(() => PHPLab.toast('🏁 Lliçó completada!'), 1200);
     } catch (e) {
       PHPLab.toast(e.message);
@@ -77,6 +81,7 @@
         if (!li || quiz.classList.contains('done')) return;
         if (e.target.classList.contains('up') && li.previousElementSibling) list.insertBefore(li, li.previousElementSibling);
         if (e.target.classList.contains('down') && li.nextElementSibling) list.insertBefore(li.nextElementSibling, li);
+        li.classList.remove('moved'); void li.offsetWidth; li.classList.add('moved');
       });
       quiz.querySelector('.check-order').addEventListener('click', () => {
         answer(quiz, [...list.children].map((li) => li.dataset.idx).join(','));

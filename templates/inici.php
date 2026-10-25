@@ -1,23 +1,70 @@
 <?php
 /** @var array $topics @var array $lessons @var array $labs @var array $concepts @var array $progress */
 ?>
+<?php
+// Salutació segons l'hora, com al laboratori «Pàgina dinàmica» del Tema 1
+$hora = (int) date('G');
+$salutacio = $hora >= 6 && $hora < 14 ? 'Bon dia' : ($hora >= 14 && $hora < 21 ? 'Bona tarda' : 'Bona nit');
+$usuari = (string) PhpLab\Auth::user();
+
+// On continuar: la primera lliçó o laboratori començat i no acabat; si no n'hi ha, la primera lliçó pendent
+$continua = null;
+foreach ($lessons as $l) {
+    if (!$l['progres']['acabada'] && $l['progres']['encertades'] > 0) { $continua = ['Lliçó', $l['titol'], "index.php?p=leccio&id={$l['id']}"]; break; }
+}
+foreach ($labs as $lab) {
+    if ($continua === null && !$lab['estat']['completed_at'] && (int) $lab['estat']['current_step'] > 0) { $continua = ['Laboratori', $lab['titol'], "index.php?p=lab&id={$lab['id']}"]; }
+}
+foreach ($lessons as $l) {
+    if ($continua === null && !$l['progres']['acabada']) { $continua = ['Lliçó', $l['titol'], "index.php?p=leccio&id={$l['id']}"]; }
+}
+$pctNivell = $progress['needed'] > 0 ? $progress['into'] / $progress['needed'] : 0;
+$circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
+?>
 <section class="hero">
-  <div>
-    <h1>Hola, <?= e(PhpLab\Auth::user()) ?> 👋</h1>
-    <p class="muted">Nivell <?= e($progress['level']) ?> · <strong><?= e($progress['name']) ?></strong>
-      · et falten <?= e($progress['needed'] - $progress['into']) ?> XP per al nivell següent.</p>
+  <div class="term-window">
+    <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>hola.php — PHPLab</span></div>
+    <div class="term-body" id="term">
+      <p class="prompt" data-type><b><?= e($usuari) ?>@phplab</b>:~$ php hola.php <?= e($usuari) ?></p>
+      <p class="hello" data-type><?= e("$salutacio, $usuari!") ?></p>
+      <p class="out" data-type>Nivell <?= e($progress['level']) ?>: <?= e($progress['name']) ?>. Et falten <b><?= e($progress['needed'] - $progress['into']) ?> XP</b> per al nivell <?= e($progress['level'] + 1) ?>.</p>
+      <?php if ($pendents > 0): ?>
+        <p class="out" data-type>Tens <b><?= e($pendents) ?> pregunta<?= $pendents > 1 ? 'es' : '' ?></b> per repassar avui.</p>
+      <?php endif; ?>
+      <p class="prompt caret" data-type><b><?= e($usuari) ?>@phplab</b>:~$ </p>
+      <div class="term-actions">
+        <?php if ($continua): ?>
+          <a class="btn primary" href="<?= e($continua[2]) ?>">Continua: <?= e($continua[1]) ?></a>
+        <?php endif; ?>
+        <?php if ($pendents > 0): ?><a class="btn" href="index.php?p=repte&amp;mode=repas">🔁 Repassar</a><?php endif; ?>
+        <a class="btn" href="index.php?p=reptes">🎯 Reptes</a>
+      </div>
+    </div>
   </div>
-  <?php if ($progress['streak'] > 0): ?>
-    <div class="streak-big">🔥 <?= e($progress['streak']) ?> <small>dia<?= $progress['streak'] > 1 ? 'es' : '' ?> seguit<?= $progress['streak'] > 1 ? 's' : '' ?></small></div>
-  <?php endif; ?>
+
+  <div class="card level-card">
+    <div class="ring" role="img" aria-label="<?= e("Nivell {$progress['level']}: {$progress['into']} de {$progress['needed']} XP") ?>">
+      <svg viewBox="0 0 150 150" aria-hidden="true">
+        <circle class="ring-bg" cx="75" cy="75" r="64"/>
+        <circle class="ring-fg" cx="75" cy="75" r="64" stroke-dasharray="<?= round($circ, 1) ?>"
+                stroke-dashoffset="<?= round($circ, 1) ?>" data-offset="<?= round($circ * (1 - max($pctNivell, 0.015)), 1) ?>"/>
+      </svg>
+      <div class="ring-center"><span class="ring-label">nivell</span><span class="ring-level"><?= e($progress['level']) ?></span></div>
+    </div>
+    <p class="level-name"><?= e($progress['name']) ?></p>
+    <p class="muted"><?= e($progress['into']) ?> / <?= e($progress['needed']) ?> XP</p>
+    <?php if ($progress['streak'] > 0): ?>
+      <span class="streak-big"><span class="flame" aria-hidden="true">🔥</span> <?= e($progress['streak']) ?> dia<?= $progress['streak'] > 1 ? 'es' : '' ?> seguit<?= $progress['streak'] > 1 ? 's' : '' ?></span>
+    <?php endif; ?>
+  </div>
 </section>
 
 <div class="grid-2">
   <section class="card">
-    <h2><span class="tag">Aprendre</span> Lliçons</h2>
+    <h2>📖 Lliçons</h2>
     <?php $temaActual = null; foreach ($lessons as $l): $p = $l['progres']; ?>
-      <?php if ($l['tema'] !== $temaActual): $temaActual = $l['tema']; ?><h3 class="group-title"><?= e($temaActual) ?></h3><?php endif; ?>
-      <a class="item" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
+      <?php if ($l['tema'] !== $temaActual): $temaActual = $l['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= e($temaActual) ?></h3><?php endif; ?>
+      <a class="item <?= e(tema_class($l['tema'])) ?>" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
         <div>
           <div class="item-title"><?= e($l['titol']) ?></div>
           <div class="muted small"><?= e($l['apartat']) ?> · <?= e($l['minuts']) ?> min</div>
@@ -30,10 +77,10 @@
   </section>
 
   <section class="card">
-    <h2><span class="tag tag-lab">Laboratori</span> Exercicis guiats</h2>
+    <h2>🧪 Laboratoris</h2>
     <?php $temaActual = null; foreach ($labs as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
-      <?php if ($lab['tema'] !== $temaActual): $temaActual = $lab['tema']; ?><h3 class="group-title"><?= e($temaActual) ?></h3><?php endif; ?>
-      <a class="item" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
+      <?php if ($lab['tema'] !== $temaActual): $temaActual = $lab['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= e($temaActual) ?></h3><?php endif; ?>
+      <a class="item <?= e(tema_class($lab['tema'])) ?>" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
         <div>
           <div class="item-title"><?= e($lab['titol']) ?></div>
           <div class="muted small"><?= e($lab['resum']) ?></div>
@@ -46,22 +93,6 @@
     <?php endforeach; ?>
   </section>
 </div>
-
-<section class="card reptes-banner">
-  <div>
-    <h2>🎯 Reptes i repàs</h2>
-    <?php if ($pendents > 0): ?>
-      <p>Tens <strong><?= e($pendents) ?> pregunta<?= $pendents > 1 ? 'es' : '' ?></strong> per repassar avui.</p>
-    <?php else: ?>
-      <p class="muted">Contrarellotge, «Troba l'error», «Què imprimeix?» i «Ordena el codi». Les preguntes que falles tornen al repàs.</p>
-    <?php endif; ?>
-  </div>
-  <div class="banner-actions">
-    <?php if ($pendents > 0): ?><a class="btn primary" href="index.php?p=repte&amp;mode=repas">🔁 Repassar ara</a><?php endif; ?>
-    <a class="btn" href="index.php?p=reptes">Veure els reptes</a>
-    <a class="btn" href="index.php?p=progres">🗺️ Mapa i insígnies</a>
-  </div>
-</section>
 
 <div class="grid-2">
   <section class="card">

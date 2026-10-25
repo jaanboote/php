@@ -91,7 +91,13 @@
       const r = await api('lab_check', { lab: labId, step, code: getCode() });
       lastTests = r.proves.map((t) => ({ nom: t.nom, ordre: t.ordre, ok: t.ok, motiu: t.motiu }));
       renderResults(r);
-      updateProgress(r.progress, r.xp);
+      updateProgress(r.progress, r.xp, btn);
+      if (r.superat) {
+        PHPLab.celebrate($('results').querySelector('.banner'), r.acabat ? 60 : 32);
+        document.querySelector('.step.current')?.classList.add('passed', 'just-passed');
+      } else {
+        PHPLab.shake($('results').querySelector('.banner'));
+      }
       if (!r.superat) {
         fails++;
         if (fails >= need) $('btn-solution').hidden = false;
@@ -121,8 +127,8 @@
       html += '<div class="code-check">' + (c.ok ? '✔' : '✖') + ' ' + esc(c.missatge) + '</div>';
     }
     html += '<h3>Proves</h3>';
-    for (const t of r.proves) {
-      html += '<details class="test ' + (t.ok ? 'ok' : 'ko') + '"' + (t.ok ? '' : ' open') + '><summary>' + (t.ok ? '✔' : '✖') + ' ' +
+    r.proves.forEach((t, i) => {
+      html += '<details class="test ' + (t.ok ? 'ok' : 'ko') + '" style="--i:' + i + '"' + (t.ok ? '' : ' open') + '><summary>' + (t.ok ? '✔' : '✖') + ' ' +
         esc(t.nom) + '<span class="test-cmd">$ ' + esc(t.ordre) + '</span></summary><div class="test-body">';
       if (!t.ok) html += '<p><strong>' + esc(t.motiu) + '</strong></p>';
       if (t.esperat !== null && !t.ok) {
@@ -139,7 +145,7 @@
       }
       html += '<button class="btn small try" type="button" data-args="' + esc(t.ordre.replace(/^php \S+\s?/, '')) + '">Prova-ho amb aquests arguments</button>';
       html += '</div></details>';
-    }
+    });
     box.innerHTML = html;
     box.querySelectorAll('.try').forEach((b) => b.addEventListener('click', () => {
       argsInput.value = b.dataset.args;

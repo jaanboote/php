@@ -10,7 +10,7 @@ $step = $lab['passos'][$current];
 ?>
 <div class="crumbs"><a href="index.php">Inici</a> › Laboratori › <?= e($lab['tema']) ?></div>
 
-<div class="lab" id="lab"
+<div class="lab <?= e(tema_class($lab['tema'])) ?>" id="lab"
      data-lab="<?= e($lab['id']) ?>" data-step="<?= $current ?>" data-total="<?= $total ?>"
      data-fitxer="<?= e($lab['fitxer']) ?>" data-finished="<?= $finished ? '1' : '0' ?>"
      data-hints="<?= (int) $row['hints_used'] ?>" data-fails="<?= (int) $row['fails'] ?>"

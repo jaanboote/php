@@ -33,7 +33,7 @@ $totalFonts = max(1, array_sum($xpFonts));
 <h2 class="section-title">🗺️ Mapa de temes</h2>
 <div class="tema-map">
   <?php foreach ($temes as $t): $r = $t['reptes']; ?>
-    <section class="card tema-card <?= $t['complet'] ? 'complet' : '' ?>">
+    <section class="card tema-card <?= e(tema_class($t['tema'])) ?> <?= $t['complet'] ? 'complet' : '' ?>">
       <header class="tema-head">
         <h3><?= e($t['tema']) ?></h3>
         <span class="pill <?= $t['complet'] ? 'ok' : ($t['fets'] ? 'doing' : '') ?>"><?= $t['complet'] ? '✔ Superat' : e($t['pct'] . ' %') ?></span>
@@ -52,7 +52,7 @@ $totalFonts = max(1, array_sum($xpFonts));
       </ol>
 
       <p class="small tema-reptes">
-        🎯 <?php if ($r['intents'] > 0): ?>Reptes: <strong><?= e((int) round($r['encerts'] * 100 / $r['intents'])) ?> %</strong> d'encerts (<?= e($r['intents']) ?> resposta<?= $r['intents'] === 1 ? '' : 'es' ?>)
+        🎯 <?php if ($r['intents'] > 0): ?>Reptes: <strong><?= e((int) round($r['encerts'] * 100 / $r['intents'])) ?> %</strong> d'encerts (<?= e($r['intents']) ?> <?= $r['intents'] === 1 ? 'resposta' : 'respostes' ?>)
         <?php else: ?><span class="muted">Encara no has fet reptes d'aquest tema (<?= e($r['preguntes']) ?> preguntes).</span><?php endif; ?>
         <a href="index.php?p=reptes&amp;tema=<?= e(urlencode($t['tema'])) ?>">Practicar</a>
       </p>

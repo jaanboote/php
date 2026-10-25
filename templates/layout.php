@@ -14,7 +14,9 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <!-- CodeMirror 5.65.16 (editor de codi), copiat a assets/vendor perquè funcioni sense Internet -->
   <link rel="stylesheet" href="assets/vendor/codemirror/codemirror.css">
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
-  <link rel="stylesheet" href="assets/css/app.css?v=2">
+  <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/app.css?v=3">
 </head>
 <body>
 <header class="topbar">
@@ -52,9 +54,9 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/vendor/codemirror/addon/edit/matchbrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/edit/closebrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/hint/show-hint.js"></script>
-<script src="assets/js/app.js?v=2"></script>
-<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=1"></script><?php endif; ?>
-<?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=1"></script><?php endif; ?>
-<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=1"></script><?php endif; ?>
+<script src="assets/js/app.js?v=3"></script>
+<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=3"></script><?php endif; ?>
+<?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=3"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=3"></script><?php endif; ?>
 </body>
 </html>
