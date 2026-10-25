@@ -110,6 +110,8 @@ h1, h2, h3 { font-family: var(--display); line-height: 1.2; letter-spacing: -.01
 h1 { font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.3rem); font-weight: 800; margin: .15em 0 .35em; letter-spacing: -.03em; }
 h2 { font-size: 1.2rem; font-weight: 700; margin: 0 0 .6em; }
 h3 { font-size: 1.02rem; font-weight: 700; margin: 1em 0 .4em; }
+/* Sense lligadures: «=>» i «===» s'han de veure tal com s'escriuen */
+code, pre, .CodeMirror, input, textarea { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
 code { font-family: var(--mono); font-size: .86em; background: var(--surface-2); padding: .12em .38em; border-radius: 5px; }
 pre { overflow-x: auto; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -343,6 +345,10 @@ pre.term, pre.code { background: var(--code-bg); color: var(--code-text); font-f
 :root[data-theme="dark"] .cm-s-default .cm-meta { color: #ff8a9a; }
 :root[data-theme="dark"] .cm-s-default .cm-bracket, :root[data-theme="dark"] .cm-s-default .cm-operator { color: #c7cbe0; }
 :root[data-theme="dark"] .cm-s-default .cm-builtin { color: #7fd4ff; }
+:root[data-theme="dark"] .cm-s-default .cm-tag { color: #ff8fa3; }
+:root[data-theme="dark"] .cm-s-default .cm-attribute { color: #ffcb6b; }
+:root[data-theme="dark"] .cm-s-default .cm-qualifier { color: #ffcb6b; }
+:root[data-theme="dark"] .cm-s-default .cm-property { color: #9fd3ff; }
 :root[data-theme="dark"] .cm-s-default .cm-atom { color: #ffb066; }
 :root[data-theme="dark"] .cm-s-default .cm-comment { color: #6f7290; }
 .cm-error-line { background: var(--err-soft); }
@@ -502,6 +508,7 @@ li.CodeMirror-hint-active { background: var(--accent); color: var(--on-accent); 
 .step.just-passed .step-num { animation: pop .6s var(--ease-spring); }
 .step.locked { opacity: .5; }
 .step-body { padding: 0 14px 12px; }
+.step-body code, .context code { overflow-wrap: anywhere; }
 .step-body.done { padding-top: 0; }
 .hints .hint { background: var(--warn-soft); border-radius: 9px; padding: 9px 11px; margin: 8px 0; font-size: .92rem; animation: rise .3s var(--ease-out) both; }
 .hint-text { font-family: var(--sans); }
@@ -679,6 +686,50 @@ li.CodeMirror-hint-active { background: var(--accent); color: var(--on-accent); 
 .table { width: 100%; border-collapse: collapse; font-size: .9rem; margin-top: 6px; }
 .table th, .table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .table th { color: var(--muted); font-weight: 600; font-size: .8rem; }
+
+
+/* ---------- Laboratoris web (fase 5): pestanyes de fitxers, navegador integrat i inspector ---------- */
+.lab.web { grid-template-columns: minmax(260px, .85fr) minmax(360px, 1.25fr) minmax(380px, 1.35fr); }
+.file-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.file-tab { font: inherit; font-family: var(--mono); font-size: .84rem; font-weight: 600; color: var(--muted); background: transparent;
+  border: 1px solid var(--border); border-bottom-width: 3px; border-radius: 9px; padding: 5px 11px; cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
+.file-tab:hover { color: var(--text); background: var(--surface-2); }
+.file-tab.active { color: var(--accent-2); border-color: var(--accent); background: var(--accent-soft); }
+.lab-browser { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.browser { border: 1px solid var(--border-strong); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-lift); }
+.browser-bar { display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.browser-dots { display: flex; gap: 6px; margin-right: 4px; }
+.browser-dots i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+.browser-dots i:nth-child(2) { background: #febc2e; } .browser-dots i:nth-child(3) { background: #28c840; }
+.browser-btn { width: 30px; height: 30px; border-radius: 8px; border: 0; background: transparent; color: var(--muted); font-size: 1.05rem; cursor: pointer; }
+.browser-btn:hover { background: var(--surface); color: var(--text); }
+.browser-address { flex: 1; display: flex; align-items: center; min-width: 0; background: var(--sunken); border: 1px solid var(--border); border-radius: 999px; padding: 0 12px; }
+.browser-address:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.browser-host { font-family: var(--mono); font-size: .82rem; color: var(--muted); }
+.browser-address input { flex: 1; min-width: 0; border: 0; background: transparent; box-shadow: none !important; padding: 6px 0; font-family: var(--mono); font-size: .82rem; }
+/* La web de l'alumne es veu sobre blanc, com en un navegador de veritat */
+.browser-frame { display: block; width: 100%; height: 420px; border: 0; background: #fff; resize: vertical; }
+.inspector { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; box-shadow: var(--shadow); font-size: .9rem; }
+.req-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.req-line .method { font-family: var(--mono); font-weight: 800; color: var(--accent-2); }
+.insp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px 14px; margin: 6px 0 4px; }
+.insp-grid h4, .inspector h4 { font-family: var(--mono); font-size: .82rem; margin: 6px 0 4px; color: var(--muted); }
+table.kv { width: 100%; border-collapse: collapse; font-size: .84rem; }
+table.kv th, table.kv td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); vertical-align: top; word-break: break-word; }
+table.kv th { font-family: var(--mono); font-weight: 600; color: var(--accent-2); width: 40%; }
+.insp-more { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.insp-more > summary { cursor: pointer; font-weight: 700; }
+.server-files, .history { margin: 6px 0 10px; padding-left: 1.2em; font-size: .86rem; }
+.test-steps { font-family: var(--mono); color: var(--muted); word-break: break-word; margin: 0 0 6px; }
+.tutor-inline { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
+.tutor-inline > summary { cursor: pointer; font-weight: 700; }
+.tutor-inline .lab-tutor { position: static; max-height: none; border: 0; box-shadow: none; padding: 8px 0 0; background: transparent; }
+.tutor-inline .chat { max-height: 320px; }
+@media (max-width: 1200px) {
+  .lab.web { grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.6fr); }
+  .lab.web .lab-browser { grid-column: 1 / -1; }
+}
+@media (max-width: 800px) { .lab.web { grid-template-columns: 1fr; } }
 
 /* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment) */
 @media (prefers-reduced-motion: reduce) {

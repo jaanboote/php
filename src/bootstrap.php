@@ -57,5 +57,8 @@ if (PHP_SAPI !== 'cli') {
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: same-origin');
-    Auth::startSession();
+    // web.php (el navegador dels laboratoris web) no fa servir la sessió de la app
+    if (!defined('PHPLAB_NO_SESSION')) {
+        Auth::startSession();
+    }
 }

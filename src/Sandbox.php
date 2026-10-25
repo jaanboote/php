@@ -106,56 +106,14 @@ final class Sandbox
                 $cmd[] = (string) $a;
             }
 
-            // Fem servir fitxers (i no "pipes") per a l'entrada i la sortida:
-            // a Windows els pipes no es poden llegir sense bloquejar.
-            $descriptors = [
-                0 => ['file', $ioDir . DIRECTORY_SEPARATOR . 'stdin.txt', 'r'],
-                1 => ['file', $ioDir . DIRECTORY_SEPARATOR . 'stdout.txt', 'w'],
-                2 => ['file', $ioDir . DIRECTORY_SEPARATOR . 'stderr.txt', 'w'],
-            ];
-            $env = [
-                'TEMP' => $jobDir, 'TMP' => $jobDir, 'TMPDIR' => $jobDir,
-                'PATH' => dirname($cmd[0]),
-            ];
-            if (getenv('SystemRoot')) {
-                $env['SystemRoot'] = getenv('SystemRoot'); // Windows el necessita per arrencar processos
-            }
-
-            $start = microtime(true);
-            $proc = proc_open($cmd, $descriptors, $pipes, $jobDir, $env, ['bypass_shell' => true]);
-            if (!is_resource($proc)) {
+            $maxOutput = (int) Config::get('sandbox.max_output', 100000);
+            $outFile   = $ioDir . DIRECTORY_SEPARATOR . 'stdout.txt';
+            $proc = self::spawn($cmd, $ioDir, $jobDir, []);
+            if ($proc === null) {
                 $result['stderr'] = "No s'ha pogut executar PHP CLI. Revisa 'sandbox.php_cli' a config.php.";
                 return $result;
             }
-
-            $timeout   = (float) Config::get('sandbox.timeout', 5);
-            $maxOutput = (int) Config::get('sandbox.max_output', 100000);
-            $outFile   = $ioDir . DIRECTORY_SEPARATOR . 'stdout.txt';
-
-            while (true) {
-                $status = proc_get_status($proc);
-                if (!$status['running']) {
-                    $result['exit_code'] = $status['exitcode'];
-                    break;
-                }
-                clearstatcache(true, $outFile);
-                if (microtime(true) - $start > $timeout) {
-                    $result['timeout'] = true;
-                } elseif (@filesize($outFile) > $maxOutput) {
-                    $result['truncated'] = true;
-                }
-                if ($result['timeout'] || $result['truncated']) {
-                    proc_terminate($proc, 9);
-                    // Esperem que acabi de morir abans d'esborrar els fitxers
-                    for ($i = 0; $i < 50 && proc_get_status($proc)['running']; $i++) {
-                        usleep(20000);
-                    }
-                    break;
-                }
-                usleep(15000);
-            }
-            proc_close($proc);
-            $result['ms'] = (int) round((microtime(true) - $start) * 1000);
+            $result = $proc + $result;
 
             $result['stdout'] = self::readLimited($outFile, $maxOutput);
             $result['stderr'] = self::readLimited($ioDir . DIRECTORY_SEPARATOR . 'stderr.txt', 20000);
@@ -186,6 +144,321 @@ final class Sandbox
         }
     }
 
+    // ------------------------------------------------------------------ Laboratoris web (php-cgi)
+
+    /** Ruta de php-cgi: la de config.php o, si no n'hi ha, al costat de php.exe (a XAMPP: C:\xampp\php\php-cgi.exe). */
+    public static function phpCgi(): string
+    {
+        $cfg = (string) Config::get('sandbox.php_cgi', '');
+        if ($cfg !== '') {
+            return $cfg;
+        }
+        $cli = (string) Config::get('sandbox.php_cli', PHP_BINARY);
+        return dirname($cli) . DIRECTORY_SEPARATOR . (DIRECTORY_SEPARATOR === '\\' ? 'php-cgi.exe' : 'php-cgi');
+    }
+
+    /** Tipus MIME dels fitxers estàtics que pot servir una web de laboratori. */
+    private const MIME = [
+        'html' => 'text/html; charset=UTF-8', 'htm' => 'text/html; charset=UTF-8', 'css' => 'text/css; charset=UTF-8',
+        'js' => 'text/javascript; charset=UTF-8', 'json' => 'application/json', 'txt' => 'text/plain; charset=UTF-8',
+        'png' => 'image/png', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'gif' => 'image/gif', 'webp' => 'image/webp',
+        'svg' => 'image/svg+xml',
+    ];
+
+    /** Fitxers interns que no formen part de la web de l'alumne. */
+    private const WEB_INTERNAL = ['_phplab_errors.log'];
+
+    /**
+     * Executa una petició HTTP contra la web de l'alumne, com ho faria Apache amb PHP en mode CGI.
+     *
+     * @param array  $sources   Fitxers que escriu l'alumne: ['index.php' => '...', 'estil.css' => '...']
+     * @param array  $req       method (GET|POST), path ('processa.php'), query ('a=1&b=2'), body (cos de la petició),
+     *                          content_type, cookies (['PHPSESSID' => '...']), base (prefix de la URL per a $_SERVER['PHP_SELF'])
+     * @param string $workspace Carpeta del «servidor» que es conserva entre peticions: uploads/, sessions, fitxers de dades...
+     * @return array status, content_type, body, location, set_cookies, errors, ms, timeout, files
+     */
+    public static function runWeb(array $sources, array $req, string $workspace): array
+    {
+        $res = [
+            'status' => 200, 'content_type' => 'text/html; charset=UTF-8', 'body' => '', 'location' => null,
+            'set_cookies' => [], 'errors' => '', 'ms' => 0, 'timeout' => false, 'truncated' => false, 'busy' => false,
+        ];
+        $method = strtoupper((string) ($req['method'] ?? 'GET')) === 'POST' ? 'POST' : 'GET';
+        $path = self::safeRelativePath((string) ($req['path'] ?? '')) ?? 'index.php';
+        $base = rtrim((string) ($req['base'] ?? ''), '/');
+        $query = (string) ($req['query'] ?? '');
+        @mkdir($workspace, 0770, true);
+
+        $sources = array_filter($sources, fn($n) => self::safeRelativePath((string) $n) !== null, ARRAY_FILTER_USE_KEY);
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $inWorkspace = is_file($workspace . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path));
+
+        // Fitxers estàtics (CSS, imatges pujades...): es serveixen tal qual, sense executar res
+        if ($ext !== 'php') {
+            if (isset($sources[$path])) {
+                $res['body'] = (string) $sources[$path];
+            } elseif ($inWorkspace && !in_array($path, self::WEB_INTERNAL, true) && !str_starts_with($path, '.')) {
+                $res['body'] = (string) file_get_contents($workspace . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path));
+            } else {
+                return ['status' => 404, 'body' => self::notFound($path)] + $res;
+            }
+            $res['content_type'] = self::MIME[$ext] ?? 'application/octet-stream';
+            return $res;
+        }
+        if (!isset($sources[$path]) && !$inWorkspace) {
+            return ['status' => 404, 'body' => self::notFound($path)] + $res;
+        }
+
+        $lock = self::acquireSlot();
+        if ($lock === null) {
+            return ['status' => 503, 'busy' => true, 'body' => 'Hi ha massa execucions en curs. Torna-ho a provar en un moment.'] + $res;
+        }
+        $id     = bin2hex(random_bytes(8));
+        $jobDir = Config::dataPath('sandbox' . DIRECTORY_SEPARATOR . 'jobs') . DIRECTORY_SEPARATOR . $id;
+        $ioDir  = $jobDir . '-io';
+        mkdir($jobDir, 0770);
+        mkdir($ioDir, 0770);
+        $jobDir = realpath($jobDir);
+        $sep = DIRECTORY_SEPARATOR;
+
+        try {
+            self::copyDir($workspace, $jobDir);
+            foreach ($sources as $name => $content) {
+                $full = $jobDir . $sep . str_replace('/', $sep, (string) $name);
+                @mkdir(dirname($full), 0770, true);
+                file_put_contents($full, (string) $content);
+            }
+            @mkdir($jobDir . $sep . '.sessions', 0770);
+            $body = (string) ($req['body'] ?? '');
+            file_put_contents($ioDir . $sep . 'stdin.txt', $body);
+
+            $ini = [
+                'auto_prepend_file' => '',
+                'display_errors' => '1',              // com a XAMPP: els errors surten a la pàgina...
+                'log_errors' => '1',                  // ...i també els recollim per explicar-los
+                'error_log' => $jobDir . $sep . '_phplab_errors.log',
+                'file_uploads' => '1',
+                'upload_max_filesize' => '3M',
+                'post_max_size' => '8M',
+                'max_file_uploads' => '10',
+                'output_buffering' => '4096',         // com a XAMPP: header() funciona encara que ja s'hagi escrit una mica
+                'session.save_path' => $jobDir . $sep . '.sessions',
+                'session.use_strict_mode' => '1',
+                'expose_php' => '0',
+            ] + self::iniSettings($jobDir);
+            $cmd = [self::phpCgi()];
+            foreach ($ini as $key => $value) {
+                $cmd[] = '-d';
+                $cmd[] = $key . '=' . $value;
+            }
+            $cookies = [];
+            foreach ((array) ($req['cookies'] ?? []) as $k => $v) {
+                $cookies[] = rawurlencode((string) $k) . '=' . rawurlencode((string) $v);
+            }
+            $env = [
+                'GATEWAY_INTERFACE' => 'CGI/1.1',
+                'SERVER_SOFTWARE' => 'Apache (PHPLab)',
+                'SERVER_NAME' => 'localhost', 'SERVER_PORT' => '80', 'SERVER_PROTOCOL' => 'HTTP/1.1',
+                'HTTP_HOST' => 'localhost', 'REMOTE_ADDR' => '127.0.0.1',
+                'HTTP_USER_AGENT' => 'Mozilla/5.0 (PHPLab)',
+                'REQUEST_METHOD' => $method,
+                'SCRIPT_FILENAME' => $jobDir . $sep . str_replace('/', $sep, $path),
+                'SCRIPT_NAME' => $base . '/' . $path,
+                'REQUEST_URI' => $base . '/' . $path . ($query !== '' ? '?' . $query : ''),
+                'DOCUMENT_ROOT' => $jobDir,
+                'QUERY_STRING' => $query,
+                'REDIRECT_STATUS' => '200',           // php-cgi s'hi nega si no ve d'un servidor web
+                'CONTENT_TYPE' => $method === 'POST' ? (string) ($req['content_type'] ?? 'application/x-www-form-urlencoded') : '',
+                'CONTENT_LENGTH' => $method === 'POST' ? (string) strlen($body) : '',
+                'HTTP_COOKIE' => implode('; ', $cookies),
+            ];
+
+            $proc = self::spawn($cmd, $ioDir, $jobDir, $env);
+            if ($proc === null) {
+                return ['status' => 500, 'body' => "No s'ha pogut executar php-cgi. Revisa 'sandbox.php_cgi' a config.php."] + $res;
+            }
+            $res = ['ms' => $proc['ms'], 'timeout' => $proc['timeout'], 'truncated' => $proc['truncated']] + $res;
+            $raw = self::readLimited($ioDir . $sep . 'stdout.txt', (int) Config::get('sandbox.max_output', 100000) + 8000);
+            $res['errors'] = self::readLimited($jobDir . $sep . '_phplab_errors.log', 20000)
+                . self::readLimited($ioDir . $sep . 'stderr.txt', 5000);
+
+            // Capçaleres CGI + cos
+            $parts = preg_split("/\r?\n\r?\n/", $raw, 2);
+            $headerText = count($parts) === 2 ? $parts[0] : '';
+            $res['body'] = count($parts) === 2 ? $parts[1] : $raw;
+            foreach (preg_split("/\r?\n/", $headerText) as $line) {
+                if (!str_contains($line, ':')) {
+                    continue;
+                }
+                [$name, $value] = array_map('trim', explode(':', $line, 2));
+                match (strtolower($name)) {
+                    'status' => $res['status'] = (int) $value ?: 200,
+                    'location' => $res['location'] = $value,
+                    'content-type' => $res['content_type'] = $value,
+                    'set-cookie' => $res['set_cookies'][] = $value,
+                    default => null,
+                };
+            }
+            if ($res['location'] !== null && $res['status'] === 200) {
+                $res['status'] = 302;   // com Apache: Location sense Status és una redirecció
+            }
+            if ($res['timeout']) {
+                $res['status'] = 500;
+                $res['body'] .= "\n\n[PHPLab] La pàgina ha trigat més de " . (int) Config::get('sandbox.timeout', 5) . " segons i s'ha aturat (possible bucle infinit).";
+            }
+
+            // Amaguem les rutes internes
+            foreach (['body', 'errors'] as $k) {
+                $res[$k] = str_replace([$jobDir . $sep, $jobDir], ['', ''], $res[$k]);
+            }
+            // Format del log («[data] PHP Warning:  ...») → el de la pantalla («Warning: ...»), el que entén ErrorExplainer
+            $res['errors'] = preg_replace(['/^\[[^\]]*\] PHP /m', '/^(Parse error|Fatal error|Warning|Notice|Deprecated):\s+/m'], ['', '$1: '], $res['errors']);
+
+            // Desem l'estat del «servidor» (fitxers pujats, sessions...) per a la petició següent
+            $exclude = array_merge(array_keys($sources), self::WEB_INTERNAL);
+            $total = array_sum(array_column(self::listFiles($jobDir, $exclude), 'size'));
+            if ($total <= 8 * self::WORKSPACE_MAX_BYTES) {
+                self::removeDir($workspace);
+                @mkdir($workspace, 0770, true);
+                self::copyDir($jobDir, $workspace, $exclude);
+            } else {
+                $res['errors'] .= "\n[PHPLab] Els fitxers del servidor ocupen més de 8 MB: no s'han desat.";
+            }
+            return $res;
+        } finally {
+            self::removeDir($jobDir);
+            self::removeDir($ioDir);
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+    }
+
+    private static function notFound(string $path): string
+    {
+        return '<!doctype html><title>404 Not Found</title><h1>Not Found</h1><p>The requested URL /' . htmlspecialchars($path) . ' was not found on this server.</p>';
+    }
+
+    /** Fitxers del «servidor» d'un laboratori web, sense les sessions (que són internes de PHP). */
+    public static function webFiles(string $workspace): array
+    {
+        return array_values(array_filter(self::listFiles($workspace), fn($f) => !str_starts_with($f['nom'], '.')));
+    }
+
+    /**
+     * Cos multipart/form-data, com el que envia el navegador amb enctype="multipart/form-data".
+     * @param array $fields [[nom, valor], ...]
+     * @param array $files  [[camp, nom_fitxer, tipus, contingut], ...]
+     * @return array{body:string, content_type:string}
+     */
+    public static function multipart(array $fields, array $files): array
+    {
+        $boundary = '----PHPLab' . bin2hex(random_bytes(8));
+        $body = '';
+        foreach ($fields as [$name, $value]) {
+            $body .= "--$boundary\r\nContent-Disposition: form-data; name=\"" . addcslashes((string) $name, '"') . "\"\r\n\r\n$value\r\n";
+        }
+        foreach ($files as [$field, $filename, $type, $content]) {
+            $body .= "--$boundary\r\nContent-Disposition: form-data; name=\"" . addcslashes((string) $field, '"') . '"; filename="'
+                . addcslashes((string) $filename, '"') . "\"\r\nContent-Type: $type\r\n\r\n$content\r\n";
+        }
+        $body .= "--$boundary--\r\n";
+        return ['body' => $body, 'content_type' => "multipart/form-data; boundary=$boundary"];
+    }
+
+    /** Converteix $_POST (amb arrays: nom[]...) en parells [nom, valor] per tornar-los a enviar. */
+    public static function flattenFields(array $data, string $prefix = ''): array
+    {
+        $out = [];
+        foreach ($data as $k => $v) {
+            $name = $prefix === '' ? (string) $k : $prefix . '[' . (is_int($k) ? '' : $k) . ']';
+            if (is_array($v)) {
+                $out = array_merge($out, self::flattenFields($v, $name));
+            } else {
+                $out[] = [$name, (string) $v];
+            }
+        }
+        return $out;
+    }
+
+    /** Converteix $_FILES (també amb camps nom[]) en [camp, nom_fitxer, tipus, contingut] per tornar-los a enviar. */
+    public static function flattenFiles(array $files): array
+    {
+        $out = [];
+        foreach ($files as $field => $f) {
+            if (is_array($f['name'])) {
+                foreach (array_keys($f['name']) as $i) {
+                    if ((int) $f['error'][$i] === UPLOAD_ERR_NO_FILE) {
+                        $out[] = [$field . '[]', '', 'application/octet-stream', ''];
+                    } elseif (is_uploaded_file($f['tmp_name'][$i])) {
+                        $out[] = [$field . '[]', $f['name'][$i], $f['type'][$i] ?: 'application/octet-stream', (string) file_get_contents($f['tmp_name'][$i])];
+                    }
+                }
+            } elseif ((int) $f['error'] === UPLOAD_ERR_NO_FILE) {
+                $out[] = [$field, '', 'application/octet-stream', ''];
+            } elseif (is_uploaded_file($f['tmp_name'])) {
+                $out[] = [$field, $f['name'], $f['type'] ?: 'application/octet-stream', (string) file_get_contents($f['tmp_name'])];
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Executa l'ordre amb els límits de temps i de sortida. L'entrada és stdin.txt i la sortida
+     * stdout.txt / stderr.txt de $ioDir. Fem servir fitxers (i no "pipes"): a Windows els pipes
+     * no es poden llegir sense bloquejar.
+     * @return array{exit_code:?int, timeout:bool, truncated:bool, ms:int}|null  null si no s'ha pogut arrencar
+     */
+    private static function spawn(array $cmd, string $ioDir, string $cwd, array $extraEnv): ?array
+    {
+        $descriptors = [
+            0 => ['file', $ioDir . DIRECTORY_SEPARATOR . 'stdin.txt', 'r'],
+            1 => ['file', $ioDir . DIRECTORY_SEPARATOR . 'stdout.txt', 'w'],
+            2 => ['file', $ioDir . DIRECTORY_SEPARATOR . 'stderr.txt', 'w'],
+        ];
+        $env = [
+            'TEMP' => $cwd, 'TMP' => $cwd, 'TMPDIR' => $cwd,
+            'PATH' => dirname($cmd[0]),
+        ] + $extraEnv;
+        if (getenv('SystemRoot')) {
+            $env['SystemRoot'] = getenv('SystemRoot'); // Windows el necessita per arrencar processos
+        }
+
+        $res = ['exit_code' => null, 'timeout' => false, 'truncated' => false, 'ms' => 0];
+        $start = microtime(true);
+        $proc = proc_open($cmd, $descriptors, $pipes, $cwd, $env, ['bypass_shell' => true]);
+        if (!is_resource($proc)) {
+            return null;
+        }
+        $timeout   = (float) Config::get('sandbox.timeout', 5);
+        $maxOutput = (int) Config::get('sandbox.max_output', 100000);
+        $outFile   = $ioDir . DIRECTORY_SEPARATOR . 'stdout.txt';
+        while (true) {
+            $status = proc_get_status($proc);
+            if (!$status['running']) {
+                $res['exit_code'] = $status['exitcode'];
+                break;
+            }
+            clearstatcache(true, $outFile);
+            if (microtime(true) - $start > $timeout) {
+                $res['timeout'] = true;
+            } elseif (@filesize($outFile) > $maxOutput) {
+                $res['truncated'] = true;
+            }
+            if ($res['timeout'] || $res['truncated']) {
+                proc_terminate($proc, 9);
+                // Esperem que acabi de morir abans d'esborrar els fitxers
+                for ($i = 0; $i < 50 && proc_get_status($proc)['running']; $i++) {
+                    usleep(20000);
+                }
+                break;
+            }
+            usleep(15000);
+        }
+        proc_close($proc);
+        $res['ms'] = (int) round((microtime(true) - $start) * 1000);
+        return $res;
+    }
+
     /** Mida màxima dels fitxers que es conserven entre execucions d'un laboratori. */
     private const WORKSPACE_MAX_BYTES = 1048576;
 
@@ -198,6 +471,12 @@ final class Sandbox
     public static function clearWorkspace(string $labId): void
     {
         self::removeDir(self::workspace($labId));
+    }
+
+    /** Esborra una carpeta de treball temporal (la fan servir les proves dels laboratoris web). */
+    public static function clearDir(string $dir): void
+    {
+        self::removeDir($dir);
     }
 
     /** Llista els fitxers d'una carpeta amb el contingut dels petits (per mostrar-los a l'alumne). */
