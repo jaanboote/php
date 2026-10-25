@@ -226,6 +226,12 @@ pre.term, pre.code { background: var(--code-bg); color: var(--code-text); font-f
 .feedback.right, .quiz.done .feedback { background: var(--ok-soft); }
 .feedback.wrong { background: var(--err-soft); }
 .next-step { text-align: center; background: var(--accent-soft); }
+.sortable { padding-left: 1.6em; margin: 8px 0 12px; }
+.sortable li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 8px; margin-bottom: 6px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; }
+.sort-buttons { display: flex; gap: 4px; flex: none; }
+.sort-buttons .btn { padding: 2px 9px; }
+.quiz.done .sort-buttons, .quiz.done .check-order { display: none; }
 
 /* ---------- Laboratori ---------- */
 .lab { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(380px, 1.5fr) minmax(280px, 1fr); gap: 16px; align-items: start; }

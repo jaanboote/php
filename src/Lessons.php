@@ -33,7 +33,7 @@ final class Lessons
     {
         $q = [];
         foreach ($lesson['blocs'] as $b) {
-            if (in_array($b['tipus'], ['test', 'completa', 'sortida'], true)) {
+            if (in_array($b['tipus'], ['test', 'completa', 'sortida', 'ordenar'], true)) {
                 $q[$b['id']] = $b;
             }
         }
@@ -61,6 +61,8 @@ final class Lessons
             'test'     => (int) $answer === (int) $q['correcta'],
             'completa' => in_array(self::squash($answer), array_map([self::class, 'squash'], $q['respostes']), true),
             'sortida'  => Labs::normalize($answer) === Labs::normalize($q['resposta']),
+            // ordenar: el navegador envia els índexs originals en l'ordre triat ("2,0,1"); correcte = 0, 1, 2...
+            'ordenar'  => array_map('intval', explode(',', $answer)) === range(0, count($q['elements']) - 1),
         };
 
         Db::run('INSERT OR IGNORE INTO lesson_answers (lesson_id, question_id) VALUES (?, ?)', [$lesson['id'], $qid]);
@@ -118,6 +120,20 @@ final class Lessons
         $total = count(self::questions($lesson));
         $ok = (int) Db::value('SELECT COUNT(*) FROM lesson_answers WHERE lesson_id = ? AND correct = 1', [$lesson['id']]);
         return ['total' => $total, 'encertades' => $ok, 'acabada' => (bool) Db::value('SELECT completed_at FROM lesson_state WHERE lesson_id = ?', [$lesson['id']])];
+    }
+
+    /**
+     * Ordre en què es mostren els elements d'una pregunta «ordenar»: barrejat, però sempre igual
+     * per a la mateixa pregunta (i mai en l'ordre correcte).
+     */
+    public static function shuffled(array $q): array
+    {
+        $idx = array_keys($q['elements']);
+        usort($idx, fn($a, $b) => strcmp(md5($q['id'] . $a), md5($q['id'] . $b)));
+        if ($idx === array_keys($q['elements'])) {
+            $idx = array_reverse($idx);
+        }
+        return $idx;
     }
 
     /** Per comparar codi curt sense tenir en compte els espais ("!= " == "!="). Les majúscules sí que compten (N no és n). */

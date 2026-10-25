@@ -43,11 +43,19 @@
       <?php else: /* preguntes */ ?>
         <?php $ans = $answers[$b['id']] ?? null; $done = $ans && $ans['correct']; ?>
         <div class="quiz <?= $done ? 'done' : '' ?>" data-q="<?= e($b['id']) ?>" data-tipus="<?= e($b['tipus']) ?>">
-          <div class="quiz-kind"><?= ['test' => '❓ Pregunta', 'completa' => '🧩 Completa el codi', 'sortida' => '🖨️ Què imprimeix?'][$b['tipus']] ?></div>
+          <div class="quiz-kind"><?= ['test' => '❓ Pregunta', 'completa' => '🧩 Completa el codi', 'sortida' => '🖨️ Què imprimeix?', 'ordenar' => '↕️ Ordena-ho'][$b['tipus']] ?></div>
           <p class="quiz-q"><?= $b['pregunta'] ?></p>
           <?php if (isset($b['codi'])): ?><pre class="code"><?= e($b['codi']) ?></pre><?php endif; ?>
 
-          <?php if ($b['tipus'] === 'test'): ?>
+          <?php if ($b['tipus'] === 'ordenar'): ?>
+            <ol class="sortable">
+              <?php foreach ($done ? array_keys($b['elements']) : PhpLab\Lessons::shuffled($b) as $k): /* ja encertada: en l'ordre correcte */ ?>
+                <li data-idx="<?= (int) $k ?>"><span class="sort-text"><?= e($b['elements'][$k]) ?></span>
+                  <span class="sort-buttons"><button type="button" class="btn small up" aria-label="Amunt">↑</button><button type="button" class="btn small down" aria-label="Avall">↓</button></span></li>
+              <?php endforeach; ?>
+            </ol>
+            <button type="button" class="btn primary check-order">Comprova l'ordre</button>
+          <?php elseif ($b['tipus'] === 'test'): ?>
             <div class="options">
               <?php foreach ($b['opcions'] as $k => $op): ?>
                 <button type="button" class="option" data-value="<?= e($k) ?>"><?= e($op) ?></button>

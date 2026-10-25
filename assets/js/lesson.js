@@ -68,6 +68,20 @@
     const input = quiz.querySelector('.answer');
     const send = () => input.value.trim() !== '' && answer(quiz, input.value);
     quiz.querySelector('.check')?.addEventListener('click', send);
+
+    // Ordenar: botons ↑ ↓ per moure cada element
+    const list = quiz.querySelector('.sortable');
+    if (list) {
+      list.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (!li || quiz.classList.contains('done')) return;
+        if (e.target.classList.contains('up') && li.previousElementSibling) list.insertBefore(li, li.previousElementSibling);
+        if (e.target.classList.contains('down') && li.nextElementSibling) list.insertBefore(li.nextElementSibling, li);
+      });
+      quiz.querySelector('.check-order').addEventListener('click', () => {
+        answer(quiz, [...list.children].map((li) => li.dataset.idx).join(','));
+      });
+    }
     if (input?.tagName === 'INPUT') input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
   });
 })();
