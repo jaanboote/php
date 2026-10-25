@@ -45,7 +45,9 @@ ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
 // Defensa en profunditat: encara que el .htaccess falli, només deixem entrar la xarxa de casa.
-if (PHP_SAPI !== 'cli' && !Auth::ipAllowed($_SERVER['REMOTE_ADDR'] ?? '')) {
+// Des del mateix PC sempre es pot entrar, encara que sigui per la seva IP de la xarxa (canvia si passes d'Ethernet a Wi-Fi)
+$mateixPc = ($_SERVER['REMOTE_ADDR'] ?? '') !== '' && ($_SERVER['REMOTE_ADDR'] ?? '') === ($_SERVER['SERVER_ADDR'] ?? null);
+if (PHP_SAPI !== 'cli' && !$mateixPc && !Auth::ipAllowed($_SERVER['REMOTE_ADDR'] ?? '')) {
     http_response_code(403);
     exit('Accés denegat: només es pot accedir des de la xarxa local.');
 }
