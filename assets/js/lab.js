@@ -4,7 +4,7 @@
 (() => {
   const root = document.getElementById('lab');
   if (!root) return;
-  const { api, esc, toast, updateProgress, makeEditor, renderOutput, argvPreview } = PHPLab;
+  const { api, esc, toast, updateProgress, makeEditor, renderOutput, argvPreview, filesHtml } = PHPLab;
 
   const labId = root.dataset.lab;
   const step = +root.dataset.step;
@@ -50,9 +50,10 @@
     const btn = $('btn-run');
     busy(btn, true);
     try {
-      const r = await api('run', { code: getCode(), args: argsInput.value, stdin: stdinInput.value, fitxer });
+      const r = await api('run', { code: getCode(), args: argsInput.value, stdin: stdinInput.value, fitxer, lab: labId });
       lastRun = { stdout: r.stdout, stderr: r.stderr, args: argsInput.value };
-      renderOutput($('output'), r, cm);
+      renderOutput($('output'), r, cm, false);
+      renderFiles(r.files);
     } catch (e) {
       toast(e.message);
     } finally {
@@ -60,6 +61,27 @@
     }
   }
   $('btn-run').addEventListener('click', run);
+
+  // ---------- Fitxers del laboratori (es conserven entre execucions) ----------
+  function renderFiles(files) {
+    const box = $('files');
+    if (!files || !files.length) {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    box.hidden = false;
+    box.innerHTML = filesHtml(files, '📁 Carpeta del programa') +
+      '<button class="btn small" type="button" id="btn-clear-files">🗑 Buidar la carpeta</button>';
+    box.querySelector('details').open = true;
+    $('btn-clear-files').addEventListener('click', async () => {
+      if (!confirm('Esborrar tots els fitxers que ha creat el programa?')) return;
+      const r = await api('lab_files', { lab: labId, buidar: true });
+      renderFiles(r.files);
+      toast('Carpeta buidada');
+    });
+  }
+  api('lab_files', { lab: labId }).then((r) => renderFiles(r.files)).catch(() => {});
 
   // ---------- Comprovar el pas ----------
   $('btn-check').addEventListener('click', async () => {
@@ -69,7 +91,13 @@
       const r = await api('lab_check', { lab: labId, step, code: getCode() });
       lastTests = r.proves.map((t) => ({ nom: t.nom, ordre: t.ordre, ok: t.ok, motiu: t.motiu }));
       renderResults(r);
-      updateProgress(r.progress, r.xp);
+      updateProgress(r.progress, r.xp, btn);
+      if (r.superat) {
+        PHPLab.celebrate($('results').querySelector('.banner'), r.acabat ? 60 : 32);
+        document.querySelector('.step.current')?.classList.add('passed', 'just-passed');
+      } else {
+        PHPLab.shake($('results').querySelector('.banner'));
+      }
       if (!r.superat) {
         fails++;
         if (fails >= need) $('btn-solution').hidden = false;
@@ -99,8 +127,8 @@
       html += '<div class="code-check">' + (c.ok ? '✔' : '✖') + ' ' + esc(c.missatge) + '</div>';
     }
     html += '<h3>Proves</h3>';
-    for (const t of r.proves) {
-      html += '<details class="test ' + (t.ok ? 'ok' : 'ko') + '"' + (t.ok ? '' : ' open') + '><summary>' + (t.ok ? '✔' : '✖') + ' ' +
+    r.proves.forEach((t, i) => {
+      html += '<details class="test ' + (t.ok ? 'ok' : 'ko') + '" style="--i:' + i + '"' + (t.ok ? '' : ' open') + '><summary>' + (t.ok ? '✔' : '✖') + ' ' +
         esc(t.nom) + '<span class="test-cmd">$ ' + esc(t.ordre) + '</span></summary><div class="test-body">';
       if (!t.ok) html += '<p><strong>' + esc(t.motiu) + '</strong></p>';
       if (t.esperat !== null && !t.ok) {
@@ -108,12 +136,16 @@
       } else {
         html += '<div>Sortida<pre class="code">' + esc(t.obtingut || '(res)') + '</pre></div>';
       }
+      if (t.fitxers_inicials && t.fitxers_inicials.length) {
+        html += '<p class="small muted">Fitxers preparats abans d\'executar: ' + t.fitxers_inicials.map(esc).join(', ') + '</p>';
+      }
+      html += filesHtml(t.fitxers, '📁 Fitxers després de l\'execució');
       for (const ex of t.errors || []) {
         html += '<div class="explain ' + esc(ex.tipus) + '"><strong>' + (ex.linia ? 'Línia ' + ex.linia + ' · ' : '') + esc(ex.titol) + '</strong><br>' + esc(ex.explicacio) + '</div>';
       }
       html += '<button class="btn small try" type="button" data-args="' + esc(t.ordre.replace(/^php \S+\s?/, '')) + '">Prova-ho amb aquests arguments</button>';
       html += '</div></details>';
-    }
+    });
     box.innerHTML = html;
     box.querySelectorAll('.try').forEach((b) => b.addEventListener('click', () => {
       argsInput.value = b.dataset.args;

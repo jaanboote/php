@@ -2,7 +2,7 @@
 /** @var array $lesson @var array $answers @var array $progres */
 ?>
 <div class="crumbs"><a href="index.php">Inici</a> › Aprendre › <?= e($lesson['tema']) ?></div>
-<article class="lesson" data-lesson="<?= e($lesson['id']) ?>">
+<article class="lesson <?= e(tema_class($lesson['tema'])) ?>" data-lesson="<?= e($lesson['id']) ?>">
   <header class="lesson-head">
     <h1><?= e($lesson['titol']) ?></h1>
     <p class="muted"><?= e($lesson['resum']) ?></p>
@@ -22,7 +22,7 @@
       <?php elseif ($b['tipus'] === 'codi'): ?>
         <h3>▶ <?= e($b['titol']) ?></h3>
         <?= $b['html'] ?? '' ?>
-        <div class="playground" data-fitxer="<?= e($b['fitxer'] ?? 'main.php') ?>">
+        <div class="playground" data-fitxer="<?= e($b['fitxer'] ?? 'main.php') ?>" data-bloc="<?= (int) $i ?>">
           <textarea class="code-src"><?= e($b['codi']) ?></textarea>
           <div class="run-bar">
             <label class="inline">$ php <?= e($b['fitxer'] ?? 'main.php') ?>
@@ -34,17 +34,28 @@
             <label class="stdin-label">Entrada (respostes a readline, una per línia)
               <textarea class="stdin" rows="2"><?= e($b['stdin']) ?></textarea></label>
           <?php endif; ?>
+          <?php if (!empty($b['fitxers'])): ?>
+            <p class="small muted">📁 Fitxers que hi ha a la carpeta abans d'executar: <?= e(implode(', ', array_keys($b['fitxers']))) ?></p>
+          <?php endif; ?>
           <div class="output" hidden></div>
         </div>
 
       <?php else: /* preguntes */ ?>
         <?php $ans = $answers[$b['id']] ?? null; $done = $ans && $ans['correct']; ?>
         <div class="quiz <?= $done ? 'done' : '' ?>" data-q="<?= e($b['id']) ?>" data-tipus="<?= e($b['tipus']) ?>">
-          <div class="quiz-kind"><?= ['test' => '❓ Pregunta', 'completa' => '🧩 Completa el codi', 'sortida' => '🖨️ Què imprimeix?'][$b['tipus']] ?></div>
+          <div class="quiz-kind"><?= ['test' => '❓ Pregunta', 'completa' => '🧩 Completa el codi', 'sortida' => '🖨️ Què imprimeix?', 'ordenar' => '↕️ Ordena-ho'][$b['tipus']] ?></div>
           <p class="quiz-q"><?= $b['pregunta'] ?></p>
           <?php if (isset($b['codi'])): ?><pre class="code"><?= e($b['codi']) ?></pre><?php endif; ?>
 
-          <?php if ($b['tipus'] === 'test'): ?>
+          <?php if ($b['tipus'] === 'ordenar'): ?>
+            <ol class="sortable">
+              <?php foreach ($done ? array_keys($b['elements']) : PhpLab\Lessons::shuffled($b) as $k): /* ja encertada: en l'ordre correcte */ ?>
+                <li data-idx="<?= (int) $k ?>"><span class="sort-text"><?= e($b['elements'][$k]) ?></span>
+                  <span class="sort-buttons"><button type="button" class="btn small up" aria-label="Amunt">↑</button><button type="button" class="btn small down" aria-label="Avall">↓</button></span></li>
+              <?php endforeach; ?>
+            </ol>
+            <button type="button" class="btn primary check-order">Comprova l'ordre</button>
+          <?php elseif ($b['tipus'] === 'test'): ?>
             <div class="options">
               <?php foreach ($b['opcions'] as $k => $op): ?>
                 <button type="button" class="option" data-value="<?= e($k) ?>"><?= e($op) ?></button>

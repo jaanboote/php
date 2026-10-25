@@ -33,7 +33,7 @@ final class Lessons
     {
         $q = [];
         foreach ($lesson['blocs'] as $b) {
-            if (in_array($b['tipus'], ['test', 'completa', 'sortida'], true)) {
+            if (in_array($b['tipus'], ['test', 'completa', 'sortida', 'ordenar'], true)) {
                 $q[$b['id']] = $b;
             }
         }
@@ -57,11 +57,7 @@ final class Lessons
     public static function answer(array $lesson, string $qid, string $answer): array
     {
         $q = self::questions($lesson)[$qid] ?? throw new \InvalidArgumentException('Pregunta inexistent');
-        $correct = match ($q['tipus']) {
-            'test'     => (int) $answer === (int) $q['correcta'],
-            'completa' => in_array(self::squash($answer), array_map([self::class, 'squash'], $q['respostes']), true),
-            'sortida'  => Labs::normalize($answer) === Labs::normalize($q['resposta']),
-        };
+        $correct = self::isCorrect($q, $answer);
 
         Db::run('INSERT OR IGNORE INTO lesson_answers (lesson_id, question_id) VALUES (?, ?)', [$lesson['id'], $qid]);
         $row = Db::one('SELECT * FROM lesson_answers WHERE lesson_id = ? AND question_id = ?', [$lesson['id'], $qid]);
@@ -74,6 +70,9 @@ final class Lessons
         );
 
         $xp = 0;
+        if (!$correct) {
+            Review::fail("lesson:{$lesson['id']}#$qid");   // tornarà a sortir al repàs
+        }
         if ($correct) {
             $xp = Progress::award('lesson_q', "{$lesson['id']}#$qid", $firstTry ? 5 : 2);
             foreach ($q['conceptes'] ?? [] as $c) {
@@ -95,6 +94,19 @@ final class Lessons
             'xp' => $xp,
             'leccio_acabada' => $done['acabada'],
         ];
+    }
+
+    /** Corregeix una resposta (també el fa servir el repàs espaciat). */
+    public static function isCorrect(array $q, string $answer): bool
+    {
+        return match ($q['tipus']) {
+            'test'     => (int) $answer === (int) $q['correcta'],
+            'completa' => in_array(self::squash($answer), array_map([self::class, 'squash'], $q['respostes']), true),
+            'sortida'  => Labs::normalize($answer) === Labs::normalize($q['resposta']),
+            // ordenar: el navegador envia els índexs originals en l'ordre triat ("2,0,1"); correcte = 0, 1, 2...
+            'ordenar'  => array_map('intval', explode(',', $answer)) === range(0, count($q['elements']) - 1),
+            default    => false,
+        };
     }
 
     /** La lliçó està acabada quan totes les preguntes s'han encertat. */
@@ -120,9 +132,23 @@ final class Lessons
         return ['total' => $total, 'encertades' => $ok, 'acabada' => (bool) Db::value('SELECT completed_at FROM lesson_state WHERE lesson_id = ?', [$lesson['id']])];
     }
 
-    /** Per comparar codi curt: sense espais i en minúscules ("!= " == "!="). */
+    /**
+     * Ordre en què es mostren els elements d'una pregunta «ordenar»: barrejat, però sempre igual
+     * per a la mateixa pregunta (i mai en l'ordre correcte).
+     */
+    public static function shuffled(array $q): array
+    {
+        $idx = array_keys($q['elements']);
+        usort($idx, fn($a, $b) => strcmp(md5($q['id'] . $a), md5($q['id'] . $b)));
+        if ($idx === array_keys($q['elements'])) {
+            $idx = array_reverse($idx);
+        }
+        return $idx;
+    }
+
+    /** Per comparar codi curt sense tenir en compte els espais ("!= " == "!="). Les majúscules sí que compten (N no és n). */
     private static function squash(string $s): string
     {
-        return mb_strtolower(preg_replace('/\s+/', '', $s));
+        return preg_replace('/\s+/', '', $s);
     }
 }

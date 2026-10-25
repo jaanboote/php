@@ -14,13 +14,17 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <!-- CodeMirror 5.65.16 (editor de codi), copiat a assets/vendor perquè funcioni sense Internet -->
   <link rel="stylesheet" href="assets/vendor/codemirror/codemirror.css">
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
-  <link rel="stylesheet" href="assets/css/app.css?v=1">
+  <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/app.css?v=3">
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="index.php"><span class="brand-mark">&lt;?</span>PHPLab</a>
   <nav class="nav">
     <a href="index.php" class="<?= $page === 'inici' ? 'active' : '' ?>">Inici</a>
+    <a href="index.php?p=reptes" class="<?= in_array($page, ['reptes', 'repte'], true) ? 'active' : '' ?>">Reptes</a>
+    <a href="index.php?p=progres" class="<?= $page === 'progres' ? 'active' : '' ?>">Progrés</a>
     <a href="index.php?p=temari" class="<?= $page === 'temari' ? 'active' : '' ?>">Temari</a>
     <a href="index.php?p=diagnostic" class="<?= $page === 'diagnostic' ? 'active' : '' ?>">Diagnòstic</a>
   </nav>
@@ -39,6 +43,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <?= $content ?>
 </main>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<a id="badge-pop" class="badge-pop" href="index.php?p=progres#insignies" role="status" aria-live="polite"></a>
 <script src="assets/vendor/codemirror/codemirror.js"></script>
 <script src="assets/vendor/codemirror/mode/xml/xml.js"></script>
 <script src="assets/vendor/codemirror/mode/javascript/javascript.js"></script>
@@ -49,8 +54,9 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/vendor/codemirror/addon/edit/matchbrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/edit/closebrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/hint/show-hint.js"></script>
-<script src="assets/js/app.js?v=1"></script>
-<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=1"></script><?php endif; ?>
-<?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=1"></script><?php endif; ?>
+<script src="assets/js/app.js?v=3"></script>
+<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=3"></script><?php endif; ?>
+<?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=3"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=3"></script><?php endif; ?>
 </body>
 </html>

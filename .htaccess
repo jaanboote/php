@@ -10,7 +10,7 @@ Options -Indexes
 DirectoryIndex index.php
 
 # 3) Fitxers que no s'han de poder descarregar mai (config.php té la clau de l'API).
-<FilesMatch "^(config\.php|config\.example\.php|composer\.(json|lock)|README\.md|\..+)$">
+<FilesMatch "^(config\.php|config\.example\.php|composer\.(json|lock)|skills-lock\.json|README\.md|\..+)$">
     Require all denied
 </FilesMatch>
 
@@ -18,7 +18,7 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^(src|templates|content|vendor|eines)(/|$) - [F,L]
-    RewriteRule (^|/)\.git - [F,L]
+    RewriteRule (^|/)\.(git|claude) - [F,L]
 </IfModule>
 
 # 5) Límits de pujada del temari (només funcionen amb PHP com a mòdul d'Apache, el cas de XAMPP).

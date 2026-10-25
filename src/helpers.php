@@ -20,3 +20,9 @@ function mini_markdown(string $text): string
     $html = preg_replace('/(?<![\w])_([^_\n]+)_(?![\w])/u', '<em>$1</em>', $html);
     return nl2br($html, false);
 }
+
+/** Classe CSS del color d'un tema ("Tema 3 – ..." => "t3"), o buit si no en té número. */
+function tema_class(?string $tema): string
+{
+    return preg_match('/Tema\s+(\d+)/u', (string) $tema, $m) ? 't' . $m[1] : '';
+}

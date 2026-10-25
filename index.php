@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, View, Labs, Lessons, Indexer, Uploader, Progress, Tutor, Db, Config};
+use PhpLab\{Auth, View, Labs, Lessons, Indexer, Uploader, Progress, Tutor, Db, Config, Reptes, Review, Badges, Stats};
 
 $page = $_GET['p'] ?? 'inici';
 
@@ -117,7 +117,8 @@ switch ($page) {
             $labs[] = $lab + ['estat' => $st];
         }
         $concepts = Db::all('SELECT * FROM concept_stats ORDER BY (fails + hints) DESC LIMIT 6');
-        View::render('inici', $common + ['title' => 'Inici', 'topics' => $topics, 'lessons' => $lessons, 'labs' => $labs, 'concepts' => $concepts]);
+        $pendents = Review::countDue();
+        View::render('inici', $common + ['title' => 'Inici', 'topics' => $topics, 'lessons' => $lessons, 'labs' => $labs, 'concepts' => $concepts, 'pendents' => $pendents]);
         break;
 
     case 'leccio':
@@ -161,6 +162,41 @@ switch ($page) {
         $tema = (string) ($_GET['tema'] ?? '');
         $files = Db::all("SELECT path, kind, text FROM files WHERE topic_name = ? AND status = 'ok' ORDER BY kind = 'teoria' DESC, kind, path", [$tema]);
         View::render('llegir', $common + ['title' => $tema ?: 'Temari', 'tema' => $tema, 'files' => $files]);
+        break;
+
+    case 'reptes':
+        View::render('reptes', $common + [
+            'title' => 'Reptes',
+            'temes' => Reptes::temes(),
+            'millors' => Reptes::bestScores(),
+            'pendents' => Review::countDue(),
+            'proper' => Review::nextDue(),
+            'caixes' => Review::boxes(),
+            'xpAvui' => Reptes::xpToday(),
+        ]);
+        break;
+
+    case 'repte':
+        $mode = (string) ($_GET['mode'] ?? '');
+        if (!isset(Reptes::MODES[$mode])) {
+            http_response_code(404);
+            exit('Mode de repte desconegut');
+        }
+        View::render('repte', $common + ['title' => Reptes::MODES[$mode]['titol'], 'mode' => $mode, 'tema' => (string) ($_GET['tema'] ?? '')]);
+        break;
+
+    case 'progres':
+        Badges::check();   // per si n'hi ha alguna de nova (p. ex. feta abans que existissin les insígnies)
+        View::render('progres', $common + [
+            'title' => 'Progrés',
+            'temes' => Stats::temaMap(),
+            'insignies' => Badges::all(),
+            'xpDies' => Stats::xpByDay(30),
+            'xpFonts' => Stats::xpBySource(),
+            'reptes' => Stats::reptesByMode(),
+            'dies' => Stats::days(),
+            'fluixos' => Stats::weak(8),
+        ]);
         break;
 
     case 'diagnostic':

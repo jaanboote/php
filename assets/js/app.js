@@ -18,7 +18,25 @@ const PHPLab = (() => {
       if (res.status === 401) { location.href = 'index.php?p=login'; }
       throw new Error(json.error || 'Error ' + res.status);
     }
+    if (json.insignies?.length) showBadges(json.insignies);
     return json;
+  }
+
+  /** Avís d'insígnia nova (després del de l'XP, una darrere l'altra). */
+  function showBadges(list) {
+    const box = document.getElementById('badge-pop');
+    if (!box) return;
+    // La primera vegada se'n poden aconseguir moltes de cop (feina feta abans de les insígnies): no les ensenyem totes
+    if (list.length > 3) list = [...list.slice(0, 2), { icona: '🏆', titol: 'I ' + (list.length - 2) + ' insígnies més', descripcio: 'Mira-les totes a la pàgina Progrés.' }];
+    list.forEach((b, i) => setTimeout(() => {
+      box.innerHTML = '<span class="badge-pop-icon">' + esc(b.icona) + '</span><div><small>Insígnia nova!</small>' +
+        '<strong>' + esc(b.titol) + '</strong><span>' + esc(b.descripcio) + '</span></div>';
+      box.classList.remove('show');
+      void box.offsetWidth;   // reinicia l'animació
+      box.classList.add('show');
+      clearTimeout(box._timer);
+      box._timer = setTimeout(() => box.classList.remove('show'), 4200);
+    }, 1800 + i * 4600));
   }
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -32,20 +50,154 @@ const PHPLab = (() => {
     t._timer = setTimeout(() => t.classList.remove('show'), 2600);
   }
 
-  /** Actualitza la barra d'XP de la capçalera. */
-  function updateProgress(p, gained = 0) {
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /**
+   * Actualitza la barra d'XP de la capçalera.
+   * Si es passa l'element que ha fet guanyar l'XP (from), el «+N XP» surt d'allà i vola fins a la barra.
+   */
+  function updateProgress(p, gained = 0, from = null) {
     if (!p) return;
     const oldLevel = +document.getElementById('p-level').textContent;
-    document.getElementById('p-level').textContent = p.level;
-    document.getElementById('p-xp').textContent = p.xp;
-    document.getElementById('p-streak').textContent = p.streak;
-    document.getElementById('p-bar').style.width = Math.round((p.into * 100) / p.needed) + '%';
-    if (gained > 0) toast('+' + gained + ' XP');
+    const apply = () => {
+      document.getElementById('p-level').textContent = p.level;
+      countTo(document.getElementById('p-xp'), p.xp);
+      document.getElementById('p-streak').textContent = p.streak;
+      document.getElementById('p-bar').style.width = Math.round((p.into * 100) / p.needed) + '%';
+      const player = document.getElementById('player');
+      player.classList.remove('gain'); void player.offsetWidth; player.classList.add('gain');
+    };
+    if (gained > 0 && from && !calm) flyXp(from, gained, apply);
+    else { apply(); if (gained > 0) toast('+' + gained + ' XP'); }
     if (p.level > oldLevel) {
       document.getElementById('player').classList.add('bump');
-      setTimeout(() => toast('🎉 Has pujat al nivell ' + p.level + ': ' + p.name + '!'), 900);
+      setTimeout(() => levelUp(p), 1100);
     }
   }
+
+  /** Fa pujar un número de mica en mica fins al valor nou. */
+  function countTo(el, to) {
+    const from = +el.textContent || 0;
+    if (calm || from === to) { el.textContent = to; return; }
+    const t0 = performance.now(), dur = 700;
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur);
+      el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  /** «+N XP» que surt de l'element i vola fins al comptador d'XP de la capçalera. */
+  function flyXp(from, amount, done) {
+    const a = from.getBoundingClientRect();
+    const b = document.getElementById('p-xp').getBoundingClientRect();
+    const chip = document.createElement('div');
+    chip.className = 'xp-fly';
+    chip.textContent = '+' + amount + ' XP';
+    document.body.appendChild(chip);
+    const x0 = a.left + a.width / 2 - chip.offsetWidth / 2, y0 = a.top - chip.offsetHeight - 6;
+    chip.style.transform = `translate(${x0}px, ${y0 + 12}px) scale(.7)`;
+    chip.style.opacity = '0';
+    requestAnimationFrame(() => {
+      chip.style.transition = 'transform .35s cubic-bezier(.34,1.56,.64,1), opacity .2s';
+      chip.style.transform = `translate(${x0}px, ${y0}px) scale(1.1)`;
+      chip.style.opacity = '1';
+      setTimeout(() => {
+        chip.style.transition = '';
+        chip.style.transform = `translate(${b.left + b.width / 2 - chip.offsetWidth / 2}px, ${b.top}px) scale(.5)`;
+        chip.style.opacity = '0';
+      }, 650);
+    });
+    setTimeout(() => { chip.remove(); done(); }, 1500);
+  }
+
+  /** Confeti que esclata des d'un element (encerts, passos superats, rècords). */
+  function celebrate(el, n = 28) {
+    if (calm || !el) return;
+    const r = el.getBoundingClientRect();
+    const css = getComputedStyle(document.documentElement);
+    const colors = ['--accent', '--spark', '--ok', '--t1', '--t4'].map((v) => css.getPropertyValue(v).trim());
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('i');
+      c.className = 'confetti';
+      const ang = (Math.PI * 2 * i) / n + Math.random() * .5;
+      const dist = 70 + Math.random() * 110;
+      c.style.setProperty('--x0', r.left + r.width / 2 + 'px');
+      c.style.setProperty('--y0', r.top + Math.min(r.height / 2, 40) + 'px');
+      c.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+      c.style.setProperty('--dy', Math.sin(ang) * dist * .7 + 60 + Math.random() * 60 + 'px');
+      c.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      c.style.background = colors[i % colors.length];
+      if (i % 3 === 0) c.style.borderRadius = '50%';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 1200);
+    }
+  }
+
+  /** Sacseja un element (resposta incorrecta). */
+  function shake(el) {
+    if (!el) return;
+    el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+    setTimeout(() => el.classList.remove('shake'), 500);
+  }
+
+  /** Pantalla de «Has pujat de nivell!». Es tanca amb un clic, Escape o sola al cap d'uns segons. */
+  function levelUp(p) {
+    const box = document.createElement('div');
+    box.className = 'level-up';
+    box.setAttribute('role', 'alertdialog');
+    box.setAttribute('aria-label', 'Has pujat al nivell ' + p.level);
+    box.innerHTML = '<div class="level-up-card"><small>Has pujat de nivell!</small><div class="level-up-num">' + esc(p.level) + '</div>' +
+      '<div class="level-up-name">' + esc(p.name) + '</div><button class="btn primary" type="button">Som-hi!</button></div>';
+    document.body.appendChild(box);
+    const btn = box.querySelector('button');
+    btn.focus();
+    setTimeout(() => celebrate(box.querySelector('.level-up-num'), 44), 250);
+    const close = () => { box.classList.add('out'); setTimeout(() => box.remove(), 300); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape' || e.key === 'Enter') close(); };
+    box.addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => box.isConnected && close(), 6000);
+  }
+
+  /** Inici: el terminal «escriu» la salutació línia a línia i l'anell d'XP s'omple. */
+  function introHome() {
+    const ring = document.querySelector('.ring-fg[data-offset]');
+    if (ring) setTimeout(() => { ring.style.strokeDashoffset = ring.dataset.offset; }, calm ? 0 : 500);
+    const term = document.getElementById('term');
+    if (!term || calm) return;
+    const lines = [...term.querySelectorAll('[data-type]')];
+    const texts = lines.map((line) => {
+      const nodes = [];
+      const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) nodes.push({ node: walker.currentNode, text: walker.currentNode.textContent });
+      nodes.forEach((n) => { n.node.textContent = ''; });
+      return nodes;
+    });
+    term.classList.add('typing');
+    let li = 0;
+    const nextLine = () => {
+      if (li >= lines.length) { term.classList.remove('typing'); return; }
+      const line = lines[li], nodes = texts[li];
+      line.classList.add('typed');
+      const isCommand = line.classList.contains('prompt');
+      let ni = 0, ci = 0;
+      const tick = () => {
+        if (ni >= nodes.length) { li++; setTimeout(nextLine, isCommand ? 320 : 140); return; }
+        const n = nodes[ni];
+        // L'usuari@phplab surt de cop (és el «prompt»); l'ordre i les respostes s'escriuen
+        if (isCommand && n.node.parentElement.tagName === 'B') { n.node.textContent = n.text; ni++; tick(); return; }
+        ci += isCommand ? 1 : 3;
+        n.node.textContent = n.text.slice(0, ci);
+        if (ci >= n.text.length) { ni++; ci = 0; }
+        setTimeout(tick, isCommand ? 30 + Math.random() * 30 : 12);
+      };
+      tick();
+    };
+    setTimeout(nextLine, 350);
+  }
+  introHome();
 
   // Paraules per a l'autocompletat: funcions i paraules clau que surten al temari
   const WORDS = ('echo print print_r var_dump printf sprintf strlen strtolower strtoupper ucfirst ucwords str_repeat str_pad ' +
@@ -99,8 +251,24 @@ const PHPLab = (() => {
     return cm;
   }
 
-  /** Pinta el resultat d'una execució: sortida + errors explicats en català. */
-  function renderOutput(box, r, cm) {
+  /** Llista de fitxers (nom, mida i contingut) que ha deixat el programa. */
+  function filesHtml(files, title = '📁 Fitxers del programa') {
+    if (!files || !files.length) return '';
+    let html = '<details class="files"><summary>' + esc(title) + ' (' + files.length + ')</summary>';
+    for (const f of files) {
+      html += '<div class="file"><div class="file-name">' + esc(f.nom) + (f.nom.endsWith('/') ? '' : ' <span class="muted">· ' + f.size + ' bytes</span>') + '</div>';
+      if (f.contingut !== null && !f.nom.endsWith('/')) {
+        html += '<pre>' + (f.contingut === '' ? '<span class="out-empty">(buit)</span>' : esc(f.contingut)) + '</pre>';
+      } else if (!f.nom.endsWith('/')) {
+        html += '<div class="muted small">(fitxer binari)</div>';
+      }
+      html += '</div>';
+    }
+    return html + '</details>';
+  }
+
+  /** Pinta el resultat d'una execució: sortida + errors explicats en català (+ fitxers, si showFiles). */
+  function renderOutput(box, r, cm, showFiles = true) {
     box.hidden = false;
     const meta = [];
     if (r.timeout) meta.push('⏱ aturat per temps');
@@ -113,6 +281,8 @@ const PHPLab = (() => {
         '</strong><br>' + esc(ex.explicacio) + (ex.original ? '<div class="orig">' + esc(ex.original) + '</div>' : '') + '</div>';
     }
     if (!r.explicacions?.length && r.stderr) html += '<div class="explain"><pre>' + esc(r.stderr) + '</pre></div>';
+    if (showFiles) html += filesHtml(r.files);
+    if (r.avis_fitxers) html += '<div class="explain avis">' + esc(r.avis_fitxers) + '</div>';
     box.innerHTML = html;
     if (cm) markErrorLines(cm, r.explicacions || []);
   }
@@ -149,9 +319,9 @@ const PHPLab = (() => {
     d.addEventListener('drop', (e) => { e.preventDefault(); d.querySelector('input').files = e.dataTransfer.files; });
   });
   document.getElementById('upload-form')?.addEventListener('submit', (e) => {
-    e.submitter?.classList.add('loading');
+    e.submitter?.classList.add('loading', 'keep-text');
     if (e.submitter) e.submitter.textContent = 'Pujant i indexant…';
   });
 
-  return { api, esc, toast, updateProgress, makeEditor, renderOutput, markErrorLines, argvPreview };
+  return { api, esc, toast, updateProgress, celebrate, shake, makeEditor, renderOutput, markErrorLines, argvPreview, filesHtml };
 })();

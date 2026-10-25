@@ -2,12 +2,13 @@
 /**
  * API JSON per al JavaScript de les pàgines: api.php?a=accio
  * Totes les accions: POST, sessió iniciada i capçalera X-CSRF-Token.
+ * Les respostes que poden fer guanyar insígnies hi afegeixen 'insignies' (les noves); app.js les mostra.
  */
 declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress};
+use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes, Badges};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -47,7 +48,13 @@ try {
     switch ($_GET['a'] ?? '') {
         case 'run':
             $args = Sandbox::parseArgs((string) ($in['args'] ?? ''));
-            $r = Sandbox::run($code, $args, (string) ($in['stdin'] ?? ''), (string) ($in['fitxer'] ?? 'main.php'));
+            // Als laboratoris, els fitxers que crea el programa es conserven entre execucions
+            $lab = isset($in['lab']) ? Labs::get((string) $in['lab']) : null;
+            // Als exemples de les lliçons, els fitxers de partida els defineix el contingut (no el navegador)
+            $lesson = isset($in['lesson']) ? Lessons::get((string) $in['lesson']) : null;
+            $files = $lesson['blocs'][(int) ($in['bloc'] ?? -1)]['fitxers'] ?? [];
+            $r = Sandbox::run($code, $args, (string) ($in['stdin'] ?? ''), (string) ($in['fitxer'] ?? 'main.php'), null,
+                              $files, $lab ? Sandbox::workspace($lab['id']) : null);
             $r['explicacions'] = ErrorExplainer::explain($r['stderr'], $r['timeout'], $r['truncated']);
             $r['argv'] = array_merge([basename((string) ($in['fitxer'] ?? 'main.php'))], $args);
             respond($r);
@@ -55,7 +62,7 @@ try {
         case 'lesson_answer':
             $lesson = Lessons::get((string) ($in['lesson'] ?? '')) ?? respond(['error' => 'Lliçó no trobada'], 404);
             $res = Lessons::answer($lesson, (string) ($in['q'] ?? ''), (string) ($in['answer'] ?? ''));
-            respond($res + ['progress' => Progress::summary()]);
+            respond($res + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_save':
             Labs::saveCode(lab($in)['id'], $code);
@@ -63,13 +70,29 @@ try {
 
         case 'lab_check':
             $res = Labs::check(lab($in), (int) ($in['step'] ?? 0), $code);
-            respond($res + ['progress' => Progress::summary()]);
+            respond($res + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_hint':
             respond(Labs::hint(lab($in), (int) ($in['step'] ?? 0), (int) ($in['level'] ?? 1)));
 
         case 'lab_solution':
             respond(Labs::solution(lab($in), (int) ($in['step'] ?? 0)));
+
+        case 'lab_files':
+            $lab = lab($in);
+            if (!empty($in['buidar'])) {
+                Sandbox::clearWorkspace($lab['id']);
+            }
+            respond(['files' => Sandbox::listFiles(Sandbox::workspace($lab['id']))]);
+
+        case 'repte_start':
+            respond(Reptes::start((string) ($in['mode'] ?? ''), isset($in['tema']) ? (string) $in['tema'] : null));
+
+        case 'repte_answer':
+            respond(Reptes::answer((int) ($in['session'] ?? 0), (string) ($in['item'] ?? ''), (string) ($in['answer'] ?? '')));
+
+        case 'repte_finish':
+            respond(Reptes::finish((int) ($in['session'] ?? 0)) + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_summary':
             respond(Labs::summary(lab($in)));

@@ -4,14 +4,16 @@ Aplicació web per aprendre PHP de manera pràctica a partir del temari de class
 (M0376 · Implantació d'aplicacions web · ASIX2). Està feta en **PHP 8 sense framework**
 perquè també puguis llegir i entendre com funciona per dins.
 
-**Fase 1 (aquesta versió):**
+**Què hi ha ara:**
 
-- Login d'un sol usuari.
-- **Pujar temari** (PDF, ZIP, DOCX, PHP, HTML, TXT, MD) i indexador amb detecció de canvis.
-- **Sandbox** per executar el teu codi amb límits de seguretat.
-- La lliçó **«Arguments per consola: $argv i $argc»**, amb exemples «prova-ho» i preguntes.
-- El laboratori complet **«Traductor de permisos Linux»** en 7 passos, amb proves automàtiques,
-  pistes de 3 nivells i un tutor socràtic (amb la IA de Claude o sense connexió).
+- Login d'un sol usuari, accés només des de la xarxa de casa.
+- **Temari:** pujar-lo (PDF, ZIP, DOCX, PHP, HTML, TXT, MD), indexador amb detecció de canvis i lectura per temes.
+- **Aprendre:** 16 lliçons dels Temes 1 a 4, amb exemples «prova-ho» executables i preguntes (test, completa, què imprimeix, ordena).
+- **Laboratori:** 14 exercicis guiats pas a pas (basats en Exercicis 01 i 02 i les activitats dels temes), amb proves
+  automàtiques, pistes de 3 nivells, solució després de 3 intents i un tutor socràtic (IA de Claude o sense connexió).
+- **Reptes:** contrarellotge, «Troba l'error», «Què imprimeix?», «Ordena el codi» i repàs espaciat.
+- **Progrés:** mapa de temes, insígnies i estadístiques.
+- **Sandbox** segur per executar el codi, amb fitxers que es conserven per laboratori.
 - XP, nivells i ratxa diària.
 
 ---
@@ -175,7 +177,9 @@ I fora de htdocs, a `C:\xampp\phplab-data\`:
 phplab-data/
 ├── phplab.sqlite          ← progrés, XP, temari indexat, xat del tutor
 ├── temari/                ← els fitxers que has pujat
-└── sandbox/               ← carpetes temporals on s'executa el teu codi (s'esborren soles)
+└── sandbox/
+    ├── jobs/              ← carpetes temporals on s'executa el teu codi (s'esborren soles)
+    └── workspaces/        ← fitxers que creen els programes de cada laboratori
 ```
 
 **Flux d'un «Comprova» al laboratori:**
@@ -210,8 +214,11 @@ Executar codi escrit per l'usuari és el més perillós d'una app com aquesta. A
 | **Entorn net** | El procés no rep les variables d'entorn d'Apache. | Filtrar informació del servidor. |
 | **Màxim 2 execucions alhora** | Bloquejos amb `flock`. | Saturar el PC amb moltes execucions. |
 | **Límit de sortida** | Si escriu més de 100 KB, s'atura. | Omplir la memòria o el disc. |
+| **Fitxers limitats** | Cada laboratori té la seva carpeta (`phplab-data\sandbox\workspaces\<laboratori>`), on es conserven els fitxers entre execucions (com a molt 1 MB). | Que un programa ompli el disc o toqui fitxers d'un altre laboratori. |
 
 Totes les directives es passen amb `-d` a `php.exe` (mira `Sandbox::iniSettings()`).
+`ini_set()` està desactivada (si no, el codi es podria treure els límits); `ini_get()` i `error_reporting()` funcionen.
+`error_log()` escriu al fitxer `php_errors.log` de la carpeta del programa, com el log d'un servidor real.
 No és un aïllament perfecte com el d'un contenidor o una màquina virtual, però per a ús personal
 a la xarxa de casa és raonable. Per això **no s'ha d'obrir mai l'app a Internet**.
 
@@ -256,12 +263,30 @@ Si alguna cosa falla, mira el log d'Apache: `C:\xampp\apache\logs\error.log`.
 
 ---
 
-## 6. Properes fases
+## 6. Reptes i repàs espaciat
 
-- **Fase 2:** lliçons, preguntes i laboratoris generats per la IA a partir del temari, desats a la
-  memòria cau i amb l'origen indicat (com a mínim el 80 % del temari; la resta marcada com a «Ampliació»).
-  Variants dels 20 exercicis CLI d'Exercicis 01.
-- **Fase 3:** reptes contrarellotge, «Troba l'error» (amb les errates reals del temari), «Què imprimeix?»,
-  ordenar línies i repàs espaciat.
-- **Fase 4:** mapa de temes, insígnies i estadístiques.
+A la pàgina **Reptes** hi ha quatre modes: ⏱ Contrarellotge (10 preguntes en 150 s), 🐞 Troba l'error (amb errates reals del temari),
+🖨️ Què imprimeix? i ↕️ Ordena el codi (s'accepta qualsevol ordre que funcioni: s'executa al sandbox). Es poden filtrar per tema.
+
+**Repàs espaciat (sistema Leitner):** cada pregunta que falles (de les lliçons o dels reptes) entra a la caixa 1 i torna a sortir
+l'endemà. Cada encert al repàs la fa pujar de caixa i s'espera més: 1, 3, 7, 14 i 30 dies. Si la falles, torna a la caixa 1.
+Quan l'encertes a la caixa 5, surt del repàs. Inici avisa quan tens preguntes per repassar.
+
+Els reptes donen com a molt 80 XP al dia (el repàs no té límit). Les preguntes són a `content/reptes/temaN.php` i
+`eines/verifica-contingut.php` les comprova totes.
+
+## 7. Progrés: mapa de temes, insígnies i estadístiques
+
+La pàgina **Progrés** té tres parts:
+
+- **Mapa de temes:** cada tema amb les lliçons i els laboratoris en ordre (fet, en curs o per començar), el percentatge
+  d'encerts als reptes del tema i el domini de cada concepte: ● dominat (80 % d'encerts o més), ◐ practicant, ◔ per reforçar.
+- **Insígnies:** 22 fites (acabar lliçons i laboratoris, un laboratori sense pistes, trobar les errates del temari, una
+  contrarellotge perfecta, ratxes de dies, superar cada tema...). Les que encara no tens mostren quant et falta. Quan n'aconsegueixes
+  una, surt un avís a qualsevol pàgina. Una insígnia aconseguida no es perd mai. Les definicions són a `src/Badges.php`.
+- **Estadístiques:** XP de cada dia dels últims 30 dies, d'on ve l'XP, partides i encert per mode de repte, i els conceptes que més costen.
+
+## 8. Properes fases
+
 - **Fase 5:** laboratoris web (formularis `$_GET`/`$_POST`, pujada de fitxers, sessions, cookies i MySQL) executats amb `php-cgi.exe`.
+- Més exercicis d'Exercicis 01 com a laboratoris.

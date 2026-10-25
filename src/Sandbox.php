@@ -44,12 +44,17 @@ final class Sandbox
      * @param string      $stdin  Text que llegirà readline() / fgets(STDIN), una línia per resposta
      * @param string      $script Nom del fitxer ($argv[0]), p. ex. "permisos.php"
      * @param string|null $append Codi PHP extra que s'executa després (per a les comprovacions)
+     * @param array       $files  Fitxers que hi ha d'haver abans d'executar: ['dades.txt' => "contingut"]
+     *                            (un nom acabat en "/" crea una carpeta)
+     * @param string|null $workspace Carpeta on es conserven els fitxers entre execucions (una per laboratori)
      */
-    public static function run(string $code, array $args = [], string $stdin = '', string $script = 'main.php', ?string $append = null): array
+    public static function run(string $code, array $args = [], string $stdin = '', string $script = 'main.php',
+                               ?string $append = null, array $files = [], ?string $workspace = null): array
     {
         $result = [
             'stdout' => '', 'stderr' => '', 'exit_code' => null,
             'timeout' => false, 'truncated' => false, 'busy' => false, 'ms' => 0,
+            'files' => [], 'avis_fitxers' => null,
         ];
 
         $lock = self::acquireSlot();
@@ -68,6 +73,25 @@ final class Sandbox
 
         try {
             $script = self::safeScriptName($script);
+
+            // Fitxers de partida: els de la carpeta del laboratori i els que demani la prova
+            if ($workspace !== null && is_dir($workspace)) {
+                self::copyDir($workspace, $jobDir);
+            }
+            foreach ($files as $name => $content) {
+                $path = self::safeRelativePath((string) $name);
+                if ($path === null) {
+                    continue;
+                }
+                $full = $jobDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
+                if (str_ends_with((string) $name, '/')) {
+                    @mkdir($full, 0770, true);
+                } else {
+                    @mkdir(dirname($full), 0770, true);
+                    file_put_contents($full, (string) $content);
+                }
+            }
+
             file_put_contents($jobDir . DIRECTORY_SEPARATOR . $script, self::prepareCode($code, $append));
             file_put_contents($jobDir . DIRECTORY_SEPARATOR . '_phplab_prepend.php', self::prependCode());
             file_put_contents($ioDir . DIRECTORY_SEPARATOR . 'stdin.txt', self::normalizeStdin($stdin));
@@ -140,6 +164,19 @@ final class Sandbox
             foreach (['stdout', 'stderr'] as $k) {
                 $result[$k] = str_replace([$jobDir . DIRECTORY_SEPARATOR, $jobDir], '', $result[$k]);
             }
+
+            // Fitxers que han quedat a la carpeta (sense el programa ni el fitxer intern)
+            $result['files'] = self::listFiles($jobDir, [$script, '_phplab_prepend.php']);
+            if ($workspace !== null) {
+                $total = array_sum(array_column($result['files'], 'size'));
+                if ($total > self::WORKSPACE_MAX_BYTES) {
+                    $result['avis_fitxers'] = 'Els fitxers ocupen massa (més d\'1 MB): no s\'han desat per a la propera execució.';
+                } else {
+                    self::removeDir($workspace);
+                    @mkdir($workspace, 0770, true);
+                    self::copyDir($jobDir, $workspace, [$script, '_phplab_prepend.php']);
+                }
+            }
             return $result;
         } finally {
             self::removeDir($jobDir);
@@ -147,6 +184,76 @@ final class Sandbox
             flock($lock, LOCK_UN);
             fclose($lock);
         }
+    }
+
+    /** Mida màxima dels fitxers que es conserven entre execucions d'un laboratori. */
+    private const WORKSPACE_MAX_BYTES = 1048576;
+
+    /** Carpeta de fitxers persistents d'un laboratori (data_dir/sandbox/workspaces/<id>). */
+    public static function workspace(string $labId): string
+    {
+        return Config::dataPath('sandbox' . DIRECTORY_SEPARATOR . 'workspaces') . DIRECTORY_SEPARATOR . preg_replace('/[^a-z0-9\-]/', '', $labId);
+    }
+
+    public static function clearWorkspace(string $labId): void
+    {
+        self::removeDir(self::workspace($labId));
+    }
+
+    /** Llista els fitxers d'una carpeta amb el contingut dels petits (per mostrar-los a l'alumne). */
+    public static function listFiles(string $dir, array $exclude = []): array
+    {
+        if (!is_dir($dir)) {
+            return [];
+        }
+        $out = [];
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($it as $f) {
+            /** @var \SplFileInfo $f */
+            $rel = str_replace('\\', '/', substr($f->getPathname(), strlen($dir) + 1));
+            if (in_array($rel, $exclude, true)) {
+                continue;
+            }
+            if ($f->isDir()) {
+                $out[] = ['nom' => $rel . '/', 'size' => 0, 'contingut' => null];
+                continue;
+            }
+            $content = (string) file_get_contents($f->getPathname(), false, null, 0, 4000);
+            $out[] = [
+                'nom' => $rel,
+                'size' => $f->getSize(),
+                'contingut' => mb_check_encoding($content, 'UTF-8') ? $content : null,   // null = binari
+            ];
+            if (count($out) >= 50) {
+                break;
+            }
+        }
+        usort($out, fn($a, $b) => strcmp($a['nom'], $b['nom']));
+        return $out;
+    }
+
+    /** Copia el contingut d'una carpeta a una altra (recursiu). */
+    private static function copyDir(string $from, string $to, array $exclude = []): void
+    {
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($from, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($it as $f) {
+            $rel = substr($f->getPathname(), strlen($from) + 1);
+            if (in_array(str_replace('\\', '/', $rel), $exclude, true) || $f->isLink()) {
+                continue;
+            }
+            $target = $to . DIRECTORY_SEPARATOR . $rel;
+            $f->isDir() ? @mkdir($target, 0770, true) : @copy($f->getPathname(), $target);
+        }
+    }
+
+    /** Ruta relativa segura dins de la carpeta del programa (sense .. ni rutes absolutes). */
+    private static function safeRelativePath(string $name): ?string
+    {
+        $name = trim(str_replace('\\', '/', $name), '/');
+        if ($name === '' || str_contains($name, '..') || preg_match('/^[a-zA-Z]:/', $name)) {
+            return null;
+        }
+        return $name;
     }
 
     /** Directives php.ini que s'apliquen al procés de l'alumne (amb -d). */
@@ -170,6 +277,7 @@ final class Sandbox
             'output_buffering'        => '0',
             'auto_prepend_file'       => $jobDir . $sep . '_phplab_prepend.php',
             'auto_append_file'        => '',
+            'error_log'               => $jobDir . $sep . 'php_errors.log',   // error_log() escriu aquí, com un log real
             'sys_temp_dir'            => $jobDir,
             'upload_tmp_dir'          => $jobDir,
             'session.save_path'       => $jobDir,
