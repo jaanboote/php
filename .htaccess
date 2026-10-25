@@ -1,0 +1,30 @@
+# PHPLab — configuració d'Apache per a aquesta carpeta.
+
+# 1) Només es pot accedir des d'aquest PC (localhost) o des de la xarxa de casa.
+#    Si la teva xarxa no és 192.168.1.x, canvia-ho aquí i a config.php ('allowed_networks').
+Require local
+Require ip 192.168.1.0/24
+
+# 2) No mostrar mai el llistat de fitxers d'una carpeta.
+Options -Indexes
+DirectoryIndex index.php
+
+# 3) Fitxers que no s'han de poder descarregar mai (config.php té la clau de l'API).
+<FilesMatch "^(config\.php|config\.example\.php|composer\.(json|lock)|README\.md|\..+)$">
+    Require all denied
+</FilesMatch>
+
+# 4) Carpetes internes: codi, plantilles, contingut i llibreries.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(src|templates|content|vendor|eines)(/|$) - [F,L]
+    RewriteRule (^|/)\.git - [F,L]
+</IfModule>
+
+# 5) Límits de pujada del temari (només funcionen amb PHP com a mòdul d'Apache, el cas de XAMPP).
+<IfModule mod_php.c>
+    php_value upload_max_filesize 50M
+    php_value post_max_size 120M
+    php_value max_file_uploads 50
+    php_value max_execution_time 300
+</IfModule>

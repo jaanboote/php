@@ -1,0 +1,6 @@
+# Configuració local amb la clau de l'API: no es puja mai
+config.php
+# Llibreries de Composer (s'instal·len amb "composer install")
+/vendor/
+.DS_Store
+Thumbs.db
