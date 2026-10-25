@@ -5,6 +5,8 @@
  *    i la del pas anterior no (si no, les proves del pas no comproven res de nou).
  *  - Lliçons: els exemples «prova-ho» s'han d'executar sense errors fatals, i les preguntes
  *    «què imprimeix?» han de donar exactament la resposta indicada.
+ *  - Reptes: «què imprimeix?» i «ordena» donen la sortida indicada; a «troba l'error», el codi
+ *    corregit funciona, el que té l'error no, i la línia marcada és la que canvia entre tots dos.
  *
  * Ús (des de la carpeta del projecte):
  *     C:\xampp\php\php.exe eines\verifica-contingut.php
@@ -71,6 +73,54 @@ foreach (Lessons::all() as $lesson) {
                 $errors++;
                 echo "FALLA $label (què imprimeix): esperat «{$b['resposta']}», surt «{$r['stdout']}» " . trim($r['stderr']) . "\n";
             }
+        }
+    }
+}
+
+// ---- Banc de reptes ----
+$ids = [];
+foreach (glob(APP_ROOT . '/content/reptes/*.php') as $file) {
+    foreach ((require $file)['items'] as $item) {
+        $label = "REPTE {$item['id']} ({$item['tipus']})";
+        $problema = null;
+        if (isset($ids[$item['id']])) {
+            $problema = 'id repetit';
+        }
+        $ids[$item['id']] = true;
+        $args = Sandbox::parseArgs($item['args'] ?? '');
+        $fitxers = $item['fitxers'] ?? [];
+
+        if ($problema === null && $item['tipus'] === 'sortida') {
+            $r = Sandbox::run($item['codi'], $args, '', 'main.php', null, $fitxers);
+            if (Labs::normalize($r['stdout']) !== Labs::normalize($item['resposta']) || trim($r['stderr']) !== '') {
+                $problema = "esperat «{$item['resposta']}», surt «{$r['stdout']}» " . trim($r['stderr']);
+            }
+        } elseif ($problema === null && $item['tipus'] === 'error') {
+            $bo = Sandbox::run($item['corregit'], $args, '', 'main.php', null, $fitxers);
+            $dolent = Sandbox::run($item['codi'], $args, '', 'main.php', null, $fitxers);
+            $linesBug = explode("\n", $item['codi']);
+            $linesOk = explode("\n", $item['corregit']);
+            if (Labs::normalize($bo['stdout']) !== Labs::normalize($item['esperat']) || trim($bo['stderr']) !== '') {
+                $problema = "el codi corregit no dona «{$item['esperat']}»: «{$bo['stdout']}» " . trim($bo['stderr']);
+            } elseif (Labs::normalize($dolent['stdout']) === Labs::normalize($item['esperat']) && trim($dolent['stderr']) === '') {
+                $problema = 'el codi amb error funciona igual que el corregit';
+            } elseif (($linesBug[$item['linia'] - 1] ?? null) === ($linesOk[$item['linia'] - 1] ?? null)) {
+                $problema = "la línia {$item['linia']} és igual al codi erroni i al corregit (la línia marcada no és la de l'error)";
+            }
+        } elseif ($problema === null && $item['tipus'] === 'ordenar' && isset($item['sortida'])) {
+            $r = Sandbox::run(implode("\n", $item['linies']) . "\n", [], '', 'ordena.php', null, $fitxers);
+            if (Labs::normalize($r['stdout']) !== Labs::normalize($item['sortida']) || trim($r['stderr']) !== '') {
+                $problema = "en ordre correcte no dona «{$item['sortida']}»: «{$r['stdout']}» " . trim($r['stderr']);
+            }
+        } elseif ($problema === null && $item['tipus'] === 'test' && !isset($item['opcions'][$item['correcta']])) {
+            $problema = "l'opció correcta no existeix";
+        }
+
+        if ($problema === null) {
+            echo "  ok  $label\n";
+        } else {
+            $errors++;
+            echo "FALLA $label: $problema\n";
         }
     }
 }

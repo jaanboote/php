@@ -194,6 +194,47 @@ pre.term, pre.code { background: var(--code-bg); color: var(--code-text); font-f
 .explain.avis { background: var(--warn-soft); border-color: var(--warn); }
 .explain .orig { font-family: var(--mono); font-size: .75rem; color: var(--muted); margin-top: 4px; word-break: break-word; }
 
+/* ---------- Reptes ---------- */
+.reptes-banner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--accent-soft); }
+.reptes-banner h2 { margin-bottom: .2em; }
+.reptes-banner p { margin: 0; }
+.banner-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.repas-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.repas-info { flex: 1 1 360px; }
+.boxes { display: flex; gap: 8px; flex-wrap: wrap; }
+.box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 6px 12px; text-align: center; min-width: 70px; }
+.box-n { display: block; font-size: 1.3rem; font-weight: 800; }
+.box-label { font-size: .75rem; color: var(--muted); }
+.tema-filter { margin: 4px 0 14px; }
+.tema-filter select { margin-left: 6px; }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.mode { text-decoration: none; color: var(--text); margin-bottom: 0; transition: transform .15s, border-color .15s; }
+.mode:hover { transform: translateY(-2px); border-color: var(--accent); }
+.mode-icon { font-size: 2rem; }
+.repte { max-width: 860px; margin: 0 auto; }
+.repte-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.repte-head h1 small { font-size: .9rem; }
+.repte-stats { display: flex; gap: 6px; }
+.timer.urgent { background: var(--err-soft); color: var(--err); }
+.timebar { height: 6px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin: 6px 0 14px; }
+.timebar-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--ok), var(--accent)); transition: width .25s linear; }
+.repte-card { min-height: 260px; }
+.item-meta { margin-bottom: 6px; }
+.code-lines { list-style: none; padding: 0; margin: 10px 0 12px; background: var(--code-bg); border-radius: 10px; overflow-x: auto; font-family: var(--mono); font-size: .85rem; }
+.code-lines li { display: flex; gap: 12px; padding: 2px 10px; cursor: pointer; color: var(--code-text); border-left: 3px solid transparent; }
+.code-lines li:hover { background: rgba(255,255,255,.06); }
+.code-lines li code { background: none; padding: 0; color: inherit; white-space: pre; font-size: inherit; }
+.code-lines .ln { color: #7d839c; min-width: 1.6em; text-align: right; user-select: none; }
+.code-lines li.chosen { background: rgba(157,140,255,.25); border-left-color: var(--accent); }
+.code-lines li.right { background: rgba(76,197,138,.25); border-left-color: var(--ok); }
+.code-lines li.wrong { background: rgba(255,107,125,.25); border-left-color: var(--err); }
+.code-sort .sort-text { font-family: var(--mono); font-size: .85rem; white-space: pre; overflow-x: auto; }
+.next-row { margin-top: 12px; text-align: right; }
+.result { text-align: center; padding: 10px 0; }
+.result-score { font-size: 3rem; font-weight: 800; color: var(--accent-2); line-height: 1.1; }
+.result-score small { font-size: 1rem; color: var(--muted); }
+.result-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+
 /* ---------- Fitxers del programa ---------- */
 .files { margin-top: 8px; font-family: var(--sans); }
 .files > summary { cursor: pointer; font-weight: 700; font-size: .88rem; padding: 4px 0; }

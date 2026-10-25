@@ -173,6 +173,41 @@ final class Db
                     created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
                 );
                 SQL,
+
+            // Fase 3: reptes i repàs espaciat
+            2 => <<<'SQL'
+                CREATE TABLE repte_sessions (
+                    id INTEGER PRIMARY KEY,
+                    mode TEXT NOT NULL,          -- rapid | error | sortida | ordenar | repas
+                    tema TEXT,
+                    items TEXT NOT NULL,         -- JSON: referències de les preguntes, en ordre
+                    answers TEXT NOT NULL DEFAULT '{}',   -- JSON: ref => {ok, ms}
+                    started_at INTEGER NOT NULL,
+                    limit_s INTEGER,             -- segons (NULL = sense límit)
+                    finished_at INTEGER,
+                    encerts INTEGER NOT NULL DEFAULT 0,
+                    score INTEGER NOT NULL DEFAULT 0,
+                    xp INTEGER NOT NULL DEFAULT 0
+                );
+                -- Repàs espaciat (sistema Leitner): caixa 1 = es repassa l'endemà ... caixa 5 = al cap d'un mes
+                CREATE TABLE review_items (
+                    ref TEXT PRIMARY KEY,        -- lesson:<lliçó>#<pregunta> o repte:<id>
+                    box INTEGER NOT NULL DEFAULT 1,
+                    due TEXT NOT NULL,           -- data (AAAA-MM-DD) en què toca repassar-la
+                    fails INTEGER NOT NULL DEFAULT 0,
+                    successes INTEGER NOT NULL DEFAULT 0,
+                    updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+                );
+                CREATE TABLE repte_stats (
+                    item_id TEXT PRIMARY KEY,
+                    attempts INTEGER NOT NULL DEFAULT 0,
+                    correct INTEGER NOT NULL DEFAULT 0
+                );
+                -- Les preguntes de lliçó que ja s'havien fallat entren al repàs des d'avui
+                INSERT INTO review_items (ref, box, due, fails)
+                    SELECT 'lesson:' || lesson_id || '#' || question_id, 1, date('now','localtime'), attempts - correct
+                    FROM lesson_answers WHERE attempts > correct;
+                SQL,
         ];
 
         $pdo->exec('CREATE TABLE IF NOT EXISTS schema_version (version INTEGER NOT NULL)');

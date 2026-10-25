@@ -47,6 +47,21 @@
   </section>
 </div>
 
+<section class="card reptes-banner">
+  <div>
+    <h2>🎯 Reptes i repàs</h2>
+    <?php if ($pendents > 0): ?>
+      <p>Tens <strong><?= e($pendents) ?> pregunta<?= $pendents > 1 ? 'es' : '' ?></strong> per repassar avui.</p>
+    <?php else: ?>
+      <p class="muted">Contrarellotge, «Troba l'error», «Què imprimeix?» i «Ordena el codi». Les preguntes que falles tornen al repàs.</p>
+    <?php endif; ?>
+  </div>
+  <div class="banner-actions">
+    <?php if ($pendents > 0): ?><a class="btn primary" href="index.php?p=repte&amp;mode=repas">🔁 Repassar ara</a><?php endif; ?>
+    <a class="btn" href="index.php?p=reptes">Veure els reptes</a>
+  </div>
+</section>
+
 <div class="grid-2">
   <section class="card">
     <h2>El teu temari</h2>
@@ -82,5 +97,5 @@
 
 <section class="card soon">
   <h2>Properament</h2>
-  <p class="muted">Més exercicis d'Exercicis 01 · Reptes contrarellotge, «Troba l'error» i repàs espaciat · Mapa de temes, insígnies i estadístiques · Laboratoris web amb formularis (Activitat de Nadal).</p>
+  <p class="muted">Mapa de temes, insígnies i estadístiques · Més exercicis d'Exercicis 01 · Laboratoris web amb formularis (Activitat de Nadal).</p>
 </section>

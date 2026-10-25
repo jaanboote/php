@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress};
+use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -83,6 +83,15 @@ try {
                 Sandbox::clearWorkspace($lab['id']);
             }
             respond(['files' => Sandbox::listFiles(Sandbox::workspace($lab['id']))]);
+
+        case 'repte_start':
+            respond(Reptes::start((string) ($in['mode'] ?? ''), isset($in['tema']) ? (string) $in['tema'] : null));
+
+        case 'repte_answer':
+            respond(Reptes::answer((int) ($in['session'] ?? 0), (string) ($in['item'] ?? ''), (string) ($in['answer'] ?? '')));
+
+        case 'repte_finish':
+            respond(Reptes::finish((int) ($in['session'] ?? 0)) + ['progress' => Progress::summary()]);
 
         case 'lab_summary':
             respond(Labs::summary(lab($in)));

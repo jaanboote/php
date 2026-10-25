@@ -57,13 +57,7 @@ final class Lessons
     public static function answer(array $lesson, string $qid, string $answer): array
     {
         $q = self::questions($lesson)[$qid] ?? throw new \InvalidArgumentException('Pregunta inexistent');
-        $correct = match ($q['tipus']) {
-            'test'     => (int) $answer === (int) $q['correcta'],
-            'completa' => in_array(self::squash($answer), array_map([self::class, 'squash'], $q['respostes']), true),
-            'sortida'  => Labs::normalize($answer) === Labs::normalize($q['resposta']),
-            // ordenar: el navegador envia els índexs originals en l'ordre triat ("2,0,1"); correcte = 0, 1, 2...
-            'ordenar'  => array_map('intval', explode(',', $answer)) === range(0, count($q['elements']) - 1),
-        };
+        $correct = self::isCorrect($q, $answer);
 
         Db::run('INSERT OR IGNORE INTO lesson_answers (lesson_id, question_id) VALUES (?, ?)', [$lesson['id'], $qid]);
         $row = Db::one('SELECT * FROM lesson_answers WHERE lesson_id = ? AND question_id = ?', [$lesson['id'], $qid]);
@@ -76,6 +70,9 @@ final class Lessons
         );
 
         $xp = 0;
+        if (!$correct) {
+            Review::fail("lesson:{$lesson['id']}#$qid");   // tornarà a sortir al repàs
+        }
         if ($correct) {
             $xp = Progress::award('lesson_q', "{$lesson['id']}#$qid", $firstTry ? 5 : 2);
             foreach ($q['conceptes'] ?? [] as $c) {
@@ -97,6 +94,19 @@ final class Lessons
             'xp' => $xp,
             'leccio_acabada' => $done['acabada'],
         ];
+    }
+
+    /** Corregeix una resposta (també el fa servir el repàs espaciat). */
+    public static function isCorrect(array $q, string $answer): bool
+    {
+        return match ($q['tipus']) {
+            'test'     => (int) $answer === (int) $q['correcta'],
+            'completa' => in_array(self::squash($answer), array_map([self::class, 'squash'], $q['respostes']), true),
+            'sortida'  => Labs::normalize($answer) === Labs::normalize($q['resposta']),
+            // ordenar: el navegador envia els índexs originals en l'ordre triat ("2,0,1"); correcte = 0, 1, 2...
+            'ordenar'  => array_map('intval', explode(',', $answer)) === range(0, count($q['elements']) - 1),
+            default    => false,
+        };
     }
 
     /** La lliçó està acabada quan totes les preguntes s'han encertat. */

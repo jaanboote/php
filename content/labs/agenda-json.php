@@ -272,7 +272,7 @@ return [
                  'fitxer_conte' => ['contactes.json' => ['"nom": "Anna"', '"telefon": "622555666"']]],
                 ['nom' => 'Afegir a una agenda que ja en té 2', 'args' => ['afegeix', 'Pau', '633777888'], 'fitxers' => ['contactes.json' => $dos],
                  'fitxer_conte' => ['contactes.json' => ['"nom": "Marta"', '"nom": "Jordi"', '"nom": "Pau"']]],
-                ['nom' => 'Accents sense À', 'args' => ['afegeix', 'Àlex', '644999000'], 'fitxer_conte' => ['contactes.json' => ['"nom": "Àlex"']]],
+                ['nom' => 'Accents llegibles (sense \\u00c0)', 'args' => ['afegeix', 'Àlex', '644999000'], 'fitxer_conte' => ['contactes.json' => ['"nom": "Àlex"']]],
                 ['nom' => 'Llistar continua funcionant', 'args' => ['llista'], 'fitxers' => ['contactes.json' => $dos], 'conte' => ['- Jordi: 611333444']],
                 ['nom' => 'Ordre desconeguda', 'args' => ['esborra'], 'conte' => ['Ús: php agenda.php'], 'codi_sortida' => 1],
                 ['nom' => 'Falta el telèfon', 'args' => ['afegeix', 'Anna'], 'conte' => ['Ús: php agenda.php'], 'codi_sortida' => 1],

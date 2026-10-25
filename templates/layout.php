@@ -21,6 +21,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <a class="brand" href="index.php"><span class="brand-mark">&lt;?</span>PHPLab</a>
   <nav class="nav">
     <a href="index.php" class="<?= $page === 'inici' ? 'active' : '' ?>">Inici</a>
+    <a href="index.php?p=reptes" class="<?= in_array($page, ['reptes', 'repte'], true) ? 'active' : '' ?>">Reptes</a>
     <a href="index.php?p=temari" class="<?= $page === 'temari' ? 'active' : '' ?>">Temari</a>
     <a href="index.php?p=diagnostic" class="<?= $page === 'diagnostic' ? 'active' : '' ?>">Diagnòstic</a>
   </nav>
@@ -52,5 +53,6 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/js/app.js?v=1"></script>
 <?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=1"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=1"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=1"></script><?php endif; ?>
 </body>
 </html>

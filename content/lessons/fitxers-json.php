@@ -191,7 +191,7 @@ return [
             'origen' => "$origen · pàg. 22-23",
             'html' => <<<'HTML'
                 <ul>
-                  <li><code>json_encode($dades)</code>: PHP → text JSON. Opcions: <code>JSON_PRETTY_PRINT</code> (sagnat) i <code>JSON_UNESCAPED_UNICODE</code> (accents sense <code>à</code>).</li>
+                  <li><code>json_encode($dades)</code>: PHP → text JSON. Opcions: <code>JSON_PRETTY_PRINT</code> (sagnat) i <code>JSON_UNESCAPED_UNICODE</code> (accents llegibles, sense <code>\u00e0</code>).</li>
                   <li><code>json_decode($json, true)</code>: JSON → array associatiu (amb <code>true</code>).</li>
                   <li>Amb <code>JSON_THROW_ON_ERROR</code>, un JSON malmès llança una <code>JsonException</code> en lloc de retornar <code>null</code> sense avisar.</li>
                 </ul>
