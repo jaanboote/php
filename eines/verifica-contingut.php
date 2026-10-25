@@ -54,17 +54,17 @@ foreach (Lessons::all() as $lesson) {
     foreach ($lesson['blocs'] as $i => $b) {
         $label = "LLIÇÓ {$lesson['id']} · bloc " . ($i + 1);
         if ($b['tipus'] === 'codi') {
-            $r = Sandbox::run($b['codi'], Sandbox::parseArgs($b['args'] ?? ''), $b['stdin'] ?? '', $b['fitxer'] ?? 'main.php');
+            $r = Sandbox::run($b['codi'], Sandbox::parseArgs($b['args'] ?? ''), $b['stdin'] ?? '', $b['fitxer'] ?? 'main.php', null, $b['fitxers'] ?? []);
             $fatal = $r['timeout'] || preg_match('/^(Parse error|Fatal error)/m', $r['stderr']);
-            // Alguns exemples mostren un avís a propòsit (es diu a l'enunciat del bloc)
-            if ($fatal && !str_contains($b['html'] ?? '', 'TypeError')) {
+            // Alguns exemples mostren un error a propòsit ('error_intencionat' => true)
+            if ($fatal && empty($b['error_intencionat'])) {
                 $errors++;
                 echo "FALLA $label (codi «{$b['titol']}»): " . trim($r['stderr']) . "\n";
             } else {
                 echo "  ok  $label (codi)" . (trim($r['stderr']) !== '' ? ' [amb avís, revisa que sigui intencionat]' : '') . "\n";
             }
         } elseif ($b['tipus'] === 'sortida') {
-            $r = Sandbox::run($b['codi'], Sandbox::parseArgs($b['args'] ?? ''));
+            $r = Sandbox::run($b['codi'], Sandbox::parseArgs($b['args'] ?? ''), $b['stdin'] ?? '', 'main.php', null, $b['fitxers'] ?? []);
             if (Labs::normalize($r['stdout']) === Labs::normalize($b['resposta']) && trim($r['stderr']) === '') {
                 echo "  ok  $label (què imprimeix)\n";
             } else {

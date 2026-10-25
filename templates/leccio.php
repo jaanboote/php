@@ -22,7 +22,7 @@
       <?php elseif ($b['tipus'] === 'codi'): ?>
         <h3>▶ <?= e($b['titol']) ?></h3>
         <?= $b['html'] ?? '' ?>
-        <div class="playground" data-fitxer="<?= e($b['fitxer'] ?? 'main.php') ?>">
+        <div class="playground" data-fitxer="<?= e($b['fitxer'] ?? 'main.php') ?>" data-bloc="<?= (int) $i ?>">
           <textarea class="code-src"><?= e($b['codi']) ?></textarea>
           <div class="run-bar">
             <label class="inline">$ php <?= e($b['fitxer'] ?? 'main.php') ?>
@@ -33,6 +33,9 @@
           <?php if (isset($b['stdin'])): ?>
             <label class="stdin-label">Entrada (respostes a readline, una per línia)
               <textarea class="stdin" rows="2"><?= e($b['stdin']) ?></textarea></label>
+          <?php endif; ?>
+          <?php if (!empty($b['fitxers'])): ?>
+            <p class="small muted">📁 Fitxers que hi ha a la carpeta abans d'executar: <?= e(implode(', ', array_keys($b['fitxers']))) ?></p>
           <?php endif; ?>
           <div class="output" hidden></div>
         </div>

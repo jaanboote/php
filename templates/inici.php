@@ -82,5 +82,5 @@
 
 <section class="card soon">
   <h2>Properament</h2>
-  <p class="muted">Tema 4 (errors, excepcions, fitxers i JSON) i Tema 1 · Més exercicis d'Exercicis 01 · Reptes contrarellotge, «Troba l'error» i repàs espaciat · Mapa de temes, insígnies i estadístiques · Laboratoris web amb formularis (Activitat de Nadal).</p>
+  <p class="muted">Tema 1 (teoria del desenvolupament web) · Més exercicis d'Exercicis 01 · Reptes contrarellotge, «Troba l'error» i repàs espaciat · Mapa de temes, insígnies i estadístiques · Laboratoris web amb formularis (Activitat de Nadal).</p>
 </section>

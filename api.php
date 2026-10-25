@@ -47,7 +47,13 @@ try {
     switch ($_GET['a'] ?? '') {
         case 'run':
             $args = Sandbox::parseArgs((string) ($in['args'] ?? ''));
-            $r = Sandbox::run($code, $args, (string) ($in['stdin'] ?? ''), (string) ($in['fitxer'] ?? 'main.php'));
+            // Als laboratoris, els fitxers que crea el programa es conserven entre execucions
+            $lab = isset($in['lab']) ? Labs::get((string) $in['lab']) : null;
+            // Als exemples de les lliçons, els fitxers de partida els defineix el contingut (no el navegador)
+            $lesson = isset($in['lesson']) ? Lessons::get((string) $in['lesson']) : null;
+            $files = $lesson['blocs'][(int) ($in['bloc'] ?? -1)]['fitxers'] ?? [];
+            $r = Sandbox::run($code, $args, (string) ($in['stdin'] ?? ''), (string) ($in['fitxer'] ?? 'main.php'), null,
+                              $files, $lab ? Sandbox::workspace($lab['id']) : null);
             $r['explicacions'] = ErrorExplainer::explain($r['stderr'], $r['timeout'], $r['truncated']);
             $r['argv'] = array_merge([basename((string) ($in['fitxer'] ?? 'main.php'))], $args);
             respond($r);
@@ -70,6 +76,13 @@ try {
 
         case 'lab_solution':
             respond(Labs::solution(lab($in), (int) ($in['step'] ?? 0)));
+
+        case 'lab_files':
+            $lab = lab($in);
+            if (!empty($in['buidar'])) {
+                Sandbox::clearWorkspace($lab['id']);
+            }
+            respond(['files' => Sandbox::listFiles(Sandbox::workspace($lab['id']))]);
 
         case 'lab_summary':
             respond(Labs::summary(lab($in)));

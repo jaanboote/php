@@ -148,7 +148,7 @@ final class Labs
     private static function runTest(array $lab, array $t, string $code): array
     {
         $args = $t['args'] ?? [];
-        $r = Sandbox::run($code, $args, $t['stdin'] ?? '', $lab['fitxer'], $t['append'] ?? null);
+        $r = Sandbox::run($code, $args, $t['stdin'] ?? '', $lab['fitxer'], $t['append'] ?? null, $t['fitxers'] ?? []);
         $out = self::normalize($r['stdout']);
         $res = [
             'nom' => $t['nom'],
@@ -158,6 +158,8 @@ final class Labs
             'esperat' => $t['exacte'] ?? null,
             'obtingut' => mb_substr($r['stdout'], 0, 3000),
             'errors' => ErrorExplainer::explain($r['stderr'], $r['timeout'], $r['truncated']),
+            'fitxers_inicials' => array_keys($t['fitxers'] ?? []),
+            'fitxers' => $r['files'],
         ];
 
         if ($r['busy']) {
@@ -181,6 +183,34 @@ final class Labs
                 return ['ok' => false, 'motiu' => "La sortida hauria de contenir: «{$needle}»"] + $res;
             }
         }
+        foreach ($t['conte_regex'] ?? [] as $regex => $descripcio) {
+            if (!preg_match($regex, $r['stdout'])) {
+                return ['ok' => false, 'motiu' => "La sortida hauria de contenir $descripcio"] + $res;
+            }
+        }
+
+        // Comprovacions sobre els fitxers que deixa el programa
+        $files = array_column($r['files'], 'contingut', 'nom');
+        foreach (array_merge(array_keys($t['fitxer_conte'] ?? []), array_keys($t['fitxer_regex'] ?? [])) as $name) {
+            if (!array_key_exists($name, $files)) {
+                return ['ok' => false, 'motiu' => "El programa hauria d'haver creat el fitxer «{$name}»."] + $res;
+            }
+        }
+        foreach ($t['fitxer_conte'] ?? [] as $name => $needles) {
+            foreach ((array) $needles as $needle) {
+                if (!str_contains(self::normalize((string) $files[$name]), self::normalize($needle))) {
+                    return ['ok' => false, 'motiu' => "El fitxer «{$name}» hauria de contenir: «{$needle}»"] + $res;
+                }
+            }
+        }
+        foreach ($t['fitxer_regex'] ?? [] as $name => $rules) {
+            foreach ($rules as $regex => $descripcio) {
+                if (!preg_match($regex, (string) $files[$name])) {
+                    return ['ok' => false, 'motiu' => "El fitxer «{$name}» hauria de tenir $descripcio"] + $res;
+                }
+            }
+        }
+
         foreach ($t['no_conte'] ?? [] as $needle) {
             if (str_contains($out, self::normalize($needle))) {
                 return ['ok' => false, 'motiu' => "La sortida NO hauria de contenir: «{$needle}»"] + $res;
@@ -298,5 +328,6 @@ final class Labs
         Db::run('DELETE FROM lab_state WHERE lab_id = ?', [$lab['id']]);
         Db::run('DELETE FROM lab_steps WHERE lab_id = ?', [$lab['id']]);
         Db::run('DELETE FROM tutor_messages WHERE lab_id = ?', [$lab['id']]);
+        Sandbox::clearWorkspace($lab['id']);
     }
 }

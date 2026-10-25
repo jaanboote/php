@@ -175,7 +175,9 @@ I fora de htdocs, a `C:\xampp\phplab-data\`:
 phplab-data/
 ├── phplab.sqlite          ← progrés, XP, temari indexat, xat del tutor
 ├── temari/                ← els fitxers que has pujat
-└── sandbox/               ← carpetes temporals on s'executa el teu codi (s'esborren soles)
+└── sandbox/
+    ├── jobs/              ← carpetes temporals on s'executa el teu codi (s'esborren soles)
+    └── workspaces/        ← fitxers que creen els programes de cada laboratori
 ```
 
 **Flux d'un «Comprova» al laboratori:**
@@ -210,8 +212,11 @@ Executar codi escrit per l'usuari és el més perillós d'una app com aquesta. A
 | **Entorn net** | El procés no rep les variables d'entorn d'Apache. | Filtrar informació del servidor. |
 | **Màxim 2 execucions alhora** | Bloquejos amb `flock`. | Saturar el PC amb moltes execucions. |
 | **Límit de sortida** | Si escriu més de 100 KB, s'atura. | Omplir la memòria o el disc. |
+| **Fitxers limitats** | Cada laboratori té la seva carpeta (`phplab-data\sandbox\workspaces\<laboratori>`), on es conserven els fitxers entre execucions (com a molt 1 MB). | Que un programa ompli el disc o toqui fitxers d'un altre laboratori. |
 
 Totes les directives es passen amb `-d` a `php.exe` (mira `Sandbox::iniSettings()`).
+`ini_set()` està desactivada (si no, el codi es podria treure els límits); `ini_get()` i `error_reporting()` funcionen.
+`error_log()` escriu al fitxer `php_errors.log` de la carpeta del programa, com el log d'un servidor real.
 No és un aïllament perfecte com el d'un contenidor o una màquina virtual, però per a ús personal
 a la xarxa de casa és raonable. Per això **no s'ha d'obrir mai l'app a Internet**.
 

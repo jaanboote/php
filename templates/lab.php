@@ -99,6 +99,7 @@ $step = $lab['passos'][$current];
     </details>
     <div id="argv-preview" class="argv muted small"></div>
     <div id="output" class="output" hidden></div>
+    <div id="files" class="files-panel" hidden></div>
     <div id="results" class="results" hidden></div>
   </section>
 

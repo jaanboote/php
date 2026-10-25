@@ -19,6 +19,8 @@
           args: pg.querySelector('.args').value,
           stdin: pg.querySelector('.stdin')?.value || '',
           fitxer: pg.dataset.fitxer,
+          lesson: lessonId,
+          bloc: +pg.dataset.bloc,
         });
         PHPLab.renderOutput(pg.querySelector('.output'), r, cm);
       } catch (e) {

@@ -99,8 +99,24 @@ const PHPLab = (() => {
     return cm;
   }
 
-  /** Pinta el resultat d'una execució: sortida + errors explicats en català. */
-  function renderOutput(box, r, cm) {
+  /** Llista de fitxers (nom, mida i contingut) que ha deixat el programa. */
+  function filesHtml(files, title = '📁 Fitxers del programa') {
+    if (!files || !files.length) return '';
+    let html = '<details class="files"><summary>' + esc(title) + ' (' + files.length + ')</summary>';
+    for (const f of files) {
+      html += '<div class="file"><div class="file-name">' + esc(f.nom) + (f.nom.endsWith('/') ? '' : ' <span class="muted">· ' + f.size + ' bytes</span>') + '</div>';
+      if (f.contingut !== null && !f.nom.endsWith('/')) {
+        html += '<pre>' + (f.contingut === '' ? '<span class="out-empty">(buit)</span>' : esc(f.contingut)) + '</pre>';
+      } else if (!f.nom.endsWith('/')) {
+        html += '<div class="muted small">(fitxer binari)</div>';
+      }
+      html += '</div>';
+    }
+    return html + '</details>';
+  }
+
+  /** Pinta el resultat d'una execució: sortida + errors explicats en català (+ fitxers, si showFiles). */
+  function renderOutput(box, r, cm, showFiles = true) {
     box.hidden = false;
     const meta = [];
     if (r.timeout) meta.push('⏱ aturat per temps');
@@ -113,6 +129,8 @@ const PHPLab = (() => {
         '</strong><br>' + esc(ex.explicacio) + (ex.original ? '<div class="orig">' + esc(ex.original) + '</div>' : '') + '</div>';
     }
     if (!r.explicacions?.length && r.stderr) html += '<div class="explain"><pre>' + esc(r.stderr) + '</pre></div>';
+    if (showFiles) html += filesHtml(r.files);
+    if (r.avis_fitxers) html += '<div class="explain avis">' + esc(r.avis_fitxers) + '</div>';
     box.innerHTML = html;
     if (cm) markErrorLines(cm, r.explicacions || []);
   }
@@ -153,5 +171,5 @@ const PHPLab = (() => {
     if (e.submitter) e.submitter.textContent = 'Pujant i indexant…';
   });
 
-  return { api, esc, toast, updateProgress, makeEditor, renderOutput, markErrorLines, argvPreview };
+  return { api, esc, toast, updateProgress, makeEditor, renderOutput, markErrorLines, argvPreview, filesHtml };
 })();

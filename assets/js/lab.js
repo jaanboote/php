@@ -4,7 +4,7 @@
 (() => {
   const root = document.getElementById('lab');
   if (!root) return;
-  const { api, esc, toast, updateProgress, makeEditor, renderOutput, argvPreview } = PHPLab;
+  const { api, esc, toast, updateProgress, makeEditor, renderOutput, argvPreview, filesHtml } = PHPLab;
 
   const labId = root.dataset.lab;
   const step = +root.dataset.step;
@@ -50,9 +50,10 @@
     const btn = $('btn-run');
     busy(btn, true);
     try {
-      const r = await api('run', { code: getCode(), args: argsInput.value, stdin: stdinInput.value, fitxer });
+      const r = await api('run', { code: getCode(), args: argsInput.value, stdin: stdinInput.value, fitxer, lab: labId });
       lastRun = { stdout: r.stdout, stderr: r.stderr, args: argsInput.value };
-      renderOutput($('output'), r, cm);
+      renderOutput($('output'), r, cm, false);
+      renderFiles(r.files);
     } catch (e) {
       toast(e.message);
     } finally {
@@ -60,6 +61,27 @@
     }
   }
   $('btn-run').addEventListener('click', run);
+
+  // ---------- Fitxers del laboratori (es conserven entre execucions) ----------
+  function renderFiles(files) {
+    const box = $('files');
+    if (!files || !files.length) {
+      box.hidden = true;
+      box.innerHTML = '';
+      return;
+    }
+    box.hidden = false;
+    box.innerHTML = filesHtml(files, '📁 Carpeta del programa') +
+      '<button class="btn small" type="button" id="btn-clear-files">🗑 Buidar la carpeta</button>';
+    box.querySelector('details').open = true;
+    $('btn-clear-files').addEventListener('click', async () => {
+      if (!confirm('Esborrar tots els fitxers que ha creat el programa?')) return;
+      const r = await api('lab_files', { lab: labId, buidar: true });
+      renderFiles(r.files);
+      toast('Carpeta buidada');
+    });
+  }
+  api('lab_files', { lab: labId }).then((r) => renderFiles(r.files)).catch(() => {});
 
   // ---------- Comprovar el pas ----------
   $('btn-check').addEventListener('click', async () => {
@@ -108,6 +130,10 @@
       } else {
         html += '<div>Sortida<pre class="code">' + esc(t.obtingut || '(res)') + '</pre></div>';
       }
+      if (t.fitxers_inicials && t.fitxers_inicials.length) {
+        html += '<p class="small muted">Fitxers preparats abans d\'executar: ' + t.fitxers_inicials.map(esc).join(', ') + '</p>';
+      }
+      html += filesHtml(t.fitxers, '📁 Fitxers després de l\'execució');
       for (const ex of t.errors || []) {
         html += '<div class="explain ' + esc(ex.tipus) + '"><strong>' + (ex.linia ? 'Línia ' + ex.linia + ' · ' : '') + esc(ex.titol) + '</strong><br>' + esc(ex.explicacio) + '</div>';
       }
