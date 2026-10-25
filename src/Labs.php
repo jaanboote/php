@@ -37,7 +37,7 @@ final class Labs
     {
         $state = Db::one('SELECT * FROM lab_state WHERE lab_id = ?', [$lab['id']]);
         if ($state === null) {
-            Db::run('INSERT INTO lab_state (lab_id, current_step, code) VALUES (?, 0, ?)', [$lab['id'], $lab['codi_inicial']]);
+            Db::run('INSERT INTO lab_state (lab_id, current_step, code) VALUES (?, 0, ?)', [$lab['id'], self::initialCode($lab)]);
             $state = Db::one('SELECT * FROM lab_state WHERE lab_id = ?', [$lab['id']]);
         }
         $steps = [];
@@ -52,6 +52,12 @@ final class Labs
     {
         Db::run('INSERT OR IGNORE INTO lab_steps (lab_id, step) VALUES (?, ?)', [$labId, $step]);
         return Db::one('SELECT * FROM lab_steps WHERE lab_id = ? AND step = ?', [$labId, $step]);
+    }
+
+    /** Codi inicial tal com es desa: un text o, als laboratoris web, els fitxers en JSON. */
+    public static function initialCode(array $lab): string
+    {
+        return is_array($lab['codi_inicial']) ? json_encode($lab['codi_inicial'], JSON_UNESCAPED_UNICODE) : $lab['codi_inicial'];
     }
 
     public static function saveCode(string $labId, string $code): void
@@ -114,22 +120,27 @@ final class Labs
      * Avalua el codi contra un pas sense desar res: comprovacions sobre el codi i proves executant-lo.
      * També el fa servir eines/verifica-contingut.php per comprovar les solucions de referència.
      */
-    public static function evaluate(array $lab, int $stepIdx, string $code): array
+    public static function evaluate(array $lab, int $stepIdx, string|array $code): array
     {
         $step = $lab['passos'][$stepIdx];
+        $web = WebLab::isWeb($lab);
+        // Als laboratoris web, el codi són diversos fitxers (en JSON o ja com a array)
+        $sources = $web ? (is_array($code) ? WebLab::cleanSources($lab, $code) : WebLab::sources($lab, $code)) : null;
 
-        // 1) Comprovacions sobre el codi (sense executar-lo)
+        // 1) Comprovacions sobre el codi (sense executar-lo). Als web, sobre un fitxer ('fitxer') o sobre tots.
         $codeChecks = [];
-        $clean = self::stripComments($code);
         foreach ($step['codi'] ?? [] as $chk) {
+            $clean = $web
+                ? self::stripComments(isset($chk['fitxer']) ? ($sources[$chk['fitxer']] ?? '') : implode("\n", $sources))
+                : self::stripComments($code);
             $ok = isset($chk['regex']) ? (bool) preg_match($chk['regex'], $clean) : !preg_match($chk['no_regex'], $clean);
             $codeChecks[] = ['ok' => $ok, 'missatge' => $chk['missatge']];
         }
 
-        // 2) Proves executant el programa
+        // 2) Proves executant el programa (o fent peticions a la web)
         $tests = [];
         foreach ($step['proves'] as $t) {
-            $tests[] = self::runTest($lab, $t, $code);
+            $tests[] = $web ? WebLab::runTest($lab, $t, $sources) : self::runTest($lab, $t, $code);
         }
 
         $passed = !in_array(false, array_column($codeChecks, 'ok'), true) && !in_array(false, array_column($tests, 'ok'), true);
@@ -329,5 +340,6 @@ final class Labs
         Db::run('DELETE FROM lab_steps WHERE lab_id = ?', [$lab['id']]);
         Db::run('DELETE FROM tutor_messages WHERE lab_id = ?', [$lab['id']]);
         Sandbox::clearWorkspace($lab['id']);
+        WebLab::reset($lab['id']);
     }
 }

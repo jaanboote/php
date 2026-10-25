@@ -8,11 +8,12 @@ perquè també puguis llegir i entendre com funciona per dins.
 
 - Login d'un sol usuari, accés només des de la xarxa de casa.
 - **Temari:** pujar-lo (PDF, ZIP, DOCX, PHP, HTML, TXT, MD), indexador amb detecció de canvis i lectura per temes.
-- **Aprendre:** 16 lliçons dels Temes 1 a 4, amb exemples «prova-ho» executables i preguntes (test, completa, què imprimeix, ordena).
-- **Laboratori:** 14 exercicis guiats pas a pas (basats en Exercicis 01 i 02 i les activitats dels temes), amb proves
+- **Aprendre:** 19 lliçons dels Temes 1 a 5, amb exemples «prova-ho» executables i preguntes (test, completa, què imprimeix, ordena).
+- **Laboratori:** 17 exercicis guiats pas a pas (basats en Exercicis 01 i 02, les activitats dels temes i l'Activitat de Nadal), amb proves
   automàtiques, pistes de 3 nivells, solució després de 3 intents i un tutor socràtic (IA de Claude o sense connexió).
 - **Reptes:** contrarellotge, «Troba l'error», «Què imprimeix?», «Ordena el codi» i repàs espaciat.
 - **Progrés:** mapa de temes, insígnies i estadístiques.
+- **Laboratoris web:** escrius una web amb formularis i la proves en un navegador integrat (POST, pujada d'imatges, sessions), amb un inspector de `$_GET`, `$_POST`, `$_FILES`, galetes i sessió.
 - **Sandbox** segur per executar el codi, amb fitxers que es conserven per laboratori.
 - XP, nivells i ratxa diària.
 
@@ -73,6 +74,7 @@ Obre `config.php` i revisa'l. Les opcions estan comentades. Les importants:
 | `data_dir` | Carpeta de dades privades (base de dades, temari, sandbox). Per defecte és `C:\xampp\phplab-data`, **fora de htdocs**. |
 | `allowed_networks` | Xarxes que poden entrar. Per defecte: aquest PC i `192.168.1.0/24` (la teva xarxa de casa). |
 | `sandbox.php_cli` | El PHP que executa el teu codi: `C:\xampp\php\php.exe`. |
+| `sandbox.php_cgi` | El PHP dels laboratoris web: `C:\xampp\php\php-cgi.exe`. Si no hi és, es busca al costat de `php_cli`. |
 | `ai.api_key` | Clau de l'API de Claude (opcional, mira el punt següent). |
 
 `config.php` no es puja mai a GitHub: és al `.gitignore` perquè hi ha la clau.
@@ -286,7 +288,31 @@ La pàgina **Progrés** té tres parts:
   una, surt un avís a qualsevol pàgina. Una insígnia aconseguida no es perd mai. Les definicions són a `src/Badges.php`.
 - **Estadístiques:** XP de cada dia dels últims 30 dies, d'on ve l'XP, partides i encert per mode de repte, i els conceptes que més costen.
 
-## 8. Properes fases
+## 8. Laboratoris web (Tema 5)
 
-- **Fase 5:** laboratoris web (formularis `$_GET`/`$_POST`, pujada de fitxers, sessions, cookies i MySQL) executats amb `php-cgi.exe`.
+Als laboratoris web escrius diversos fitxers (`index.php`, `processa.php`, `estil.css`...) i els proves en un **navegador integrat**
+a la dreta de la pàgina: els formularis s'envien, les imatges es pugen i les redireccions i sessions funcionen com a XAMPP.
+
+- **Laboratoris:** formulari de salutació amb GET, la **Carta als Reis Mags** (l'Activitat de Nadal: POST, validació i pujada de fins a 3
+  imatges a `uploads/`) i una zona privada amb inici de sessió, `$_SESSION` i `password_verify()`.
+- **Inspector:** a cada petició mostra el mètode, el codi HTTP, `$_GET`, `$_POST`, `$_FILES`, les galetes, el contingut de la sessió,
+  els fitxers del «servidor» i els errors de PHP explicats.
+- **Lliçons:** formularis GET i POST, pujar fitxers amb `$_FILES` i galetes, sessions i contrasenyes (aquesta última és ampliació:
+  els apartats 5.10–5.12 del mòdul encara no tenen apunts de classe).
+
+**Com funciona per dins:** el navegador és un `<iframe>` que carrega `web.php/<testimoni>/<laboratori>/<fitxer>`. `web.php` executa
+el fitxer amb `php-cgi.exe` (el mateix sandbox: temps límit, memòria, `open_basedir`, funcions desactivades) i en retorna la resposta.
+
+| Mesura | Per què |
+|---|---|
+| L'iframe porta `sandbox` i `web.php` envia `Content-Security-Policy: sandbox` | El codi de la teva web (HTML i JavaScript) s'executa en un origen aïllat: no pot llegir les galetes de PHPLab ni tocar la pàgina del laboratori, encara que obris la URL directament. |
+| Testimoni signat a la URL (caduca en 12 h) | Un iframe aïllat no envia la sessió de la app; el testimoni prova que l'has obert tu des del laboratori. |
+| Galetes i sessions de la teva web desades al servidor (`phplab-data\sandbox\web`) | No es barregen amb les de PHPLab, i l'inspector les pot ensenyar. |
+| Fitxers del «servidor» a la carpeta del laboratori (com a molt 8 MB) | Les imatges pujades es conserven entre peticions, sense sortir de la carpeta del sandbox. |
+
+Si a **Diagnòstic** surt «php-cgi per als laboratoris web» en vermell, revisa `sandbox.php_cgi` a `config.php`.
+
+## 9. Properes fases
+
+- Accés a bases de dades amb PDO i MySQL (apartat 6 del mòdul).
 - Més exercicis d'Exercicis 01 com a laboratoris.

@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes, Badges};
+use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes, Badges, WebLab};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -41,6 +41,19 @@ function lab(array $in): array
     return Labs::get((string) ($in['lab'] ?? '')) ?? respond(['error' => 'Laboratori no trobat'], 404);
 }
 
+/** Als laboratoris web, el codi són els fitxers en JSON: només hi deixem els que defineix el laboratori. */
+function labCode(array $lab, string $code): string
+{
+    if (!WebLab::isWeb($lab)) {
+        return $code;
+    }
+    $files = json_decode($code, true);
+    if (!is_array($files)) {
+        respond(['error' => 'Format dels fitxers no vàlid'], 400);
+    }
+    return json_encode(WebLab::cleanSources($lab, $files), JSON_UNESCAPED_UNICODE);
+}
+
 // Les sessions PHP bloquegen peticions simultànies; com que aquí ja no escrivim a $_SESSION, l'alliberem.
 session_write_close();
 
@@ -65,11 +78,28 @@ try {
             respond($res + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_save':
-            Labs::saveCode(lab($in)['id'], $code);
+            $lab = lab($in);
+            Labs::saveCode($lab['id'], labCode($lab, $code));
+            respond(['ok' => true]);
+
+        case 'web_open':
+            // Desa els fitxers i retorna l'adreça per obrir-los al navegador integrat
+            $lab = lab($in);
+            Labs::state($lab);
+            Labs::saveCode($lab['id'], labCode($lab, $code));
+            $path = preg_replace('#[^A-Za-z0-9_./?=&%\-+]#', '', (string) ($in['path'] ?? 'index.php')) ?: 'index.php';
+            respond(['url' => WebLab::url($lab['id'], ltrim(str_replace('..', '', $path), '/'))]);
+
+        case 'web_inspector':
+            respond(WebLab::inspector(lab($in)));
+
+        case 'web_reset':
+            WebLab::reset(lab($in)['id']);
             respond(['ok' => true]);
 
         case 'lab_check':
-            $res = Labs::check(lab($in), (int) ($in['step'] ?? 0), $code);
+            $lab = lab($in);
+            $res = Labs::check($lab, (int) ($in['step'] ?? 0), labCode($lab, $code));
             respond($res + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_hint':

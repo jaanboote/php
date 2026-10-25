@@ -129,5 +129,5 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
 
 <section class="card soon">
   <h2>Properament</h2>
-  <p class="muted">Més exercicis d'Exercicis 01 · Laboratoris web amb formularis (Activitat de Nadal).</p>
+  <p class="muted">Més exercicis d'Exercicis 01 · Bases de dades amb PDO i MySQL (apartat 6 del mòdul) · Lliçons noves quan pugis el Tema 5 del professor.</p>
 </section>

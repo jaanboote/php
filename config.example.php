@@ -19,6 +19,7 @@ return [
     // Execució del codi de l'alumne (sandbox).
     'sandbox' => [
         'php_cli'      => 'C:\\xampp\\php\\php.exe',   // a Linux: /usr/bin/php
+        'php_cgi'      => 'C:\\xampp\\php\\php-cgi.exe', // laboratoris web (si no hi és, es busca al costat de php_cli)
         'timeout'      => 5,        // segons màxims per execució
         'memory_limit' => '64M',
         'max_output'   => 100000,   // bytes màxims de sortida
