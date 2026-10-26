@@ -1,318 +1,288 @@
-# PHPLab
+<p align="center">
+  <img src="docs/img/banner.png" alt="PHPLab: aprèn PHP fent-lo" width="100%">
+</p>
 
-Aplicació web per aprendre PHP de manera pràctica a partir del temari de classe
-(M0376 · Implantació d'aplicacions web · ASIX2). Està feta en **PHP 8 sense framework**
-perquè també puguis llegir i entendre com funciona per dins.
+<p align="center">
+  <img alt="PHP 8.2+" src="https://img.shields.io/badge/PHP-8.2%2B-8f93f5?style=flat-square&logo=php&logoColor=white&labelColor=0b0b10">
+  <img alt="Sense framework" src="https://img.shields.io/badge/framework-cap-ededf3?style=flat-square&labelColor=0b0b10">
+  <img alt="SQLite" src="https://img.shields.io/badge/SQLite-PDO-5cb4ee?style=flat-square&logo=sqlite&logoColor=white&labelColor=0b0b10">
+  <img alt="XAMPP a Windows" src="https://img.shields.io/badge/XAMPP-Windows-f3a648?style=flat-square&logo=apache&logoColor=white&labelColor=0b0b10">
+  <img alt="Funciona sense Internet" src="https://img.shields.io/badge/funciona-sense%20Internet-3fcf9f?style=flat-square&labelColor=0b0b10">
+</p>
 
-**Què hi ha ara:**
-
-- Login d'un sol usuari, accés només des de la xarxa de casa.
-- **Temari:** pujar-lo (PDF, ZIP, DOCX, PHP, HTML, TXT, MD), indexador amb detecció de canvis i lectura per temes.
-- **Aprendre:** 19 lliçons dels Temes 1 a 5, amb exemples «prova-ho» executables i preguntes (test, completa, què imprimeix, ordena).
-- **Laboratori:** 17 exercicis guiats pas a pas (basats en Exercicis 01 i 02, les activitats dels temes i l'Activitat de Nadal), amb proves
-  automàtiques, pistes de 3 nivells, solució després de 3 intents i un tutor socràtic (IA de Claude o sense connexió).
-- **Reptes:** contrarellotge, «Troba l'error», «Què imprimeix?», «Ordena el codi» i repàs espaciat.
-- **Progrés:** mapa de temes, insígnies i estadístiques.
-- **Laboratoris web:** escrius una web amb formularis i la proves en un navegador integrat (POST, pujada d'imatges, sessions), amb un inspector de `$_GET`, `$_POST`, `$_FILES`, galetes i sessió.
-- **Sandbox** segur per executar el codi, amb fitxers que es conserven per laboratori.
-- XP, nivells i ratxa diària.
+<p align="center">
+  <b>Una app web per aprendre PHP a partir del temari de classe</b><br>
+  M0376 · Implantació d'aplicacions web · ASIX2<br>
+  <a href="#que-hi-ha">Què hi ha</a> ·
+  <a href="#com-funciona">Com funciona</a> ·
+  <a href="#seguretat">Seguretat</a> ·
+  <a href="#installacio">Instal·lació</a> ·
+  <a href="docs/GUIA.md">Guia completa</a>
+</p>
 
 ---
 
-## 1. Instal·lació (Windows + XAMPP)
+**PHPLab** converteix els apunts i els exercicis de classe en lliçons interactives, laboratoris amb correcció automàtica,
+reptes i repàs espaciat. Tot el codi que escrius s'executa de veritat al teu PC, en un *sandbox* aïllat, i la teva web
+de formularis s'obre en un navegador integrat on pots veure què rep PHP a cada petició.
 
-### 1.1 Activa l'extensió `zip` de PHP
+L'aplicació està feta en **PHP 8 pur, sense framework**, perquè també serveixi d'exemple: el codi està comentat en català i
+es pot llegir de dalt a baix.
 
-Al teu XAMPP (PHP 8.2.12) l'extensió `zip` està desactivada, i cal per als ZIP i els DOCX.
+<p align="center">
+  <img src="docs/img/inici.png" alt="Pantalla d'inici: terminal de benvinguda, anell de nivell i llista de lliçons i laboratoris" width="100%">
+</p>
 
-1. Obre `C:\xampp\php\php.ini` amb un editor de text.
-2. Busca la línia `;extension=zip` i treu-li el `;` del davant: `extension=zip`.
-3. Al mateix fitxer, revisa aquests valors per poder pujar fitxers grans:
-   ```ini
-   upload_max_filesize = 50M
-   post_max_size = 120M
-   ```
-4. Reinicia Apache des del panell de control de XAMPP (Stop → Start).
+<a id="que-hi-ha"></a>
 
-### 1.2 Descarrega el projecte
+## ✨ Què hi ha
 
-Amb [Git per a Windows](https://git-scm.com/download/win), obre un terminal (`cmd`):
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>📖 Lliçons</h3>
+      <p><b>19 lliçons</b> dels Temes 1 a 5, amb exemples «Prova-ho» que pots editar i executar, i preguntes de quatre tipus:
+      test, completa el codi, «què imprimeix?» i ordena les línies. La correcció es fa sempre al servidor.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>🧪 Laboratoris</h3>
+      <p><b>17 exercicis guiats</b> pas a pas, basats en els exercicis de classe. Cada pas té proves automàtiques, pistes
+      de 3 nivells, la solució després de 3 intents i un tutor que t'ajuda sense donar-te la resposta.</p>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>🌐 Laboratoris web</h3>
+      <p>Escrius <code>index.php</code>, <code>processa.php</code> i <code>estil.css</code> i els proves en un <b>navegador integrat</b>:
+      formularis GET i POST, pujada d'imatges, redireccions i sessions. L'inspector et mostra <code>$_GET</code>, <code>$_POST</code>,
+      <code>$_FILES</code>, les galetes i <code>$_SESSION</code>.</p>
+    </td>
+    <td valign="top">
+      <h3>🎯 Reptes i repàs</h3>
+      <p><b>59 reptes</b> en quatre modes: contrarellotge, «Troba l'error» (amb errates reals del temari), «Què imprimeix?» i «Ordena el codi».
+      El que falles torna al <b>repàs espaciat</b> (sistema Leitner: 1, 3, 7, 14 i 30 dies).</p>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <h3>🗺️ Progrés</h3>
+      <p>Mapa de temes amb el domini de cada concepte, <b>23 insígnies</b>, XP, nivells, ratxa de dies i estadístiques.
+      Confeti quan encertes i una pantalla especial quan puges de nivell.</p>
+    </td>
+    <td valign="top">
+      <h3>📚 Temari</h3>
+      <p>Puges els PDF, ZIP o DOCX de classe i la app els indexa per temes, detecta els canvis i et deixa llegir-los.
+      Les lliçons citen la pàgina d'on surt cada explicació.</p>
+    </td>
+  </tr>
+</table>
 
-```bat
-cd C:\xampp\htdocs
-git clone https://github.com/jaanboote/php phplab
+### El navegador integrat
+
+La **Carta als Reis Mags** (l'Activitat de Nadal): omples el formulari, puges la imatge d'una joguina i PHP la desa a `uploads/`.
+A sota, l'inspector mostra què ha arribat a `$_POST` i a `$_FILES`.
+
+<p align="center">
+  <img src="docs/img/demo-web.gif" alt="Animació: s'omple el formulari de la carta, es puja una imatge i apareix la carta amb l'inspector de la petició" width="100%">
+</p>
+
+### Més captures
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/img/laboratori.png" alt="Laboratori de consola: passos, editor, entrada per a readline i proves superades"><br><sub><b>Laboratori de consola</b>: editor, entrada per a <code>readline()</code>, proves i tutor.</sub></td>
+    <td width="50%"><img src="docs/img/laboratori-web.png" alt="Laboratori web: pestanyes de fitxers, navegador integrat amb la carta i inspector"><br><sub><b>Laboratori web</b>: pestanyes de fitxers, navegador i inspector.</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/img/leccio.png" alt="Lliçó amb un exemple executat i la sortida en una finestra de terminal"><br><sub><b>Lliçó</b>: un exemple «Prova-ho» executat.</sub></td>
+    <td><img src="docs/img/reptes.png" alt="Repte Troba l'error amb la línia correcta marcada en verd i la incorrecta en vermell"><br><sub><b>Troba l'error</b>: la línia bona en verd i el codi corregit.</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/img/progres.png" alt="Pàgina de progrés amb xifres, mapa de temes i insígnies"><br><sub><b>Progrés</b>: mapa de temes, conceptes dominats i insígnies.</sub></td>
+  </tr>
+</table>
+
+### Contingut per tema
+
+| Tema | Lliçons | Laboratoris | Reptes |
+|---|---|---|:---:|
+| 🟦 **1 · Introducció al desenvolupament web** | Frontend i backend · Client-servidor · MVC i entorn | Pàgina dinàmica (Bon dia, bona tarda, bona nit) | 7 |
+| 🟪 **2 · Fonaments de PHP** | Variables · Operadors · Condicionals i bucles · Arrays · Funcions · `$argv` i `$argc` | Alerta meteorològica · Horòscop xinès · Caixer automàtic · Caixa d'eines matemàtica · Permisos Linux · Còpia de seguretat | 17 |
+| 🟩 **3 · Funcions integrades** | `isset`/`empty` · Dates · Cadenes i `mb_*` · `map`, `filter`, `reduce` | Calculadora amb `match` · Calendari de lliuraments · Frases · Comptador de paraules | 14 |
+| 🟧 **4 · Errors, excepcions i fitxers** | Errors i `php.ini` · Excepcions · Fitxers i JSON | Calculadora segura · Comptador de visites · Agenda en JSON | 11 |
+| 🟥 **5 · Formularis, fitxers i sessions** | GET i POST · Pujar fitxers · Galetes i sessions | 🌐 Salutació amb GET · 🌐 Carta als Reis Mags · 🌐 Zona privada amb sessions | 10 |
+
+Els laboratoris surten dels enunciats de classe (Exercicis 01 i 02, les activitats de cada tema i l'Activitat de Nadal).
+Quan un contingut no és del temari de classe, la app el marca com a **ampliació**.
+
+<a id="com-funciona"></a>
+
+## ⚙️ Com funciona
+
+```mermaid
+flowchart LR
+    subgraph NAV["Navegador"]
+        P["Pàgines<br/>index.php"]
+        JS["JavaScript<br/>assets/js"]
+        IF["Navegador integrat<br/>iframe aïllat"]
+    end
+    subgraph APP["PHPLab · Apache + PHP"]
+        API["api.php<br/>JSON + CSRF"]
+        WEB["web.php<br/>testimoni signat"]
+        SRC["src/<br/>Lessons · Labs · Reptes<br/>Review · Badges · Stats"]
+        SB["Sandbox"]
+        DB[("SQLite<br/>progrés, XP, repàs")]
+        CT["content/<br/>lliçons, laboratoris i reptes"]
+    end
+    CLI["php.exe<br/>codi de consola"]
+    CGI["php-cgi.exe<br/>webs de l'alumne"]
+    AI["API de Claude<br/>opcional"]
+
+    P --> SRC
+    JS --> API --> SRC
+    IF --> WEB --> SB
+    SRC --> DB
+    SRC --> CT
+    SRC --> SB
+    SB --> CLI
+    SB --> CGI
+    SRC -. tutor .-> AI
 ```
 
-El projecte queda a `C:\xampp\htdocs\phplab`.
+- **El contingut és codi PHP.** Cada lliçó, laboratori i repte és un fitxer de `content/` que retorna un array: text, exemples,
+  preguntes, passos, proves i pistes. Afegir-ne un de nou vol dir afegir-hi un fitxer.
+- **Tot es corregeix al servidor.** El navegador no rep mai les respostes correctes. Les preguntes es comproven a PHP i
+  els laboratoris s'executen de veritat.
+- **El sandbox** executa el teu codi en un procés PHP separat amb límits de temps, memòria i carpeta (mira [Seguretat](#seguretat)).
+- **Els laboratoris web** fan servir `php-cgi.exe`, el mateix mecanisme que usa un servidor web real. Així `$_POST`, `$_FILES`,
+  `header('Location: ...')` i les sessions funcionen igual que a XAMPP.
 
-### 1.3 Instal·la Composer i les dependències
+### Què passa quan prems «Comprova el pas»
 
-Composer és el gestor de llibreries de PHP. PHPLab en fa servir tres: `smalot/pdfparser` (llegir PDF),
-`anthropic-ai/sdk` (l'SDK oficial de Claude) i `guzzlehttp/guzzle` (connexions HTTPS).
+```mermaid
+sequenceDiagram
+    actor A as Alumne
+    participant N as Navegador
+    participant API as api.php
+    participant L as Labs
+    participant S as Sandbox
+    participant DB as SQLite
 
-1. Descarrega i executa **Composer-Setup.exe** des de <https://getcomposer.org/download/>.
-   Quan et demani el PHP, tria `C:\xampp\php\php.exe`.
-2. Tanca i torna a obrir el terminal i comprova-ho: `composer -V`
-3. Instal·la les dependències:
-   ```bat
-   cd C:\xampp\htdocs\phplab
-   composer install
-   ```
+    A->>N: Comprova el pas
+    N->>API: lab_check (codi + token CSRF)
+    API->>L: avalua el pas actual
+    L->>L: comprovacions sobre el codi (p. ex. «fes servir match»)
+    loop cada prova del pas
+        L->>S: executa amb arguments, entrada o peticions HTTP
+        S-->>L: sortida, errors, fitxers creats
+        L->>L: compara amb el resultat esperat
+    end
+    L->>DB: intents, pas superat, XP, conceptes
+    API-->>N: resultat de cada prova + XP + insígnies noves
+    N-->>A: confeti 🎉 o què ha fallat i per què
+```
 
-> Sense Composer la app també funciona, però no llegirà PDF i el tutor anirà sempre en mode sense connexió.
+Els errors de PHP («Undefined array key», «Unsupported operand types»...) es tradueixen a explicacions en català
+amb la línia on passen.
 
-### 1.4 Configura `config.php`
+### El tutor
+
+Cada laboratori té un tutor socràtic: et fa preguntes i et dona pistes, però no t'escriu la solució.
+Amb una clau de l'API de Claude respon amb IA (amb límits diaris de peticions i de tokens). Sense clau, funciona en
+**mode sense connexió**, amb pistes i preguntes preparades per a cada pas.
+
+<a id="seguretat"></a>
+
+## 🔒 Seguretat
+
+La app està pensada per a ús personal **a la xarxa de casa**, no per publicar-la a Internet.
+
+| | Mesura |
+|---|---|
+| **Accés** | Només des de `localhost` i la xarxa local (`.htaccess` i comprovació a PHP). Un sol usuari amb `password_hash()`, bloqueig després de 5 intents, sessió `HttpOnly` i `SameSite=Strict`, i token CSRF a totes les accions. |
+| **Sandbox** | Procés separat, 5 s de temps màxim, 64 MB de memòria, `open_basedir` a la carpeta del laboratori, funcions perilloses desactivades (`exec`, `system`, sockets, `curl`, `ini_set`...), sense `allow_url_fopen` i com a molt 2 execucions alhora. |
+| **Laboratoris web** | La teva web s'obre en un iframe amb `sandbox` i amb la capçalera `Content-Security-Policy: sandbox`: el seu JavaScript no pot llegir res de PHPLab. L'adreça porta un testimoni signat que caduca. Les galetes i les sessions de la teva web es guarden a part. |
+| **Temari pujat** | Es guarda fora de `htdocs`, amb protecció contra *zip slip* i *zip bomb*, i sense duplicats (hash SHA-256). |
+| **Clau de l'API** | A `config.php`, que no es puja mai al repositori i no arriba mai al navegador. |
+
+Els detalls de cada mesura, i per què hi és, són a la [guia completa](docs/GUIA.md#4-seguretat-què-fa-la-app-i-per-què).
+
+<a id="installacio"></a>
+
+## 🚀 Instal·lació ràpida
+
+Necessites **XAMPP** (PHP 8.2 o superior) a Windows. A la [guia completa](docs/GUIA.md) hi ha cada pas explicat, amb captures
+dels problemes més habituals.
 
 ```bat
+:: 1. Descarrega el projecte dins de htdocs
+cd C:\xampp\htdocs
+git clone https://github.com/jaanboote/php.git phplab
+cd phplab
+
+:: 2. Instal·la les dependències (lectura de PDF i SDK de Claude)
+composer install
+
+:: 3. Crea la configuració
 copy config.example.php config.php
 ```
 
-Obre `config.php` i revisa'l. Les opcions estan comentades. Les importants:
+4. Activa `extension=zip` a `C:\xampp\php\php.ini` i reinicia Apache.
+5. Obre **http://localhost/phplab**, crea el teu usuari i ves a **Diagnòstic**: totes les línies han d'estar en verd
+   (la clau de l'API és opcional).
 
-| Opció | Per a què serveix |
-|---|---|
-| `data_dir` | Carpeta de dades privades (base de dades, temari, sandbox). Per defecte és `C:\xampp\phplab-data`, **fora de htdocs**. |
-| `allowed_networks` | Xarxes que poden entrar. Per defecte: aquest PC i `192.168.1.0/24` (la teva xarxa de casa). |
-| `sandbox.php_cli` | El PHP que executa el teu codi: `C:\xampp\php\php.exe`. |
-| `sandbox.php_cgi` | El PHP dels laboratoris web: `C:\xampp\php\php-cgi.exe`. Si no hi és, es busca al costat de `php_cli`. |
-| `ai.api_key` | Clau de l'API de Claude (opcional, mira el punt següent). |
+Per actualitzar a una versió nova: `git pull` a la carpeta del projecte i recarregar amb **Ctrl+F5**.
+Les migracions de la base de dades s'apliquen soles.
 
-`config.php` no es puja mai a GitHub: és al `.gitignore` perquè hi ha la clau.
+## 🗂️ Estructura
 
-### 1.5 Clau de l'API de Claude (opcional)
-
-1. Entra a <https://console.anthropic.com/>, crea un compte i afegeix-hi crèdit.
-2. A **API Keys**, crea una clau i copia-la a `config.php` → `'api_key' => 'sk-ant-...'`.
-3. El model per defecte és `claude-haiku-5-5`, el més econòmic. Pots limitar la despesa amb
-   `max_requests_day`, `max_tokens_day` i `max_tokens`.
-
-Si el tutor diu *«problema de certificats SSL»*, revisa que `ai.ca_bundle` apunti a
-`C:\xampp\apache\bin\curl-ca-bundle.crt`, que ja ve amb XAMPP.
-
-### 1.6 Primer accés
-
-1. Des del **PC servidor**, obre <http://localhost/phplab>.
-2. Crea el teu usuari i la contrasenya (mínim 10 caràcters). Aquesta pantalla només surt la primera
-   vegada i **només des de localhost**.
-3. Ves a **Diagnòstic** i comprova que tot surt en verd.
-
-### 1.7 Accés des del portàtil o el mòbil
-
-- Obre `http://192.168.1.72/phplab`, amb la IP del PC servidor (la veus amb `ipconfig`).
-- Si no carrega, cal obrir el tallafoc del Windows: *Tallafoc de Windows Defender → Permet una aplicació* →
-  marca **Apache HTTP Server** a les xarxes **privades**. Comprova també que la xarxa de casa
-  estigui configurada com a «Privada».
-- La IP `192.168.56.1` que surt a `ipconfig` és l'adaptador de VirtualBox. No és la teva xarxa de casa.
-- Si et canvia la IP, pots reservar-la al router (DHCP estàtic).
-
-### 1.8 Actualitzar a una versió nova
-
-```bat
-cd C:\xampp\htdocs\phplab
-git pull
-composer install
-```
-
-La base de dades s'actualitza sola: les taules noves es creen automàticament.
-
-### Si has oblidat la contrasenya
-
-```bat
-cd C:\xampp\htdocs\phplab
-C:\xampp\php\php.exe eines\canvia-contrasenya.php
-```
-
----
-
-## 2. Com afegir temari nou
-
-1. Ves a **Temari** → **Pujar temari** i tria els fitxers. Pots pujar-ne diversos alhora o un ZIP sencer.
-2. La app guarda els fitxers a `data_dir\temari`, n'extreu el text i detecta el tema llegint la
-   capçalera dels PDF del professor («Tema 2 – Fonaments PHP»). Si no la troba, fa servir el nom
-   del fitxer o de la carpeta.
-3. En acabar, et diu quins fitxers són nous i si han aparegut **temes nous**.
-4. Si un fitxer ja existia amb el mateix contingut, no es duplica (es compara el hash SHA-256).
-
-Des de la pàgina d'**Inici** o de **Temari**, fes clic en un tema per **llegir-ne el text** dins de l'app.
-
-El botó **Actualitzar temari** torna a revisar la carpeta i només processa els fitxers nous o modificats.
-També pots copiar fitxers directament a `C:\xampp\phplab-data\temari` i després prémer aquest botó.
-
-> **Avís:** quan s'extreu el text d'un PDF, el codi perd la indentació. Per això els laboratoris
-> estan escrits a mà a partir dels enunciats.
-
----
-
-## 3. Com funciona (estructura del projecte)
-
-```
+```text
 phplab/
-├── index.php              ← pàgines (index.php?p=inici, leccio, lab, temari, diagnostic)
-├── api.php                ← API JSON per al JavaScript (executar, comprovar, pistes, tutor)
-├── config.example.php     ← plantilla de configuració (copia-la a config.php)
-├── .htaccess              ← qui pot entrar i què no es pot descarregar
-├── src/                   ← la lògica, una classe per fitxer
-│   ├── bootstrap.php      ← arrencada: config, autoload, control d'IP, sessió
-│   ├── Auth.php           ← login, sessions, CSRF i límit d'intents
-│   ├── Db.php             ← SQLite amb PDO i creació automàtica de taules
-│   ├── Sandbox.php        ← executa el codi de l'alumne amb límits
-│   ├── ErrorExplainer.php ← tradueix els errors de PHP al català
-│   ├── Uploader.php       ← pujada de fitxers i extracció segura de ZIP
-│   ├── TextExtractor.php  ← text de PDF, DOCX, HTML...
-│   ├── Indexer.php        ← indexa el temari i busca fragments rellevants
-│   ├── Labs.php           ← motor dels laboratoris (proves, pistes, solució, XP)
-│   ├── Lessons.php        ← lliçons i correcció de preguntes
-│   ├── Tutor.php          ← tutor socràtic (Claude o sense connexió)
-│   ├── Progress.php       ← XP, nivells i ratxa
-│   └── View.php           ← plantilles
-├── templates/             ← HTML de cada pàgina
+├── index.php            Pàgines (inici, lliçó, laboratori, reptes, progrés, temari...)
+├── api.php              Accions en JSON per al JavaScript (executar, corregir, pistes, tutor...)
+├── web.php              Navegador integrat dels laboratoris web
+├── src/                 Lògica: Sandbox, Labs, WebLab, Lessons, Reptes, Review, Badges, Stats, Tutor, Indexer...
+├── templates/           Vistes PHP (una per pàgina)
 ├── content/
-│   ├── lessons/           ← lliçons (un fitxer PHP que retorna un array)
-│   └── labs/              ← laboratoris (un fitxer PHP que retorna un array)
-├── assets/                ← CSS, JS i CodeMirror (l'editor, copiat aquí perquè funcioni sense Internet)
-└── eines/                 ← scripts de terminal
+│   ├── lessons/         Una lliçó per fitxer
+│   ├── labs/            Un laboratori per fitxer (de consola o web)
+│   └── reptes/          Banc de reptes per tema
+├── assets/              CSS, JavaScript, CodeMirror i fonts (tot local: funciona sense Internet)
+├── eines/               verifica-contingut.php i canvia-contrasenya.php
+└── docs/                Guia completa i imatges d'aquest README
 ```
 
-I fora de htdocs, a `C:\xampp\phplab-data\`:
+Les dades (base de dades SQLite, temari pujat i carpetes del sandbox) es guarden **fora de `htdocs`**, a `C:\xampp\phplab-data`.
 
-```
-phplab-data/
-├── phplab.sqlite          ← progrés, XP, temari indexat, xat del tutor
-├── temari/                ← els fitxers que has pujat
-└── sandbox/
-    ├── jobs/              ← carpetes temporals on s'executa el teu codi (s'esborren soles)
-    └── workspaces/        ← fitxers que creen els programes de cada laboratori
-```
+## ✍️ Afegir contingut
 
-**Flux d'un «Comprova» al laboratori:**
-`lab.js` → `api.php?a=lab_check` → `Labs::check()` → per a cada prova, `Sandbox::run()` executa el
-teu codi amb uns arguments → es compara la sortida amb l'esperada → es guarda l'intent i, si
-l'has superat, l'XP.
+1. Copia un fitxer semblant de `content/lessons/`, `content/labs/` o `content/reptes/` i canvia'n el contingut.
+2. Comprova-ho tot:
 
-**Comprovar el contingut:** després de crear o modificar lliçons i laboratoris, executa
-`C:\xampp\php\php.exe eines\verifica-contingut.php`. Comprova que la solució de cada pas supera les
-seves proves i que les respostes de les preguntes «què imprimeix?» són correctes.
+   ```bat
+   C:\xampp\php\php.exe eines\verifica-contingut.php
+   ```
 
-**Afegir un laboratori nou a mà:** copia `content/labs/permisos.php` amb un altre nom, canvia
-`id`, `fitxer` i els passos. Cada pas té `proves` amb `args` i el que ha de sortir (`conte`,
-`no_conte` o `exacte`). A la fase 2, la IA en generarà a partir del temari.
+   L'eina executa tots els exemples i comprova cada laboratori:
+   - que la solució de cada pas supera les seves proves;
+   - que la solució del pas anterior **no** les supera (si les superés, les proves no comprovarien res de nou).
 
----
+   També comprova les respostes de «Què imprimeix?» i, a «Troba l'error», que la línia marcada sigui la que canvia
+   entre el codi erroni i el corregit. Al final ha de sortir **«Tot correcte.»**
 
-## 4. Seguretat (què fa la app i per què)
+## 🧰 Tecnologies
 
-### Execució del teu codi (sandbox)
-
-Executar codi escrit per l'usuari és el més perillós d'una app com aquesta. Aquestes són les capes de protecció:
-
-| Mesura | Què fa | Contra què protegeix |
-|---|---|---|
-| **Procés separat** (`proc_open`) | El codi s'executa amb `php.exe` en un procés a part, no dins d'Apache. | Si peta, l'app continua funcionant. |
-| **Timeout de 5 s** | Si el procés no acaba, es mata (`proc_terminate`). | Bucles infinits. |
-| **`memory_limit=64M`** | El procés no pot fer servir més memòria. | Programes que s'ho mengen tot. |
-| **`open_basedir`** | PHP només pot obrir fitxers dins de la carpeta temporal de l'execució. | Llegir `config.php`, la base de dades o fitxers del sistema. |
-| **`disable_functions`** | Desactiva `exec`, `shell_exec`, `system`, `proc_open`, sockets, `curl`, `ini_set`... | Executar ordres del Windows, connectar-se a la xarxa o treure's els límits. |
-| **`allow_url_fopen=Off`** | `file_get_contents("http://...")` no funciona. | Descarregar coses d'Internet. |
-| **Entorn net** | El procés no rep les variables d'entorn d'Apache. | Filtrar informació del servidor. |
-| **Màxim 2 execucions alhora** | Bloquejos amb `flock`. | Saturar el PC amb moltes execucions. |
-| **Límit de sortida** | Si escriu més de 100 KB, s'atura. | Omplir la memòria o el disc. |
-| **Fitxers limitats** | Cada laboratori té la seva carpeta (`phplab-data\sandbox\workspaces\<laboratori>`), on es conserven els fitxers entre execucions (com a molt 1 MB). | Que un programa ompli el disc o toqui fitxers d'un altre laboratori. |
-
-Totes les directives es passen amb `-d` a `php.exe` (mira `Sandbox::iniSettings()`).
-`ini_set()` està desactivada (si no, el codi es podria treure els límits); `ini_get()` i `error_reporting()` funcionen.
-`error_log()` escriu al fitxer `php_errors.log` de la carpeta del programa, com el log d'un servidor real.
-No és un aïllament perfecte com el d'un contenidor o una màquina virtual, però per a ús personal
-a la xarxa de casa és raonable. Per això **no s'ha d'obrir mai l'app a Internet**.
-
-### Accés i sessió
-
-- **Només xarxa local:** ho limita el `.htaccess` (`Require local` + `Require ip 192.168.1.0/24`) i,
-  per si el `.htaccess` no s'aplica, també el PHP (`allowed_networks`). Això és *defensa en profunditat*.
-- **Contrasenya amb `password_hash()`:** a la base de dades només hi ha el hash (bcrypt), mai la contrasenya.
-- **Límit d'intents:** amb 5 errors en 15 minuts, aquella IP queda bloquejada una estona (contra la força bruta).
-- **Cookie de sessió `HttpOnly` i `SameSite=Strict`:** el JavaScript no la pot llegir (contra XSS)
-  i el navegador no l'envia des d'altres webs (contra CSRF). En entrar es regenera l'ID de sessió (contra la fixació de sessió).
-- **Tokens CSRF:** cada formulari i cada crida a l'API porten un token aleatori que es comprova amb `hash_equals()`.
-- **Escapament amb `htmlspecialchars()`** (funció `e()`) a totes les dades que es mostren (contra XSS).
-- **Consultes preparades amb PDO:** mai es concatenen dades a l'SQL (contra la injecció SQL).
-
-### Fitxers pujats
-
-- Es guarden **fora del webroot** (`C:\xampp\phplab-data`): encara que pugessis un `.php`, Apache no el podria executar.
-- **Llista blanca d'extensions:** pdf, zip, docx, php, html, htm, txt i md.
-- **Zip slip:** cap entrada d'un ZIP pot sortir de la carpeta. Es rebutgen les rutes amb `..`, les absolutes i les que porten lletra d'unitat.
-- **Zip bomb:** es limiten el nombre de fitxers i la mida descomprimida, comptant els bytes reals.
-- La clau de l'API només és a `config.php`, que el `.htaccess` impedeix descarregar. Les crides a Claude
-  es fan des del servidor: la clau no arriba mai al navegador.
-
----
-
-## 5. Problemes freqüents
-
-| Problema | Solució |
+| | |
 |---|---|
-| «Falta config.php» | `copy config.example.php config.php` |
-| 403 des del mòbil | La IP del mòbil no és a `192.168.1.x`. Revisa el `.htaccess` i `allowed_networks`. |
-| No es pot entrar des d'un altre PC | Tallafoc del Windows (punt 1.7). |
-| «cal activar extension=zip» | Punt 1.1 i reinicia Apache. |
-| Els PDF surten com a «pendent» | Executa `composer install` i després prem «Actualitzar temari». |
-| PDF «sense text» | És un PDF escanejat (una imatge). Cal un PDF amb text. |
-| La pujada falla sense cap missatge | Augmenta `post_max_size` i `upload_max_filesize` al `php.ini`. |
-| El tutor diu «problema de certificats SSL» | Revisa `ai.ca_bundle` (punt 1.5). |
-| `readline()` | Al sandbox, `readline()` llegeix de la caixa «Entrada» (una resposta per línia) i mostra el que respons, com faria el terminal. |
+| **Servidor** | PHP 8.2 sense framework · PDO SQLite amb migracions · Apache (XAMPP) |
+| **Execució del codi** | `proc_open` amb `php.exe` (consola) i `php-cgi.exe` (web) |
+| **Interfície** | HTML i CSS propis, JavaScript sense dependències · CodeMirror 5 · fonts Bricolage Grotesque, Lexend i JetBrains Mono |
+| **Temari** | `smalot/pdfparser` (PDF) · `ZipArchive` (ZIP i DOCX) |
+| **Tutor (opcional)** | SDK oficial de PHP de l'API de Claude |
 
-Si alguna cosa falla, mira el log d'Apache: `C:\xampp\apache\logs\error.log`.
+## 🙏 Crèdits
 
----
-
-## 6. Reptes i repàs espaciat
-
-A la pàgina **Reptes** hi ha quatre modes: ⏱ Contrarellotge (10 preguntes en 150 s), 🐞 Troba l'error (amb errates reals del temari),
-🖨️ Què imprimeix? i ↕️ Ordena el codi (s'accepta qualsevol ordre que funcioni: s'executa al sandbox). Es poden filtrar per tema.
-
-**Repàs espaciat (sistema Leitner):** cada pregunta que falles (de les lliçons o dels reptes) entra a la caixa 1 i torna a sortir
-l'endemà. Cada encert al repàs la fa pujar de caixa i s'espera més: 1, 3, 7, 14 i 30 dies. Si la falles, torna a la caixa 1.
-Quan l'encertes a la caixa 5, surt del repàs. Inici avisa quan tens preguntes per repassar.
-
-Els reptes donen com a molt 80 XP al dia (el repàs no té límit). Les preguntes són a `content/reptes/temaN.php` i
-`eines/verifica-contingut.php` les comprova totes.
-
-## 7. Progrés: mapa de temes, insígnies i estadístiques
-
-La pàgina **Progrés** té tres parts:
-
-- **Mapa de temes:** cada tema amb les lliçons i els laboratoris en ordre (fet, en curs o per començar), el percentatge
-  d'encerts als reptes del tema i el domini de cada concepte: ● dominat (80 % d'encerts o més), ◐ practicant, ◔ per reforçar.
-- **Insígnies:** 22 fites (acabar lliçons i laboratoris, un laboratori sense pistes, trobar les errates del temari, una
-  contrarellotge perfecta, ratxes de dies, superar cada tema...). Les que encara no tens mostren quant et falta. Quan n'aconsegueixes
-  una, surt un avís a qualsevol pàgina. Una insígnia aconseguida no es perd mai. Les definicions són a `src/Badges.php`.
-- **Estadístiques:** XP de cada dia dels últims 30 dies, d'on ve l'XP, partides i encert per mode de repte, i els conceptes que més costen.
-
-## 8. Laboratoris web (Tema 5)
-
-Als laboratoris web escrius diversos fitxers (`index.php`, `processa.php`, `estil.css`...) i els proves en un **navegador integrat**
-a la dreta de la pàgina: els formularis s'envien, les imatges es pugen i les redireccions i sessions funcionen com a XAMPP.
-
-- **Laboratoris:** formulari de salutació amb GET, la **Carta als Reis Mags** (l'Activitat de Nadal: POST, validació i pujada de fins a 3
-  imatges a `uploads/`) i una zona privada amb inici de sessió, `$_SESSION` i `password_verify()`.
-- **Inspector:** a cada petició mostra el mètode, el codi HTTP, `$_GET`, `$_POST`, `$_FILES`, les galetes, el contingut de la sessió,
-  els fitxers del «servidor» i els errors de PHP explicats.
-- **Lliçons:** formularis GET i POST, pujar fitxers amb `$_FILES` i galetes, sessions i contrasenyes (aquesta última és ampliació:
-  els apartats 5.10–5.12 del mòdul encara no tenen apunts de classe).
-
-**Com funciona per dins:** el navegador és un `<iframe>` que carrega `web.php/<testimoni>/<laboratori>/<fitxer>`. `web.php` executa
-el fitxer amb `php-cgi.exe` (el mateix sandbox: temps límit, memòria, `open_basedir`, funcions desactivades) i en retorna la resposta.
-
-| Mesura | Per què |
-|---|---|
-| L'iframe porta `sandbox` i `web.php` envia `Content-Security-Policy: sandbox` | El codi de la teva web (HTML i JavaScript) s'executa en un origen aïllat: no pot llegir les galetes de PHPLab ni tocar la pàgina del laboratori, encara que obris la URL directament. |
-| Testimoni signat a la URL (caduca en 12 h) | Un iframe aïllat no envia la sessió de la app; el testimoni prova que l'has obert tu des del laboratori. |
-| Galetes i sessions de la teva web desades al servidor (`phplab-data\sandbox\web`) | No es barregen amb les de PHPLab, i l'inspector les pot ensenyar. |
-| Fitxers del «servidor» a la carpeta del laboratori (com a molt 8 MB) | Les imatges pujades es conserven entre peticions, sense sortir de la carpeta del sandbox. |
-
-Si a **Diagnòstic** surt «php-cgi per als laboratoris web» en vermell, revisa `sandbox.php_cgi` a `config.php`.
-
-## 9. Properes fases
-
-- Accés a bases de dades amb PDO i MySQL (apartat 6 del mòdul).
-- Més exercicis d'Exercicis 01 com a laboratoris.
+- Temari, exercicis i Activitat de Nadal: **prof. David Porti**, mòdul M0376 d'ASIX2. Aquest repositori no inclou els PDF de classe:
+  cadascú puja els seus.
+- [CodeMirror](https://codemirror.net/5/) (MIT) i les fonts [Bricolage Grotesque](https://github.com/ateliertriay/bricolage),
+  [Lexend](https://www.lexend.com/) i [JetBrains Mono](https://www.jetbrains.com/lp/mono/) (SIL Open Font License).

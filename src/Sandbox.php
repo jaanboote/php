@@ -6,7 +6,7 @@ namespace PhpLab;
 /**
  * Executa el codi de l'alumne en un procés PHP CLI separat i limitat.
  *
- * Mesures de seguretat (explicades al README):
+ * Mesures de seguretat (explicades a docs/GUIA.md):
  *  - Procés separat (proc_open): si el codi peta o es penja, l'aplicació no cau.
  *  - Timeout de paret: si triga més de N segons, es mata el procés (bucles infinits).
  *  - memory_limit: el procés no pot gastar més memòria de la indicada.

@@ -17,7 +17,7 @@ DirectoryIndex index.php
 # 4) Carpetes internes: codi, plantilles, contingut i llibreries.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^(src|templates|content|vendor|eines)(/|$) - [F,L]
+    RewriteRule ^(src|templates|content|vendor|eines|docs)(/|$) - [F,L]
     RewriteRule (^|/)\.(git|claude) - [F,L]
 </IfModule>
 
