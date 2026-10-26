@@ -35,7 +35,7 @@ use PhpLab\Auth;
 
 if (!is_file(APP_ROOT . '/config.php')) {
     http_response_code(500);
-    exit('Falta config.php. Copia config.example.php com a config.php i revisa-la (mira el README).');
+    exit('Falta config.php. Copia config.example.php com a config.php i revisa-la (mira docs/GUIA.md).');
 }
 Config::load(require APP_ROOT . '/config.php');
 
