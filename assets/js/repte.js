@@ -7,7 +7,7 @@
   const { api, esc, toast, updateProgress } = PHPLab;
 
   const card = document.getElementById('r-card');
-  const st = { session: null, items: [], idx: 0, encerts: 0, combo: 0, temps: null, deadline: null, timer: null, finished: false };
+  const st = { session: null, items: [], idx: 0, encerts: 0, combo: 0, temps: null, deadline: null, timer: null, finished: false, resultats: [] };
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /** Compte enrere «3, 2, 1, Som-hi!» abans de començar (no al repàs, que és tranquil). */
@@ -58,6 +58,12 @@
   function updateHeader() {
     document.getElementById('r-progress').textContent = Math.min(st.idx + 1, st.items.length) + ' / ' + st.items.length;
     document.getElementById('r-encerts').textContent = st.encerts + ' encert' + (st.encerts === 1 ? '' : 's');
+    // Un punt per pregunta: verd o vermell segons la resposta, i el de la pregunta actual ressaltat
+    const passos = document.getElementById('r-passos');
+    if (passos.children.length !== st.items.length) passos.innerHTML = '<li></li>'.repeat(st.items.length);
+    [...passos.children].forEach((li, i) => {
+      li.className = st.resultats[i] === true ? 'ok' : st.resultats[i] === false ? 'ko' : i === st.idx && !st.finished ? 'actual' : '';
+    });
   }
 
   /** Comptador de combo: apareix a partir de 2 encerts seguits i «salta» a cada encert. */
@@ -158,6 +164,7 @@
     try {
       const r = await api('repte_answer', { session: st.session, item: it.ref, answer });
       if (r.correcte) st.encerts++;
+      st.resultats[st.idx] = r.correcte;
       st.combo = r.correcte ? st.combo + 1 : 0;
       updateHeader();
       updateCombo();

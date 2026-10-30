@@ -17,7 +17,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=10">
+  <link rel="stylesheet" href="assets/css/app.css?v=11">
 </head>
 <body>
 <a class="salta" href="#contingut">Salta al contingut</a>
@@ -62,6 +62,6 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/js/app.js?v=7"></script>
 <?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=6"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=5"></script><?php endif; ?>
-<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=6"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=7"></script><?php endif; ?>
 </body>
 </html>

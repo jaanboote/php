@@ -28,6 +28,7 @@ $cfg = Reptes::MODES[$mode];
     </div>
   </header>
   <div class="timebar" <?= $cfg['temps'] ? '' : 'hidden' ?>><div class="timebar-fill" id="r-timebar"></div></div>
+  <ol class="repte-passos" id="r-passos" aria-hidden="true"></ol>
 
   <section class="card repte-card" id="r-card">
     <p class="muted">Carregant les preguntes…</p>
