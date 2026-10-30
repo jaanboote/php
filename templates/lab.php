@@ -29,6 +29,8 @@ $step = $lab['passos'][$current];
 
     <?php if ($summary): ?>
       <section class="summary">
+        <?php $ratxa = 3; $humorForcat = 'eufòric'; $fraseForcada = 'Laboratori superat! Quin crack!'; $mascotaClasse = 'mascota-resum';
+              require __DIR__ . '/_mascota.php'; ?>
         <h2>🎉 Laboratori acabat!</h2>
         <p><strong><?= e($summary['xp']) ?> XP</strong> guanyats · <?= e($summary['intents']) ?> comprovacions · <?= e($summary['pistes']) ?> pistes
           <?= $summary['minuts'] !== null ? ' · ' . e($summary['minuts']) . ' min' : '' ?></p>
@@ -37,7 +39,7 @@ $step = $lab['passos'][$current];
         <?php if ($summary['dificils']): ?>
           <h3>El que t'ha costat més</h3>
           <p><?php foreach ($summary['dificils'] as $d): ?><span class="pill doing"><?= e($d) ?></span> <?php endforeach; ?></p>
-          <p class="muted small">Ho tindràs en compte al repàs (fase 3).</p>
+          <p class="muted small">Ho tindràs en compte al repàs.</p>
         <?php endif; ?>
         <form method="post" onsubmit="return confirm('Començar de zero? L\'XP que ja tens no es perd.')">
           <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">

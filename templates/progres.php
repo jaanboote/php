@@ -25,7 +25,7 @@ $totalFonts = max(1, array_sum($xpFonts));
 <section class="stat-tiles">
   <div class="stat-tile"><span class="stat-label">Nivell</span><span class="stat-value"><?= e($progress['level']) ?></span><span class="stat-sub"><?= e($progress['name']) ?></span></div>
   <div class="stat-tile"><span class="stat-label">XP total</span><span class="stat-value"><?= e($progress['xp']) ?></span><span class="stat-sub"><?= e($totalMes) ?> els últims 30 dies</span></div>
-  <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value">🔥 <?= e($progress['streak']) ?></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> dia<?= $dies['millor_ratxa'] === 1 ? '' : 'es' ?></span></div>
+  <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value">🔥 <?= e($progress['streak']) ?></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> <?= $dies['millor_ratxa'] === 1 ? 'dia' : 'dies' ?></span></div>
   <div class="stat-tile"><span class="stat-label">Dies practicant</span><span class="stat-value"><?= e($dies['actius']) ?></span><span class="stat-sub">en total</span></div>
   <div class="stat-tile"><span class="stat-label">Insígnies</span><span class="stat-value"><?= e($aconseguides) ?><small>/<?= count($insignies) ?></small></span><span class="stat-sub"><a href="#insignies">veure-les</a></span></div>
 </section>
@@ -40,16 +40,54 @@ $totalFonts = max(1, array_sum($xpFonts));
       </header>
       <div class="meter" role="img" aria-label="<?= e("{$t['fets']} de " . count($t['passos']) . ' fets') ?>"><div class="meter-fill" style="width: <?= e($t['pct']) ?>%"></div></div>
 
-      <ol class="tema-path">
-        <?php foreach ($t['passos'] as $p): ?>
-          <li class="node <?= e($p['estat']) ?>">
-            <a href="index.php?p=<?= $p['tipus'] === 'lab' ? 'lab' : 'leccio' ?>&amp;id=<?= e($p['id']) ?>" title="<?= e($estatText[$p['estat']]) ?>">
-              <span class="node-dot"><?= $p['estat'] === 'fet' ? '✔' : ($p['tipus'] === 'lab' ? '🧪' : '📖') ?></span>
-              <span class="node-text"><?= e($p['titol']) ?><small><?= $p['tipus'] === 'lab' ? 'Laboratori' : 'Lliçó' ?> · <?= e($estatText[$p['estat']]) ?></small></span>
-            </a>
-          </li>
-        <?php endforeach; ?>
-      </ol>
+      <?php
+      // Camí de nivells: cada pas fa ziga-zaga (x en %, y en px) i una corba els uneix
+      $camiPas = 132;
+      $camiXs = [50, 72, 50, 28];
+      $camiPunts = [];
+      foreach ($t['passos'] as $i => $p) {
+          $camiPunts[] = [$camiXs[$i % 4], 40 + $i * $camiPas];
+      }
+      $camiAlt = 40 + count($camiPunts) * $camiPas - 20;
+      $camiBase = $camiFet = '';
+      foreach ($camiPunts as $i => [$cx, $cy]) {
+          if ($i === 0) {
+              $camiBase = "M$cx $cy";
+              continue;
+          }
+          [$cpx, $cpy] = $camiPunts[$i - 1];
+          $camiSeg = ' C' . $cpx . ' ' . ($cpy + $camiPas / 2) . ' ' . $cx . ' ' . ($cy - $camiPas / 2) . ' ' . $cx . ' ' . $cy;
+          $camiBase .= $camiSeg;
+          // El tram s'il·lumina si els dos passos que uneix estan fets
+          if ($t['passos'][$i - 1]['estat'] === 'fet' && $t['passos'][$i]['estat'] === 'fet') {
+              $camiFet .= "M$cpx $cpy" . $camiSeg;
+          }
+      }
+      $camiActual = null;
+      foreach ($t['passos'] as $i => $p) {
+          if ($p['estat'] !== 'fet') {
+              $camiActual = $i;
+              break;
+          }
+      }
+      ?>
+      <div class="cami" style="height: <?= (int) $camiAlt ?>px">
+        <svg class="cami-svg" viewBox="0 0 100 <?= (int) $camiAlt ?>" preserveAspectRatio="none" aria-hidden="true">
+          <path class="cami-base" d="<?= e($camiBase) ?>"/>
+          <?php if ($camiFet !== ''): ?><path class="cami-fet" d="<?= e($camiFet) ?>"/><?php endif; ?>
+        </svg>
+        <ol class="cami-nodes">
+          <?php foreach ($t['passos'] as $i => $p): [$cx, $cy] = $camiPunts[$i]; ?>
+            <li class="cami-node <?= e($p['estat']) ?><?= $i === $camiActual ? ' actual' : '' ?>" style="left: <?= (int) $cx ?>%; top: <?= (int) $cy ?>px">
+              <a href="index.php?p=<?= $p['tipus'] === 'lab' ? 'lab' : 'leccio' ?>&amp;id=<?= e($p['id']) ?>" title="<?= e($estatText[$p['estat']]) ?>">
+                <span class="cami-bola"><?= $p['estat'] === 'fet' ? '✔' : ($p['tipus'] === 'lab' ? '🧪' : '📖') ?></span>
+                <span class="cami-nom"><?= e($p['titol']) ?><small><?= $p['tipus'] === 'lab' ? 'Laboratori' : 'Lliçó' ?> · <?= e($estatText[$p['estat']]) ?></small></span>
+                <?php if ($i === $camiActual): ?><span class="cami-aqui">Ets aquí</span><?php endif; ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ol>
+      </div>
 
       <p class="small tema-reptes">
         🎯 <?php if ($r['intents'] > 0): ?>Reptes: <strong><?= e((int) round($r['encerts'] * 100 / $r['intents'])) ?> %</strong> d'encerts (<?= e($r['intents']) ?> <?= $r['intents'] === 1 ? 'resposta' : 'respostes' ?>)
@@ -76,7 +114,9 @@ $totalFonts = max(1, array_sum($xpFonts));
 <h2 class="section-title" id="insignies">🏅 Insígnies <small class="muted"><?= e($aconseguides) ?> de <?= count($insignies) ?></small></h2>
 <div class="badges">
   <?php foreach ($insignies as $b): $on = $b['data'] !== null; ?>
-    <div class="badge <?= $on ? 'on' : 'off' ?>">
+    <?php $nova = $on && strtotime($b['data']) > time() - 2 * 86400;   // aconseguida fa menys de 2 dies ?>
+    <div class="badge <?= $on ? 'on' : 'off' ?><?= $nova ? ' nova' : '' ?>">
+      <?php if ($nova): ?><span class="badge-nova">Nova!</span><?php endif; ?>
       <span class="badge-icon" aria-hidden="true"><?= $b['icona'] ?></span>
       <div>
         <strong><?= e($b['titol']) ?></strong>

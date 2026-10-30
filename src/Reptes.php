@@ -185,11 +185,13 @@ final class Reptes
         $total = count(json_decode($s['items'], true));
         $encerts = (int) $s['encerts'];
 
+        $answers = json_decode($s['answers'], true) ?: [];
+        ['punts' => $punts, 'max' => $comboMax] = self::combo($answers);
+
         if ($s['finished_at'] === null) {
-            $score = $encerts * 10;
+            $score = $punts;
             if ($cfg['temps'] !== null) {
                 // Bonus de velocitat: 1 punt per cada 5 segons que sobren (només si s'han respost totes)
-                $answers = json_decode($s['answers'], true) ?: [];
                 $used = min((int) $cfg['temps'], time() - (int) $s['started_at']);
                 if (count($answers) === $total) {
                     $score += intdiv((int) $cfg['temps'] - $used, 5);
@@ -215,7 +217,29 @@ final class Reptes
             'millor' => max($best, (int) $s['score']),
             'limit_xp' => $s['mode'] !== 'repas' && self::xpToday() >= self::DAILY_XP_CAP,
             'repas_pendent' => Review::countDue(),
+            'combo_max' => $comboMax,
+            'segons' => (int) $s['finished_at'] - (int) $s['started_at'],
         ];
+    }
+
+    /**
+     * Punts dels encerts amb combo: cada encert seguit val més (10, 15, 20 i, a partir del quart, 25).
+     * Les respostes es desen en l'ordre en què s'han contestat.
+     * @return array{punts:int, max:int} punts i el combo més llarg
+     */
+    public static function combo(array $answers): array
+    {
+        $punts = $seguits = $max = 0;
+        foreach ($answers as $a) {
+            if (!empty($a['ok'])) {
+                $seguits++;
+                $max = max($max, $seguits);
+                $punts += 10 + 5 * min($seguits - 1, 3);
+            } else {
+                $seguits = 0;
+            }
+        }
+        return ['punts' => $punts, 'max' => $max];
     }
 
     /** XP guanyat avui amb reptes (sense el repàs). */

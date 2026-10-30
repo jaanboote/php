@@ -10,7 +10,7 @@ $descripcions = [
 ];
 ?>
 <h1>Reptes</h1>
-<p class="muted">Practica ràpid el que has après. Les preguntes que falles tornen al repàs espaciat.
+<p class="muted">Practica ràpid el que has après. Cada encert seguit suma més punts (combo). Les preguntes que falles tornen al repàs espaciat.
   Avui has guanyat <strong><?= e($xpAvui) ?></strong> de <?= Reptes::DAILY_XP_CAP ?> XP possibles amb reptes (el repàs no té límit).</p>
 
 <section class="card repas-card">
@@ -55,7 +55,7 @@ $descripcions = [
       <h2><?= e($cfg['titol']) ?></h2>
       <p class="muted small"><?= e($desc) ?></p>
       <p class="small"><?= e($cfg['preguntes']) ?> preguntes · <?= $cfg['temps'] ? e($cfg['temps']) . ' s' : 'sense límit de temps' ?> · <?= e($cfg['xp']) ?> XP per encert</p>
-      <?php if ($m): ?><p class="small muted">🏆 Millor puntuació: <?= e($m['millor']) ?> · <?= e($m['partides']) ?> partida<?= $m['partides'] > 1 ? 'es' : '' ?></p><?php endif; ?>
+      <?php if ($m): ?><p class="small muted">🏆 Millor puntuació: <?= e($m['millor']) ?> · <?= e($m['partides']) ?> <?= $m['partides'] > 1 ? 'partides' : 'partida' ?></p><?php endif; ?>
     </a>
   <?php endforeach; ?>
 </div>

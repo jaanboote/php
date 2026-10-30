@@ -2,16 +2,17 @@
 /**
  * La mascota: un elefant de PHP dibuixat en SVG. El seu humor depèn de la ratxa de dies:
  *   0 dies → dorm · 1-2 → content · 3 o més → eufòric (amb espurnes).
+ * Opcionals: $humorForcat i $fraseForcada (per celebrar alguna cosa) i $mascotaClasse (on es col·loca).
  * @var int $ratxa
  */
-$humor = $ratxa <= 0 ? 'dorm' : ($ratxa < 3 ? 'content' : 'eufòric');
-$frase = match ($humor) {
+$humor = $humorForcat ?? ($ratxa <= 0 ? 'dorm' : ($ratxa < 3 ? 'content' : 'eufòric'));
+$frase = $fraseForcada ?? match ($humor) {
     'dorm' => 'Zzz... Fem una pregunta i em despertes?',
     'content' => 'Som-hi! Una lliçó més i fem ratxa.',
     default => "$ratxa dies seguits! Imparable!",
 };
 ?>
-<figure class="mascota humor-<?= e($humor === 'eufòric' ? 'euforic' : $humor) ?>" aria-label="<?= e($frase) ?>">
+<figure class="mascota <?= e($mascotaClasse ?? '') ?> humor-<?= e($humor === 'eufòric' ? 'euforic' : $humor) ?>" aria-label="<?= e($frase) ?>">
   <figcaption class="mascota-bafarada"><?= e($frase) ?></figcaption>
   <svg viewBox="0 0 170 150" aria-hidden="true">
     <ellipse class="m-ombra" cx="96" cy="141" rx="58" ry="6"/>

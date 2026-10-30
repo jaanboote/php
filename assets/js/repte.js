@@ -7,10 +7,29 @@
   const { api, esc, toast, updateProgress } = PHPLab;
 
   const card = document.getElementById('r-card');
-  const st = { session: null, items: [], idx: 0, encerts: 0, temps: null, deadline: null, timer: null, finished: false };
+  const st = { session: null, items: [], idx: 0, encerts: 0, combo: 0, temps: null, deadline: null, timer: null, finished: false };
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /** Compte enrere «3, 2, 1, Som-hi!» abans de començar (no al repàs, que és tranquil). */
+  function countdown() {
+    if (calm || root.dataset.mode === 'repas') return Promise.resolve();
+    return new Promise((resolve) => {
+      const passos = ['3', '2', '1', 'Som-hi!'];
+      let i = 0;
+      const pas = () => {
+        if (i >= passos.length) { resolve(); return; }
+        card.innerHTML = '<div class="countdown" aria-live="assertive"><span class="' + (i === 3 ? 'go' : '') + '">' + passos[i] + '</span></div>';
+        i++;
+        setTimeout(pas, i === 4 ? 500 : 650);
+      };
+      pas();
+    });
+  }
 
   // ---------- Inici de la partida ----------
   async function start() {
+    // El compte enrere va abans de crear la partida: així no es menja temps del rellotge
+    await countdown();
     try {
       const r = await api('repte_start', { mode: root.dataset.mode, tema: root.dataset.tema || null });
       Object.assign(st, { session: r.session, items: r.items, temps: r.temps });
@@ -39,6 +58,16 @@
   function updateHeader() {
     document.getElementById('r-progress').textContent = Math.min(st.idx + 1, st.items.length) + ' / ' + st.items.length;
     document.getElementById('r-encerts').textContent = st.encerts + ' encert' + (st.encerts === 1 ? '' : 's');
+  }
+
+  /** Comptador de combo: apareix a partir de 2 encerts seguits i «salta» a cada encert. */
+  function updateCombo() {
+    const el = document.getElementById('r-combo');
+    el.hidden = st.combo < 2;
+    if (st.combo < 2) return;
+    el.textContent = '🔥 Combo ×' + st.combo;
+    el.classList.toggle('calent', st.combo >= 4);
+    el.classList.remove('salta'); void el.offsetWidth; el.classList.add('salta');
   }
 
   // ---------- Pintar una pregunta ----------
@@ -129,7 +158,9 @@
     try {
       const r = await api('repte_answer', { session: st.session, item: it.ref, answer });
       if (r.correcte) st.encerts++;
+      st.combo = r.correcte ? st.combo + 1 : 0;
       updateHeader();
+      updateCombo();
       showFeedback(it, answer, r);
     } catch (e) {
       toast(e.message);
@@ -186,16 +217,24 @@
       const r = await api('repte_finish', { session: st.session });
       const pct = r.total ? Math.round((r.encerts * 100) / r.total) : 0;
       const tema = root.dataset.tema ? '&tema=' + encodeURIComponent(root.dataset.tema) : '';
+      // Carta de resultat: rang segons el percentatge d'encerts
+      const rang = pct === 100 ? 'S' : pct >= 80 ? 'A' : pct >= 60 ? 'B' : pct >= 40 ? 'C' : 'D';
+      const temps = Math.floor(r.segons / 60) + ':' + String(r.segons % 60).padStart(2, '0');
+      const stat = (valor, etiqueta) => '<div><b>' + valor + '</b><span>' + etiqueta + '</span></div>';
       card.innerHTML = '<div class="result">' +
+        '<div class="result-card rang-' + rang + '">' +
+        '<div class="rc-top"><span class="rc-mode">' + esc(root.dataset.titol) + '</span><span class="rc-rang" title="Rang">' + rang + '</span></div>' +
         '<div class="result-score">' + r.score + '<small> punts</small></div>' +
         (r.record ? '<div class="pill ok">🏆 Nou rècord!</div>' : '<div class="small muted">Millor puntuació: ' + r.millor + '</div>') +
-        '<p><strong>' + r.encerts + ' de ' + r.total + '</strong> encerts (' + pct + ' %) · <strong>+' + r.xp + ' XP</strong></p>' +
+        '<div class="rc-stats">' + stat(r.encerts + '/' + r.total, 'encerts') + stat('×' + r.combo_max, 'millor combo') +
+        stat(temps, 'temps') + stat('+' + r.xp, 'XP') + '</div></div>' +
         (r.limit_xp ? '<p class="small muted">Has arribat al límit d\'XP diari dels reptes. Pots continuar practicant, però sense XP fins demà.</p>' : '') +
         (r.repas_pendent ? '<p>🔁 Tens <strong>' + r.repas_pendent + '</strong> ' + (r.repas_pendent > 1 ? 'preguntes' : 'pregunta') + ' per repassar avui.</p>' : '') +
         '<div class="result-actions">' +
         (root.dataset.mode === 'repas' ? '' : '<a class="btn primary" href="index.php?p=repte&mode=' + root.dataset.mode + tema + '">Torna-hi</a>') +
         (r.repas_pendent && root.dataset.mode !== 'repas' ? '<a class="btn" href="index.php?p=repte&mode=repas">Repassar</a>' : '') +
         '<a class="btn" href="index.php?p=reptes">Tornar als reptes</a></div></div>';
+      document.getElementById('r-combo').hidden = true;
       document.getElementById('r-progress').textContent = 'Acabat';
       // La puntuació compta des de 0 i, si és rècord o partida perfecta, confeti
       const score = card.querySelector('.result-score');
