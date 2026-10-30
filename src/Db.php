@@ -216,6 +216,21 @@ final class Db
                     unlocked_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
                 );
                 SQL,
+            4 => <<<'SQL'
+                -- Simulacres d'examen (mira src/Examens.php): un intent per fila
+                CREATE TABLE exam_attempts (
+                    id INTEGER PRIMARY KEY,
+                    examen_id TEXT NOT NULL,
+                    started_at INTEGER NOT NULL,
+                    limit_s INTEGER NOT NULL,
+                    respostes TEXT NOT NULL DEFAULT '{}',   -- JSON: ref => resposta (teoria) o codi (pràctica)
+                    saved_at INTEGER,
+                    finished_at INTEGER,
+                    nota REAL,                              -- sobre 10
+                    detall TEXT                             -- JSON: correcció de cada pregunta i programa
+                );
+                CREATE INDEX exam_attempts_examen ON exam_attempts (examen_id, finished_at);
+                SQL,
         ];
 
         $pdo->exec('CREATE TABLE IF NOT EXISTS schema_version (version INTEGER NOT NULL)');

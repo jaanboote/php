@@ -1,6 +1,6 @@
 ---
 name: afegir-contingut
-description: Com crear o modificar lliçons, laboratoris (de consola i web) i reptes a content/, i validar-los. Usa-la quan es demani afegir o canviar contingut didàctic.
+description: Com crear o modificar lliçons, laboratoris (de consola i web), reptes i exàmens a content/, i validar-los. Usa-la quan es demani afegir o canviar contingut didàctic.
 ---
 
 # Afegir o modificar contingut de PHPLab
@@ -13,6 +13,7 @@ Tot el contingut didàctic és a `content/`: **un fitxer PHP per element, que re
 | `content/lessons/<id>.php` | Una lliçó | `src/Lessons.php`, `templates/leccio.php` |
 | `content/labs/<id>.php` | Un laboratori (de consola o web) | `src/Labs.php`, `src/WebLab.php`, `templates/lab.php` |
 | `content/reptes/temaN.php` | El banc de reptes d'un tema | `src/Reptes.php` |
+| `content/examens/<id>.php` | Un simulacre d'examen | `src/Examens.php`, `templates/examen.php` |
 
 Abans d'escriure, **llegeix un fitxer semblant de la mateixa carpeta** i copia'n l'estil. Bons exemples:
 `content/lessons/fitxers-json.php`, `content/labs/pagina-dinamica.php` (consola), `content/labs/carta-reis.php` (web) i
@@ -203,6 +204,37 @@ de reptes i de lliçons.
 - A `ordenar` amb `linies` + `sortida`, s'accepta qualsevol ordre que, executat, doni la mateixa sortida.
 - `'errata' => 'Tema 2, pàgina 77'` marca un error que surt tal qual al temari (compta per a la insígnia «Caçador d'errates»).
 
+## Exàmens (`content/examens/<id>.php`)
+
+Simulacres amb una part teòrica i una de pràctica, que es corregeixen al servidor en entregar-los (`src/Examens.php`).
+Exemple: `content/examens/tema2-a.php`; amb diversos temes, `content/examens/final-1-4.php`.
+
+```php
+return [
+    'id' => 'tema2-a',
+    'ordre' => 21,                       // Tema N → N1, N2...; l'examen final, 90
+    'titol' => 'Tema 2 · Simulacre A',
+    'tema' => 'Tema 2 – Fonaments de PHP',   // o bé 'temes' => [...] (i un 'tema' a cada pregunta) per a un examen de diversos temes
+    'resum' => 'Una frase per a la targeta.',
+    'minuts' => 45,
+    'xp' => 50,                          // el primer cop que s'aprova
+    'punts_teoria' => 6,                 // es reparteixen a parts iguals entre les preguntes
+    'teoria' => [ /* preguntes amb el format dels reptes: test, sortida, error, ordenar, i també completa */ ],
+    'practica' => [
+        ['id' => 'p1', 'titol' => '...', 'fitxer' => 'descompte.php', 'punts' => 4,
+         'enunciat' => '<p>HTML amb els missatges literals que comproven les proves.</p>',
+         'codi_inicial' => "<?php\n// ...\n\n",
+         'fitxers' => ['dades.txt' => "..."],   // opcional: fitxers de partida quan l'alumne executa el programa
+         'proves' => [ /* com les dels laboratoris de consola */ ],
+         'solucio' => '...', 'solucio_explicacio' => '...'],
+    ],
+];
+```
+
+- `punts_teoria` més la suma dels `punts` de la pràctica ha de fer **10**. Un programa val la part proporcional de proves que supera.
+- Els `id` de les preguntes (`q1`, `q2`...) són únics dins de l'examen. Les preguntes han de ser noves: no copiïs les dels reptes ni de les lliçons.
+- Els codis de les preguntes, en *nowdoc* (`<<<'PHP'`): amb cometes dobles, les `$variables` s'interpolarien.
+
 ## Regles didàctiques
 
 - **Segueix el temari de classe.** Cita d'on surt cada cosa (`origen`, `apartat`) i fes servir els exemples i els noms
@@ -228,6 +260,8 @@ Ha de sortir **«Tot correcte.»** L'eina comprova:
   **no** les supera. Si les supera, les proves no comproven res de nou: afegeix-ne una que distingeixi els dos passos
   (o marca el pas amb `'repas' => true` si és un pas de repàs).
 - Lliçons: els blocs `codi` s'executen sense Fatal error i cada `sortida` dona exactament la `resposta`.
+- Exàmens: la teoria com els reptes (i a `completa`, el codi amb la primera resposta s'executa sense errors); a la pràctica,
+  la `solucio` supera totes les proves i el `codi_inicial` no; els punts sumen 10.
 - Reptes: `sortida` i `ordenar` donen la sortida indicada; a `error`, el `corregit` dona `esperat`, el `codi` erroni no,
   i la línia `linia` és diferent entre tots dos; a `test`, l'opció `correcta` existeix. No hi ha `id` repetits.
 

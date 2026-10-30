@@ -1263,6 +1263,91 @@ pre.code.cm-s-default { color: #e8e9f6; }
 .btn:has(> .ic:first-child) { padding-left: 12px; }
 .btn:has(> .ic:last-child):not(:has(> .ic:first-child)) { padding-right: 12px; }
 
+/* ---------- Exàmens ---------- */
+.examen-final { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin: 6px 0 28px; padding: 26px 28px;
+  border-radius: var(--radius-lg); border: 1px solid color-mix(in srgb, var(--spark) 35%, var(--border));
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--spark) 14%, transparent), transparent 60%), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), var(--shadow); }
+.examen-final h2 { margin: 2px 0 6px; font-size: 1.5rem; }
+.examen-final p { margin: 0 0 10px; color: var(--muted); max-width: 62ch; }
+.examen-final-etiqueta { color: var(--spark-ink) !important; font-weight: 600; font-size: .86rem; text-transform: uppercase; letter-spacing: .06em; }
+.examen-tema { margin-bottom: 22px; }
+.examen-tema > .group-title { font-size: 1rem; color: var(--text); margin: 0 0 10px; }
+.examen-tema > .group-title .tema-icona { color: var(--tema); }
+.examen-graella { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.examen-card { display: flex; flex-direction: column; gap: 6px; margin: 0; text-decoration: none; color: var(--text); border-top: 3px solid var(--tema, var(--accent));
+  transition: transform .16s var(--ease-out-quint), border-color .2s ease, box-shadow .2s ease; }
+@media (hover: hover) { .examen-card:hover { transform: translateY(-3px); border-color: var(--tema, var(--accent)); box-shadow: var(--shadow-lift); } }
+.examen-card:active { transform: scale(.985); }
+.examen-card-cap { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.examen-card h3 { margin: 0; font-size: 1.1rem; }
+.examen-card p { margin: 0; }
+.examen-estat { color: var(--muted); margin-top: auto !important; }
+.examen-xifres { display: flex; flex-wrap: wrap; gap: 6px 16px; list-style: none; padding: 0; margin: 4px 0; color: var(--muted); }
+.examen-xifres li { display: inline-flex; align-items: center; gap: 6px; }
+.examen-xifres strong { color: var(--text); }
+.nota-pill { font: 800 .95rem/1 var(--display); padding: 6px 10px; border-radius: 10px; font-variant-numeric: tabular-nums; }
+.nota-pill.ok { background: var(--ok-soft); color: var(--ok); }
+.nota-pill.ko { background: var(--err-soft); color: var(--err); }
+
+.examen-intro { border-top: 4px solid var(--tema, var(--spark)); }
+.examen-intro h1 { margin-top: 0; }
+.examen-normes { margin: 16px 0 18px; padding: 14px 18px; border-radius: 12px; background: var(--surface-2); }
+.examen-normes h2 { font-size: 1rem; margin: 0 0 6px; }
+.examen-normes ul { margin: 0; padding-left: 1.2em; }
+.examen-normes li { margin: 3px 0; }
+
+/* Barra fixa amb el rellotge mentre es fa l'examen */
+.examen-barra { position: sticky; top: 62px; z-index: 15; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; margin-bottom: 10px;
+  border-radius: 14px; border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--surface) 90%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: var(--shadow); }
+.examen-barra-titol { margin-right: auto; }
+.examen-barra .timer { font-size: .95rem; }
+.examen-barra .timer.urgent { background: var(--err-soft); color: var(--err); }
+@media (max-width: 800px) { .examen-barra { top: 98px; } .examen-barra-titol { width: 100%; } }
+.ex-pregunta.respost { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+.ex-pregunta .option.chosen { border-color: var(--accent); background: var(--accent-soft); }
+.ex-pregunta .answer { width: 100%; font-family: var(--mono); }
+.ex-programa .CodeMirror { border-radius: 0 10px 10px 10px; }
+.ex-enunciat > :first-child { margin-top: 0; }
+.examen-final-entrega { display: flex; justify-content: flex-end; margin: 10px 0 30px; }
+
+/* Resultat */
+.examen-resultat { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; border-top: 4px solid var(--ok); }
+.examen-resultat.suspes { border-top-color: var(--err); }
+.examen-resultat h1 { margin: 0 0 6px; font-size: 1.5rem; }
+.nota-gran { display: flex; align-items: baseline; gap: 6px; padding: 18px 24px; border-radius: 18px; background: var(--ok-soft); color: var(--ok);
+  animation: pop .6s var(--ease-spring) both; }
+.suspes .nota-gran { background: var(--err-soft); color: var(--err); }
+.nota-xifra { font: 800 3.4rem/1 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.nota-sobre { font-weight: 600; opacity: .8; }
+.examen-resultat-text { flex: 1 1 320px; }
+.examen-veredicte { margin: 0; font-weight: 700; color: var(--ok); display: flex; align-items: center; gap: 6px; }
+.suspes .examen-veredicte { color: var(--err); }
+.examen-barres { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--surface-2); margin: 12px 0 14px; max-width: 520px; }
+.examen-barres span { width: var(--pct); transform-origin: left; animation: barra-entra .8s var(--ease-out-quint) .2s both; }
+.barra-teoria { background: var(--accent); }
+.barra-practica { background: var(--spark); }
+@keyframes barra-entra { from { transform: scaleX(0); } }
+.correccio { border-left: 3px solid var(--border-strong); }
+.correccio.ok { border-left-color: var(--ok); }
+.correccio.ko { border-left-color: var(--err); }
+.correccio.mig { border-left-color: var(--warn); }
+.correccio-cap { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0 0 6px; }
+.correccio-num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2); font-weight: 700; font-size: .85rem; }
+.correccio-respostes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.correccio-respostes p { margin: 0 0 4px; }
+pre.resposta { margin: 0; padding: 10px 12px; border-radius: 10px; font-family: var(--mono); font-size: .85rem; white-space: pre-wrap; word-break: break-word;
+  background: var(--sunken); border: 1px solid var(--border); }
+pre.resposta.ok { border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+pre.resposta.ko { border-color: color-mix(in srgb, var(--err) 45%, transparent); }
+.correccio-proves { list-style: none; padding: 0; margin: 6px 0 10px; }
+.correccio-proves li { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; }
+.correccio-proves li.ok > .ic { color: var(--ok); }
+.correccio-proves li.ko > .ic { color: var(--err); }
+.correccio-proves code { margin-left: 6px; }
+.correccio-motiu { display: block; }
+
 /* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment) */
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }

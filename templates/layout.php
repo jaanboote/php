@@ -17,7 +17,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=14">
+  <link rel="stylesheet" href="assets/css/app.css?v=15">
 </head>
 <body>
 <?= icones_sprite() ?>
@@ -25,7 +25,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <header class="topbar">
   <a class="brand" href="index.php"><span class="brand-mark">&lt;?</span>PHPLab</a>
   <nav class="nav">
-    <?php foreach ([['index.php', 'Inici', ['inici']], ['index.php?p=reptes', 'Reptes', ['reptes', 'repte']], ['index.php?p=progres', 'Progrés', ['progres']],
+    <?php foreach ([['index.php', 'Inici', ['inici']], ['index.php?p=reptes', 'Reptes', ['reptes', 'repte']], ['index.php?p=examens', 'Exàmens', ['examens', 'examen']], ['index.php?p=progres', 'Progrés', ['progres']],
                     ['index.php?p=temari', 'Temari', ['temari']], ['index.php?p=diagnostic', 'Diagnòstic', ['diagnostic']]] as [$href, $nom, $pagines]):
         $actiu = in_array($page, $pagines, true); ?>
       <a href="<?= e($href) ?>" class="<?= $actiu ? 'active' : '' ?>" <?= $actiu ? 'aria-current="page"' : '' ?>><?php if ($actiu): ?><span class="nav-marca" aria-hidden="true"></span><?php endif; ?><?= e($nom) ?></a>
@@ -64,5 +64,6 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=8"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=7"></script><?php endif; ?>
 <?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=10"></script><?php endif; ?>
+<?php if ($page === 'examen'): ?><script src="assets/js/examen.js?v=1"></script><?php endif; ?>
 </body>
 </html>

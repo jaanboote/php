@@ -169,11 +169,12 @@ final class Stats
     /** D'on ve l'XP: lliçons, laboratoris i reptes. */
     public static function xpBySource(): array
     {
-        $out = ['Lliçons' => 0, 'Laboratoris' => 0, 'Reptes' => 0];
+        $out = ['Lliçons' => 0, 'Laboratoris' => 0, 'Reptes' => 0, 'Exàmens' => 0];
         foreach (Db::all('SELECT kind, SUM(amount) xp FROM xp_events GROUP BY kind') as $r) {
             $key = match (true) {
                 str_starts_with($r['kind'], 'lesson') => 'Lliçons',
                 str_starts_with($r['kind'], 'lab') => 'Laboratoris',
+                $r['kind'] === 'examen' => 'Exàmens',
                 default => 'Reptes',
             };
             $out[$key] += (int) $r['xp'];

@@ -6,12 +6,12 @@ d'instal·lació i seguretat a `docs/GUIA.md`.
 
 ## Estructura
 
-- `index.php`: pàgines (inici, lliçó, laboratori, reptes, progrés, temari, diagnòstic).
+- `index.php`: pàgines (inici, lliçó, laboratori, reptes, exàmens, progrés, temari, diagnòstic).
 - `api.php`: accions en JSON per al JavaScript (executar, corregir, pistes, tutor...).
 - `web.php`: navegador integrat dels laboratoris web (executa amb `php-cgi`).
 - `src/`: lògica (Sandbox, Labs, WebLab, Lessons, Reptes, Review, Badges, Stats, Auth, Db, Uploader...).
 - `templates/`: una vista PHP per pàgina.
-- `content/lessons`, `content/labs`, `content/reptes`: el contingut didàctic, un array PHP per fitxer.
+- `content/lessons`, `content/labs`, `content/reptes`, `content/examens`: el contingut didàctic, un array PHP per fitxer.
 - `eines/`: `verifica-contingut.php` i `canvia-contrasenya.php`.
 
 ## Regles

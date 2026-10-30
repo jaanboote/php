@@ -106,7 +106,7 @@ final class Reptes
     }
 
     /** El que veu el navegador d'una pregunta: res que en reveli la resposta. */
-    private static function publicItem(array $item): array
+    public static function publicItem(array $item): array
     {
         $pub = [
             'ref' => $item['ref'],
@@ -303,7 +303,7 @@ final class Reptes
     }
 
     /** La resposta correcta, per mostrar-la després de respondre. */
-    private static function solution(array $item): array
+    public static function solution(array $item): array
     {
         return match ($item['tipus']) {
             'test'     => ['correcta' => (int) $item['correcta']],
