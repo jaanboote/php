@@ -90,6 +90,18 @@ const PHPLab = (() => {
     requestAnimationFrame(step);
   }
 
+  // Els números marcats amb data-compta pugen des de zero la primera vegada que es veuen
+  if ('IntersectionObserver' in window && !calm) {
+    const obs = new IntersectionObserver((entrades) => entrades.forEach((en) => {
+      if (!en.isIntersecting) return;
+      obs.unobserve(en.target);
+      const to = +en.target.textContent;
+      en.target.textContent = '0';
+      countTo(en.target, to);
+    }));
+    document.querySelectorAll('[data-compta]').forEach((el) => obs.observe(el));
+  }
+
   /** «+N XP» que surt de l'element i vola fins al comptador d'XP de la capçalera. */
   function flyXp(from, amount, done) {
     const a = from.getBoundingClientRect();

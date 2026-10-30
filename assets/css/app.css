@@ -140,7 +140,9 @@ pre { overflow-x: auto; }
   transition: color .15s, background .15s; }
 .nav a:hover { color: var(--text); background: var(--surface-2); }
 .nav a.active { color: var(--accent-2); background: var(--accent-soft); }
-.nav a.active::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -11px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent); }
+/* La marca de la pàgina activa: té nom de transició perquè, en canviar de pàgina, llisqui fins al nou enllaç */
+.nav-marca { position: absolute; left: 12px; right: 12px; bottom: -11px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent);
+  view-transition-name: nav-marca; }
 .player { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: .9rem; }
 .level-badge { display: inline-flex; align-items: center; justify-content: center; gap: 3px; min-width: 52px; height: 30px; padding: 0 8px; font-family: var(--display); font-weight: 800;
   color: var(--on-accent); background: var(--accent); clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%); }
@@ -584,7 +586,7 @@ li.CodeMirror-hint-active { background: var(--accent); color: var(--on-accent); 
   .run-bar .inline input { min-width: 0; width: 100%; }
   .tema-filter label { display: grid; gap: 4px; }
   .tema-filter select { margin-left: 0; width: 100%; }
-  .nav a.active::after { display: none; }
+  .nav-marca { display: none; }
   .player { margin-left: 0; order: 3; width: 100%; }
   .xpbar { flex: 1; }
   .lab { grid-template-columns: 1fr; }
@@ -1170,6 +1172,42 @@ h2 .h-ic, h1 .h-ic { stroke-width: 2; }
   .level-card { display: grid; grid-template-columns: auto 1fr; justify-items: start; align-content: center; column-gap: 28px; row-gap: 4px; text-align: left; }
   .level-card .ring { grid-row: 1 / span 3; }
 }
+
+/* ---------- Animacions: revisió amb web-animation-design ---------- */
+/* Corbes de referència: ease-out per al que entra o surt, ease-in-out per al que es mou dins la pantalla */
+:root { --ease-out-quint: cubic-bezier(.23, 1, .32, 1); --ease-in-out-cubic: cubic-bezier(.645, .045, .355, 1); interpolate-size: allow-keywords; }
+
+/* Canvi de pàgina més àgil (per sota de 300 ms) i la marca del menú que llisca fins a la pàgina nova */
+::view-transition-new(root) { animation-duration: .26s; }
+::view-transition-old(root) { animation-duration: .16s; }
+::view-transition-group(nav-marca) { animation-duration: .32s; animation-timing-function: var(--ease-in-out-cubic); }
+::view-transition-group(cap-pagina) { animation-duration: .3s; }
+
+/* Els desplegables s'obren i es tanquen lliscant en lloc d'aparèixer de cop (navegadors que ho suporten) */
+details::details-content { block-size: 0; overflow: clip; overflow-clip-margin: 6px;
+  transition: block-size .24s var(--ease-out-quint), content-visibility .24s allow-discrete; }
+details[open]::details-content { block-size: auto; }
+.grup-tema[open] .item { animation: rise .32s var(--ease-out-quint) both; animation-delay: calc(min(var(--i, 0), 8) * 30ms); }
+
+/* Resposta en prémer: l'element cedeix una mica sota el dit */
+.item, .mode, .badge, .stat-tile { transition: transform .16s var(--ease-out-quint), box-shadow .2s ease, border-color .2s ease, background-color .15s ease; }
+.item:active { transform: scale(.985); }
+.mode:active { transform: translateY(-2px) scale(.985); }
+.option:active, .btn:active { transition-duration: .06s; }
+
+/* Els efectes de passar el ratolí només on hi ha ratolí: als mòbils el toc els deixava enganxats */
+@media (hover: none) {
+  .mode:hover { transform: none; box-shadow: var(--shadow); }
+  .mode-rapid:hover .il-agulla, .mode-rapid:hover .il-velocitat, .mode-error:hover .il-bitxo { animation: none; }
+}
+
+/* Repte: el contingut de cada pregunta entra escalonat (enunciat, codi, resposta) */
+.repte-card > *:nth-child(2) { animation-delay: 40ms; }
+.repte-card > *:nth-child(3) { animation-delay: 80ms; }
+.repte-card > *:nth-child(n + 4) { animation-delay: 120ms; }
+
+/* Les xifres que compten no fan ballar el text del voltant */
+[data-compta] { font-variant-numeric: tabular-nums; }
 
 /* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment) */
 @media (prefers-reduced-motion: reduce) {

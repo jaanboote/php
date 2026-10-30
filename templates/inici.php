@@ -74,8 +74,8 @@ $perTema = static function (array $items): array {
     <?php foreach ($perTema($lessons) as $tema => $grup): $fetes = count(array_filter($grup, fn ($l) => $l['progres']['acabada'])); ?>
     <details class="grup-tema <?= e(tema_class($tema)) ?>" <?= $tema === $temaObert ? 'open' : '' ?>>
       <summary class="group-title"><?= tema_icona($tema, 18) ?><span><?= e($tema) ?></span><span class="grup-compte"><?= e($fetes . '/' . count($grup)) ?></span></summary>
-      <?php foreach ($grup as $l): $p = $l['progres']; ?>
-      <a class="item <?= e(tema_class($l['tema'])) ?>" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
+      <?php foreach ($grup as $k => $l): $p = $l['progres']; ?>
+      <a class="item <?= e(tema_class($l['tema'])) ?>" style="--i: <?= $k ?>" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
         <div>
           <div class="item-title"><?= e($l['titol']) ?></div>
           <div class="muted small"><?= e($l['apartat']) ?> · <?= e($l['minuts']) ?> min</div>
@@ -94,8 +94,8 @@ $perTema = static function (array $items): array {
     <?php foreach ($perTema($labs) as $tema => $grup): $fets = count(array_filter($grup, fn ($lab) => (bool) $lab['estat']['completed_at'])); ?>
     <details class="grup-tema <?= e(tema_class($tema)) ?>" <?= $tema === $temaObert ? 'open' : '' ?>>
       <summary class="group-title"><?= tema_icona($tema, 18) ?><span><?= e($tema) ?></span><span class="grup-compte"><?= e($fets . '/' . count($grup)) ?></span></summary>
-      <?php foreach ($grup as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
-      <a class="item <?= e(tema_class($lab['tema'])) ?>" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
+      <?php foreach ($grup as $k => $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
+      <a class="item <?= e(tema_class($lab['tema'])) ?>" style="--i: <?= $k ?>" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
         <div>
           <div class="item-title"><?= e($lab['titol']) ?></div>
           <div class="muted small"><?= e($lab['resum']) ?></div>
