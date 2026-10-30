@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes, Badges, WebLab};
+use PhpLab\{Auth, Sandbox, ErrorExplainer, Labs, Lessons, Tutor, Progress, Reptes, Badges, WebLab, Examens};
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -66,6 +66,11 @@ try {
             // Als exemples de les lliçons, els fitxers de partida els defineix el contingut (no el navegador)
             $lesson = isset($in['lesson']) ? Lessons::get((string) $in['lesson']) : null;
             $files = $lesson['blocs'][(int) ($in['bloc'] ?? -1)]['fitxers'] ?? [];
+            // Als programes dels exàmens, igual: els fitxers de partida surten de l'enunciat
+            $examen = isset($in['examen']) ? Examens::get((string) $in['examen']) : null;
+            if ($examen !== null) {
+                $files = Examens::fitxersPrograma($examen, (string) ($in['programa'] ?? ''));
+            }
             $r = Sandbox::run($code, $args, (string) ($in['stdin'] ?? ''), (string) ($in['fitxer'] ?? 'main.php'), null,
                               $files, $lab ? Sandbox::workspace($lab['id']) : null);
             $r['explicacions'] = ErrorExplainer::explain($r['stderr'], $r['timeout'], $r['truncated']);
@@ -123,6 +128,16 @@ try {
 
         case 'repte_finish':
             respond(Reptes::finish((int) ($in['session'] ?? 0)) + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
+
+        case 'examen_start':
+            respond(Examens::start((string) ($in['examen'] ?? '')));
+
+        case 'examen_desa':
+            respond(Examens::desa((int) ($in['intent'] ?? 0), is_array($in['respostes'] ?? null) ? $in['respostes'] : []));
+
+        case 'examen_entrega':
+            respond(Examens::entrega((int) ($in['intent'] ?? 0), is_array($in['respostes'] ?? null) ? $in['respostes'] : [])
+                + ['progress' => Progress::summary(), 'insignies' => Badges::check()]);
 
         case 'lab_summary':
             respond(Labs::summary(lab($in)));

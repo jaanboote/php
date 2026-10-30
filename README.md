@@ -23,7 +23,7 @@
 ---
 
 **PHPLab** converteix els apunts i els exercicis de classe en lliçons interactives, laboratoris amb correcció automàtica,
-reptes i repàs espaciat. Tot el codi que escrius s'executa de veritat al teu PC, en un *sandbox* aïllat, i la teva web
+reptes, simulacres d'examen i repàs espaciat. Tot el codi que escrius s'executa de veritat al teu PC, en un *sandbox* aïllat, i la teva web
 de formularis s'obre en un navegador integrat on pots veure què rep PHP a cada petició.
 
 L'aplicació està feta en **PHP 8 pur, sense framework**, perquè també serveixi d'exemple: el codi està comentat en català i
@@ -59,8 +59,11 @@ es pot llegir de dalt a baix.
     </td>
     <td valign="top">
       <h3>🎯 Reptes i repàs</h3>
-      <p><b>59 reptes</b> en quatre modes: contrarellotge, «Troba l'error» (amb errates reals del temari), «Què imprimeix?» i «Ordena el codi».
+      <p><b>91 reptes</b> en quatre modes: contrarellotge, «Troba l'error» (amb errates reals del temari), «Què imprimeix?» i «Ordena el codi».
       El que falles torna al <b>repàs espaciat</b> (sistema Leitner: 1, 3, 7, 14 i 30 dies).</p>
+      <h3>📝 Exàmens</h3>
+      <p><b>2 simulacres per tema</b> (temes 1 a 4) i un <b>examen final</b> dels quatre temes, amb rellotge. Part teòrica i part pràctica
+      (programes corregits amb proves), nota sobre 10 i la correcció de cada pregunta en entregar-lo.</p>
     </td>
   </tr>
   <tr>
@@ -104,13 +107,15 @@ A sota, l'inspector mostra què ha arribat a `$_POST` i a `$_FILES`.
 
 ### Contingut per tema
 
-| Tema | Lliçons | Laboratoris | Reptes |
-|---|---|---|:---:|
-| 🟦 **1 · Introducció al desenvolupament web** | Frontend i backend · Client-servidor · MVC i entorn | Pàgina dinàmica (Bon dia, bona tarda, bona nit) | 7 |
-| 🟪 **2 · Fonaments de PHP** | Variables · Operadors · Condicionals i bucles · Arrays · Funcions · `$argv` i `$argc` | Alerta meteorològica · Horòscop xinès · Caixer automàtic · Caixa d'eines matemàtica · Permisos Linux · Còpia de seguretat | 17 |
-| 🟩 **3 · Funcions integrades** | `isset`/`empty` · Dates · Cadenes i `mb_*` · `map`, `filter`, `reduce` | Calculadora amb `match` · Calendari de lliuraments · Frases · Comptador de paraules | 14 |
-| 🟧 **4 · Errors, excepcions i fitxers** | Errors i `php.ini` · Excepcions · Fitxers i JSON | Calculadora segura · Comptador de visites · Agenda en JSON | 11 |
-| 🟥 **5 · Formularis, fitxers i sessions** | GET i POST · Pujar fitxers · Galetes i sessions | 🌐 Salutació amb GET · 🌐 Carta als Reis Mags · 🌐 Zona privada amb sessions | 10 |
+| Tema | Lliçons | Laboratoris | Reptes | Exàmens |
+|---|---|---|:---:|:---:|
+| 🟦 **1 · Introducció al desenvolupament web** | Frontend i backend · Client-servidor · MVC i entorn | Pàgina dinàmica (Bon dia, bona tarda, bona nit) · Codis d'estat HTTP | 15 | 2 |
+| 🟪 **2 · Fonaments de PHP** | Variables · Operadors · Condicionals i bucles · Arrays · Funcions · `$argv` i `$argc` | Alerta meteorològica · Quants dies té aquest mes? · Horòscop xinès · Validador de contrasenyes · Caixer automàtic · Caixa d'eines matemàtica · Permisos Linux · Còpia de seguretat · Generador de regles .htaccess | 25 | 2 |
+| 🟩 **3 · Funcions integrades** | `isset`/`empty` · Dates · Cadenes i `mb_*` · `map`, `filter`, `reduce` | Calculadora amb `match` · Calendari de lliuraments · Frases · Analitzador de text · Comptador de paraules · Fitxa de notes | 22 | 2 |
+| 🟧 **4 · Errors, excepcions i fitxers** | Errors i `php.ini` · Excepcions · Fitxers i JSON | Calculadora segura · Comptador de visites · Agenda en JSON · Llista de la compra en un fitxer | 19 | 2 |
+| 🟥 **5 · Formularis, fitxers i sessions** | GET i POST · Pujar fitxers · Galetes i sessions | 🌐 Salutació amb GET · 🌐 Carta als Reis Mags · 🌐 Zona privada amb sessions | 10 | — |
+
+A més, l'**examen final dels temes 1 a 4** barreja preguntes dels quatre temes i té dos programes.
 
 Els laboratoris surten dels enunciats de classe (Exercicis 01 i 02, les activitats de cada tema i l'Activitat de Nadal).
 Quan un contingut no és del temari de classe, la app el marca com a **ampliació**.

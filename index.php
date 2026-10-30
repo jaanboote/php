@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-use PhpLab\{Auth, View, Labs, Lessons, Indexer, Uploader, Progress, Tutor, Db, Config, Reptes, Review, Badges, Stats};
+use PhpLab\{Auth, View, Labs, Lessons, Indexer, Uploader, Progress, Tutor, Db, Config, Reptes, Review, Badges, Stats, Examens};
 
 $page = $_GET['p'] ?? 'inici';
 
@@ -197,6 +197,35 @@ switch ($page) {
             'title' => Reptes::MODES[$mode]['titol'], 'mode' => $mode, 'tema' => (string) ($_GET['tema'] ?? ''),
             'buit' => $mode === 'repas' && Review::countDue() === 0,   // res per repassar: pantalla buida, sense partida
             'proper' => Review::nextDue(),
+        ]);
+        break;
+
+    case 'examens':
+        View::render('examens', $common + ['title' => 'Exàmens', 'examens' => Examens::all(), 'resum' => Examens::resum()]);
+        break;
+
+    case 'examen':
+        $examen = Examens::get((string) ($_GET['id'] ?? ''));
+        if (!$examen) {
+            $noTrobat('Examen no trobat', 'Aquest simulacre no existeix. Torna a la pàgina d\'exàmens per veure els que hi ha.');
+        }
+        $intent = (int) ($_GET['intent'] ?? 0);
+        $resultat = null;
+        if ($intent > 0) {
+            try {
+                $resultat = Examens::resultat($intent);
+            } catch (InvalidArgumentException) {
+                $resultat = null;
+            }
+            if ($resultat !== null && $resultat['examen'] !== $examen['id']) {
+                $resultat = null;
+            }
+        }
+        View::render('examen', $common + [
+            'title' => $examen['titol'],
+            'examen' => $examen,
+            'historial' => Examens::historial($examen['id']),
+            'resultat' => $resultat,
         ]);
         break;
 
