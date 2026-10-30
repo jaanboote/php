@@ -169,5 +169,98 @@ return [
             'correcta' => 1,
             'explicacio' => 'Els errors no s\'han de mostrar mai a l\'usuari (revelen informació), però sí que s\'han de registrar al log.',
         ],
+        [
+            'id' => 't4-file-linies', 'tipus' => 'sortida', 'conceptes' => ['fitxers'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\nfile_put_contents(\"compra.txt\", \"pa\\nllet\\n\");\n\$linies = file(\"compra.txt\", FILE_IGNORE_NEW_LINES);\necho count(\$linies) . \$linies[1];",
+            'resposta' => '2llet',
+            'explicacio' => 'file() torna una línia per element (sense el salt de línia, gràcies a FILE_IGNORE_NEW_LINES): ["pa", "llet"].',
+        ],
+        [
+            'id' => 't4-json-assoc', 'tipus' => 'sortida', 'conceptes' => ['JSON'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\n\$d = json_decode('{\"nom\":\"Anna\",\"edat\":9}', true);\necho \$d[\"nom\"] . \$d[\"edat\"];",
+            'resposta' => 'Anna9',
+            'explicacio' => 'Amb true com a segon argument, json_decode() retorna un array associatiu i s\'hi accedeix amb $d["nom"].',
+        ],
+        [
+            'id' => 't4-getmessage', 'tipus' => 'sortida', 'conceptes' => ['jerarquia d\'excepcions'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\ntry {\n    throw new RuntimeException(\"No es pot llegir\");\n} catch (Exception \$e) {\n    echo get_class(\$e) . \": \" . \$e->getMessage();\n}",
+            'resposta' => 'RuntimeException: No es pot llegir',
+            'explicacio' => 'catch (Exception) captura també les filles com RuntimeException, i l\'objecte conserva la seva classe real i el missatge.',
+        ],
+        [
+            'id' => 't4-finally-return', 'tipus' => 'sortida', 'conceptes' => ['try / catch / finally'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\nfunction prova(): string\n{\n    try {\n        return \"A\";\n    } finally {\n        echo \"B\";\n    }\n}\necho prova();",
+            'resposta' => 'BA',
+            'explicacio' => 'El finally s\'executa sempre, fins i tot quan el try fa return: primer surt «B» i després l\'echo mostra el valor retornat, «A».',
+        ],
+        [
+            'id' => 't4-file-exists', 'tipus' => 'sortida', 'conceptes' => ['fitxers'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\nvar_dump(file_exists(\"no-hi-es.txt\"));\nfile_put_contents(\"no-hi-es.txt\", \"\");\nvar_dump(file_exists(\"no-hi-es.txt\"));",
+            'resposta' => "bool(false)\nbool(true)",
+            'explicacio' => 'file_put_contents() crea el fitxer si no existeix, encara que hi escriguis un text buit.',
+        ],
+        [
+            'id' => 't4-falta-append', 'tipus' => 'error', 'conceptes' => ['fitxers'],
+            'pregunta' => 'Volíem un registre amb 2 línies, però en surt 1. On és l\'error?',
+            'codi' => <<<'PHP'
+                <?php
+                file_put_contents("log.txt", "primera" . PHP_EOL);
+                file_put_contents("log.txt", "segona" . PHP_EOL);
+                echo count(file("log.txt")) . PHP_EOL;
+                PHP,
+            'linia' => 3,
+            'corregit' => <<<'PHP'
+                <?php
+                file_put_contents("log.txt", "primera" . PHP_EOL);
+                file_put_contents("log.txt", "segona" . PHP_EOL, FILE_APPEND);
+                echo count(file("log.txt")) . PHP_EOL;
+                PHP,
+            'esperat' => '2',
+            'explicacio' => 'Sense FILE_APPEND, file_put_contents() substitueix tot el contingut: la segona escriptura esborra la primera.',
+        ],
+        [
+            'id' => 't4-json-sense-throw', 'tipus' => 'error', 'conceptes' => ['JSON', 'excepcions'],
+            'pregunta' => 'El JSON és incorrecte, però surt «Llegit». On és l\'error?',
+            'codi' => <<<'PHP'
+                <?php
+                try {
+                    $dades = json_decode("{nom: Anna}", true);
+                    echo "Llegit" . PHP_EOL;
+                } catch (JsonException $e) {
+                    echo "JSON incorrecte" . PHP_EOL;
+                }
+                PHP,
+            'linia' => 3,
+            'corregit' => <<<'PHP'
+                <?php
+                try {
+                    $dades = json_decode("{nom: Anna}", true, 512, JSON_THROW_ON_ERROR);
+                    echo "Llegit" . PHP_EOL;
+                } catch (JsonException $e) {
+                    echo "JSON incorrecte" . PHP_EOL;
+                }
+                PHP,
+            'esperat' => 'JSON incorrecte',
+            'explicacio' => 'Per defecte json_decode() retorna null quan el JSON és incorrecte i no llança res. Cal JSON_THROW_ON_ERROR perquè llanci una JsonException.',
+        ],
+        [
+            'id' => 't4-ord-throw', 'tipus' => 'ordenar', 'conceptes' => ['throw', 'try / catch / finally'],
+            'pregunta' => 'Ordena les línies perquè mostri «Error: no es pot dividir per zero»:',
+            'linies' => [
+                '<?php',
+                'try {',
+                '    throw new InvalidArgumentException("no es pot dividir per zero");',
+                '} catch (InvalidArgumentException $e) {',
+                '    echo "Error: " . $e->getMessage();',
+                '}',
+            ],
+            'sortida' => 'Error: no es pot dividir per zero',
+            'explicacio' => 'El throw va dins del try; el catch, just després, captura l\'excepció i en mostra el missatge amb getMessage().',
+        ],
     ],
 ];

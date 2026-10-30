@@ -234,5 +234,103 @@ return [
             'correcta' => 1,
             'explicacio' => 'A PHP 8 un text no numèric ja no es converteix en 0: la comparació és false. A PHP 7 donava true!',
         ],
+        [
+            'id' => 't2-ternari', 'tipus' => 'sortida', 'conceptes' => ['operador ternari'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\n\$edat = 17;\necho \$edat >= 18 ? \"major\" : \"menor\";",
+            'resposta' => 'menor',
+            'explicacio' => 'condició ? si_cert : si_fals. 17 >= 18 és fals, així que tria «menor».',
+        ],
+        [
+            'id' => 't2-traspas', 'tipus' => 'sortida', 'conceptes' => ['operadors lògics', 'mòdul'],
+            'pregunta' => 'Què imprimeix? (S = de traspàs, N = no.)',
+            'codi' => "<?php\nforeach ([1900, 2000, 2024] as \$any) {\n    echo (\$any % 4 == 0 && \$any % 100 != 0) || \$any % 400 == 0 ? \"S\" : \"N\";\n}",
+            'resposta' => 'NSS',
+            'explicacio' => '1900 és divisible entre 100 i no entre 400: no. 2000 és divisible entre 400: sí. 2024 és divisible entre 4 i no entre 100: sí. (Exercici 5 d\'Exercicis 01.)',
+        ],
+        [
+            'id' => 't2-dowhile', 'tipus' => 'sortida', 'conceptes' => ['bucle do...while'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\n\$i = 10;\ndo {\n    echo \$i;\n    \$i++;\n} while (\$i < 5);",
+            'resposta' => '10',
+            'explicacio' => 'do...while executa el bloc almenys una vegada i comprova la condició al final. Un while normal no hauria imprès res.',
+        ],
+        [
+            'id' => 't2-caracters', 'tipus' => 'sortida', 'conceptes' => ['bucle for', 'cadenes de text'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\n\$p = \"Hola1\";\n\$digits = 0;\nfor (\$i = 0; \$i < strlen(\$p); \$i++) {\n    if (ctype_digit(\$p[\$i])) {\n        \$digits++;\n    }\n}\necho \$digits . \$p[0];",
+            'resposta' => '1H',
+            'explicacio' => 'Un string es recorre com un array: només «1» és un dígit. $p[0] és el primer caràcter, «H». (Exercici 10 d\'Exercicis 01.)',
+        ],
+        [
+            'id' => 't2-argc', 'tipus' => 'sortida', 'conceptes' => ['arguments per consola'],
+            'pregunta' => 'S\'executa amb <code>php htaccess.php bloqueja 10.0.0.1 10.0.0.2</code>. Què imprimeix?',
+            'codi' => "<?php\necho \$argc . \" \" . \$argv[\$argc - 1];",
+            'args' => 'bloqueja 10.0.0.1 10.0.0.2',
+            'resposta' => '4 10.0.0.2',
+            'explicacio' => '$argv té el nom del programa i els 3 arguments: $argc val 4 i l\'últim element és $argv[3].',
+        ],
+        [
+            'id' => 't2-dowhile-pc', 'tipus' => 'error', 'conceptes' => ['bucle do...while', 'sintaxi'],
+            'pregunta' => 'Parse error! A quina línia és l\'error?',
+            'codi' => <<<'PHP'
+                <?php
+                $i = 1;
+                do {
+                    echo $i;
+                    $i++;
+                } while ($i <= 3)
+                echo PHP_EOL . "Fi" . PHP_EOL;
+                PHP,
+            'linia' => 6,
+            'corregit' => <<<'PHP'
+                <?php
+                $i = 1;
+                do {
+                    echo $i;
+                    $i++;
+                } while ($i <= 3);
+                echo PHP_EOL . "Fi" . PHP_EOL;
+                PHP,
+            'esperat' => "123\nFi",
+            'explicacio' => 'A diferència del while normal, el do...while acaba amb punt i coma després de la condició.',
+        ],
+        [
+            'id' => 't2-return', 'tipus' => 'error', 'conceptes' => ['funcions'],
+            'pregunta' => 'Fatal error: «Return value must be of type int, none returned». On és l\'error?',
+            'codi' => <<<'PHP'
+                <?php
+                function doble(int $n): int
+                {
+                    $n * 2;
+                }
+                echo doble(4) . PHP_EOL;
+                PHP,
+            'linia' => 4,
+            'corregit' => <<<'PHP'
+                <?php
+                function doble(int $n): int
+                {
+                    return $n * 2;
+                }
+                echo doble(4) . PHP_EOL;
+                PHP,
+            'esperat' => '8',
+            'explicacio' => 'La funció calcula $n * 2 però no el retorna. Sense return, una funció declarada amb : int dona un error de tipus.',
+        ],
+        [
+            'id' => 't2-ord-saluda', 'tipus' => 'ordenar', 'conceptes' => ['funcions'],
+            'pregunta' => 'Ordena les línies perquè el programa mostri «Hola, Anna!»:',
+            'linies' => [
+                '<?php',
+                'function saluda(string $nom): string',
+                '{',
+                '    return "Hola, $nom!";',
+                '}',
+                'echo saluda("Anna");',
+            ],
+            'sortida' => 'Hola, Anna!',
+            'explicacio' => 'La capçalera de la funció, el cos entre claus amb el return, i la crida. (PHP permet cridar una funció abans de definir-la al mateix fitxer.)',
+        ],
     ],
 ];

@@ -165,5 +165,88 @@ return [
             'correcta' => 2,
             'explicacio' => 'mb_strlen compta caràcters (6). strlen comptaria bytes (7), i count/sizeof són per a arrays.',
         ],
+        [
+            'id' => 't3-number-format', 'tipus' => 'sortida', 'conceptes' => ['number_format'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\necho number_format(1234.5, 2, \",\", \".\");",
+            'resposta' => '1.234,50',
+            'explicacio' => 'number_format(número, decimals, separador decimal, separador de milers): 2 decimals amb coma i punt als milers, com en català.',
+        ],
+        [
+            'id' => 't3-usort-desc', 'tipus' => 'sortida', 'conceptes' => ['ordenar arrays'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\n\$n = [3, 10, 7];\nusort(\$n, fn(\$a, \$b) => \$b <=> \$a);\necho implode(\"-\", \$n);",
+            'resposta' => '10-7-3',
+            'explicacio' => 'Amb $b <=> $a (al revés del normal), usort() ordena de més gran a més petit.',
+        ],
+        [
+            'id' => 't3-nau', 'tipus' => 'sortida', 'conceptes' => ['operador nau espacial'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\necho (5 <=> 8) . (8 <=> 8) . (9 <=> 8);",
+            'resposta' => '-101',
+            'explicacio' => '<=> retorna -1 si l\'esquerra és més petita, 0 si són iguals i 1 si és més gran: «-1», «0» i «1» enganxats.',
+        ],
+        [
+            'id' => 't3-explode-buits', 'tipus' => 'sortida', 'conceptes' => ['explode', 'map, filter i reduce'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\n\$trossos = explode(\" \", \" a  b \");\n\$paraules = array_filter(\$trossos);\necho count(\$trossos) . \"/\" . count(\$paraules);",
+            'resposta' => '5/2',
+            'explicacio' => 'Cada espai talla: queden "", "a", "", "b" i "". array_filter() sense funció treu els valors buits i en deixa 2.',
+        ],
+        [
+            'id' => 't3-contains-buit', 'tipus' => 'sortida', 'conceptes' => ['funcions de cadenes'],
+            'pregunta' => 'Què imprimeix?',
+            'codi' => "<?php\nvar_dump(str_contains(\"Hola\", \"\"));",
+            'resposta' => 'bool(true)',
+            'explicacio' => 'Per a str_contains(), el text buit és dins de qualsevol text. Si la paraula clau ve de l\'usuari, comprova abans que no sigui buida.',
+        ],
+        [
+            'id' => 't3-number-format-args', 'tipus' => 'error', 'conceptes' => ['number_format'],
+            'pregunta' => 'Fatal error: TypeError. A quina línia és l\'error?',
+            'codi' => <<<'PHP'
+                <?php
+                $preu = 1234.5;
+                echo number_format($preu, ",", 2) . " €" . PHP_EOL;
+                PHP,
+            'linia' => 3,
+            'corregit' => <<<'PHP'
+                <?php
+                $preu = 1234.5;
+                echo number_format($preu, 2, ",", ".") . " €" . PHP_EOL;
+                PHP,
+            'esperat' => '1.234,50 €',
+            'explicacio' => 'El segon argument de number_format() és el nombre de decimals (un enter), i després van els separadors. L\'ordre dels arguments importa.',
+        ],
+        [
+            'id' => 't3-usort-retorn', 'tipus' => 'error', 'conceptes' => ['ordenar arrays'],
+            'pregunta' => 'implode() dona un TypeError. On és l\'error?',
+            'codi' => <<<'PHP'
+                <?php
+                $n = [3, 1, 2];
+                $n = usort($n, fn($a, $b) => $a <=> $b);
+                echo implode(",", $n) . PHP_EOL;
+                PHP,
+            'linia' => 3,
+            'corregit' => <<<'PHP'
+                <?php
+                $n = [3, 1, 2];
+                usort($n, fn($a, $b) => $a <=> $b);
+                echo implode(",", $n) . PHP_EOL;
+                PHP,
+            'esperat' => '1,2,3',
+            'explicacio' => 'usort() ordena l\'array que rep (per referència) i retorna true. En desar-ne el resultat a $n, l\'array es perd i queda un booleà.',
+        ],
+        [
+            'id' => 't3-ord-mitjana', 'tipus' => 'ordenar', 'conceptes' => ['number_format', 'arrays'],
+            'pregunta' => 'Ordena les línies perquè mostri la mitjana amb un decimal i coma:',
+            'linies' => [
+                '<?php',
+                '$notes = [7, 8, 9.5];',
+                '$mitjana = array_sum($notes) / count($notes);',
+                'echo number_format($mitjana, 1, ",", ".");',
+            ],
+            'sortida' => '8,2',
+            'explicacio' => 'Primer les dades, després el càlcul (array_sum / count = 8,1666...) i finalment mostrar-lo arrodonit a 1 decimal.',
+        ],
     ],
 ];
