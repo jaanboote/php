@@ -2,12 +2,14 @@
 /**
  * La mascota: un elefant de PHP dibuixat en SVG. El seu humor depèn de la ratxa de dies:
  *   0 dies → dorm · 1-2 → content · 3 o més → eufòric (amb espurnes).
+ * També 'confos' (amb interrogants), per a les pàgines que no existeixen.
  * Opcionals: $humorForcat i $fraseForcada (per celebrar alguna cosa) i $mascotaClasse (on es col·loca).
  * @var int $ratxa
  */
 $humor = $humorForcat ?? ($ratxa <= 0 ? 'dorm' : ($ratxa < 3 ? 'content' : 'eufòric'));
 $frase = $fraseForcada ?? match ($humor) {
     'dorm' => 'Zzz... Fem una pregunta i em despertes?',
+    'confos' => 'Mmm... aquí no hi ha res.',
     'content' => 'Som-hi! Una lliçó més i fem ratxa.',
     default => "$ratxa dies seguits! Imparable!",
 };
@@ -43,6 +45,8 @@ $frase = $fraseForcada ?? match ($humor) {
     </g>
     <?php if ($humor === 'dorm'): ?>
       <g class="m-zzz"><text x="22" y="40">z</text><text x="10" y="24">Z</text></g>
+    <?php elseif ($humor === 'confos'): ?>
+      <g class="m-preguntes"><text x="16" y="44">?</text><text x="34" y="26">?</text></g>
     <?php elseif ($humor === 'eufòric'): ?>
       <g class="m-espurnes">
         <path d="M20 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/>

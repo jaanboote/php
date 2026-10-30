@@ -23,14 +23,36 @@ $checks = [
     ['Clau de l\'API de Claude', Tutor::aiAvailable(), 'Opcional: sense clau, el tutor funciona en mode sense connexió.', true],
 ];
 ?>
+<?php
+$errors = count(array_filter($checks, fn($c) => !$c[1] && empty($c[3])));
+?>
 <h1>Diagnòstic</h1>
-<section class="card">
-  <ul class="checks">
-    <?php foreach ($checks as $c): [$label, $ok, $help] = $c; $optional = $c[3] ?? false; ?>
-      <li class="<?= $ok ? 'ok' : ($optional ? 'opt' : 'ko') ?>"><span class="check-icon"><?= $ok ? '✔' : ($optional ? '○' : '✖') ?></span>
-        <span><?= e($label) ?><?php if (!$ok): ?><br><small class="muted"><?= e($help) ?></small><?php endif; ?></span></li>
-    <?php endforeach; ?>
-  </ul>
-  <p class="small muted">PHP del sandbox: <?= e($test['stdout'] ?: '—') ?> · <code><?= e($phpCli) ?></code> · temps límit <?= e(Config::get('sandbox.timeout')) ?> s · memòria <?= e(Config::get('sandbox.memory_limit')) ?></p>
-  <p class="small muted">Accés permès des de: <?= e(implode(', ', (array) Config::get('allowed_networks'))) ?> · La teva IP: <?= e($_SERVER['REMOTE_ADDR'] ?? '') ?></p>
+<section class="card panell <?= $errors ? 'amb-errors' : 'tot-ok' ?>">
+  <div class="panell-estat">
+    <span class="led gran <?= $errors ? 'ko' : 'ok' ?>" aria-hidden="true"></span>
+    <div>
+      <h2><?= $errors ? e($errors . ($errors > 1 ? ' coses per arreglar' : ' cosa per arreglar')) : 'Tot en ordre' ?></h2>
+      <p class="muted"><?= $errors ? 'Mira els llums vermells: a sota de cada un hi ha com arreglar-ho.' : 'PHPLab té tot el que necessita per funcionar.' ?></p>
+    </div>
+  </div>
+  <div class="panell-specs">
+    <span class="meta-chip">🐘 Sandbox: PHP <?= e($test['stdout'] ?: '—') ?></span>
+    <span class="meta-chip">⏱ <?= e(Config::get('sandbox.timeout')) ?> s per execució</span>
+    <span class="meta-chip">🧠 <?= e(Config::get('sandbox.memory_limit')) ?> de memòria</span>
+    <span class="meta-chip">🌐 La teva IP: <?= e($_SERVER['REMOTE_ADDR'] ?? '') ?></span>
+  </div>
 </section>
+
+<div class="checks-grid">
+  <?php foreach ($checks as $c): [$label, $ok, $help] = $c; $optional = $c[3] ?? false; $estat = $ok ? 'ok' : ($optional ? 'opt' : 'ko'); ?>
+    <div class="check-tile <?= $estat ?>">
+      <span class="led <?= $estat ?>" aria-hidden="true"></span>
+      <div>
+        <strong><?= e($label) ?></strong>
+        <span class="small muted"><?= $ok ? 'Correcte' : e($help) ?></span>
+      </div>
+      <span class="sr-only"><?= $ok ? 'correcte' : ($optional ? 'opcional, no configurat' : 'error') ?></span>
+    </div>
+  <?php endforeach; ?>
+</div>
+<p class="small muted">PHP del sandbox: <code><?= e($phpCli) ?></code> · Accés permès des de: <?= e(implode(', ', (array) Config::get('allowed_networks'))) ?></p>

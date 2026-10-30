@@ -61,10 +61,48 @@
         }
       }
       PHPLab.updateProgress(r.progress, r.xp, optionBtn || fb);
-      if (r.leccio_acabada && r.xp >= 20) setTimeout(() => PHPLab.toast('🏁 Lliçó completada!'), 1200);
+      if (r.leccio_nova) setTimeout(() => celebraLeccio(r.xp_leccio), 1400);
     } catch (e) {
       PHPLab.toast(e.message);
     }
+  }
+
+  /**
+   * Pantalla de «Lliçó completada!» amb la mascota, l'XP de la lliçó i cap on anar ara
+   * (el laboratori per practicar-ho i la lliçó següent). Si s'està mostrant la de pujar de nivell, espera.
+   */
+  function celebraLeccio(xp) {
+    if (document.querySelector('.level-up')) {
+      setTimeout(() => celebraLeccio(xp), 700);
+      return;
+    }
+    const art = document.querySelector('.lesson');
+    const { esc } = PHPLab;
+    let accions = '';
+    if (art.dataset.labId) {
+      accions += '<a class="btn primary" href="index.php?p=lab&amp;id=' + encodeURIComponent(art.dataset.labId) + '">🧪 Practica-ho: ' + esc(art.dataset.labTitol) + '</a>';
+    }
+    if (art.dataset.seguentId) {
+      accions += '<a class="btn' + (art.dataset.labId ? '' : ' primary') + '" href="index.php?p=leccio&amp;id=' + encodeURIComponent(art.dataset.seguentId) + '">📖 Següent: ' + esc(art.dataset.seguentTitol) + '</a>';
+    }
+    accions += '<button class="btn" type="button" data-tanca>Quedar-me aquí</button>';
+    const box = document.createElement('div');
+    box.className = 'level-up leccio-feta';
+    box.setAttribute('role', 'alertdialog');
+    box.setAttribute('aria-label', 'Lliçó completada');
+    box.innerHTML = '<div class="level-up-card"><small>Lliçó completada!</small>' +
+      '<div class="level-up-name">' + esc(art.querySelector('h1').textContent) + '</div>' +
+      '<div class="leccio-xp">+' + esc(xp) + ' XP</div><div class="leccio-accions">' + accions + '</div></div>';
+    const tpl = document.getElementById('tpl-mascota');
+    if (tpl) box.querySelector('.level-up-card').prepend(tpl.content.cloneNode(true));
+    document.body.appendChild(box);
+    PHPLab.celebrate(box.querySelector('.leccio-xp'), 50);
+    box.querySelector('.leccio-accions .btn').focus();
+    const tanca = () => { box.classList.add('out'); setTimeout(() => box.remove(), 300); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape') tanca(); };
+    box.querySelector('[data-tanca]').addEventListener('click', tanca);
+    box.addEventListener('click', (e) => { if (e.target === box) tanca(); });
+    document.addEventListener('keydown', onKey);
   }
 
   document.querySelectorAll('.quiz').forEach((quiz) => {

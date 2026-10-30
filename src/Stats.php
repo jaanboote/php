@@ -155,6 +155,17 @@ final class Stats
         return $out;
     }
 
+    /**
+     * Calendari de pràctica (com el de GitHub): les últimes $setmanes setmanes, de dilluns a diumenge,
+     * acabant la setmana d'avui. Els dies que encara han de venir no hi surten.
+     * @return array<int, array{dia:string, xp:int}> del més antic a avui
+     */
+    public static function calendari(int $setmanes = 18): array
+    {
+        $diaSetmana = (int) date('N');   // 1 = dilluns ... 7 = diumenge
+        return self::xpByDay(($setmanes - 1) * 7 + $diaSetmana);
+    }
+
     /** D'on ve l'XP: lliçons, laboratoris i reptes. */
     public static function xpBySource(): array
     {

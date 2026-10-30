@@ -45,3 +45,29 @@ function tema_icona(?string $tema, int $mida = 22): string
     return '<svg class="tema-icona" width="' . $mida . '" height="' . $mida . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
         . 'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $dibuix . '</svg>';
 }
+
+/**
+ * Icona SVG d'un fitxer segons l'extensió: un full amb la cantonada doblegada i una etiqueta de color
+ * (PDF vermell, ZIP taronja, DOCX blau, PHP lila...). És HTML nostre: es pot imprimir sense escapar.
+ */
+function fitxer_icona(string $ext): string
+{
+    $ext = strtolower($ext);
+    $color = match ($ext) {
+        'pdf' => '#ff6b7a',
+        'zip' => '#f3a648',
+        'doc', 'docx' => '#5cb4ee',
+        'php' => '#9a9ef0',
+        'html', 'htm' => '#ff8f5a',
+        'md' => '#3fcf9f',
+        default => '#8d8ea4',
+    };
+    $etiqueta = htmlspecialchars(strtoupper(mb_substr($ext !== '' ? $ext : '?', 0, 4)), ENT_QUOTES);
+    return '<svg class="fitxer-icona" width="40" height="48" viewBox="0 0 40 48" aria-hidden="true">'
+        . '<path d="M4 3h22l10 10v32H4z" fill="#15151d" stroke="' . $color . '" stroke-width="2" stroke-linejoin="round"/>'
+        . '<path d="M26 3v10h10" fill="none" stroke="' . $color . '" stroke-width="2" stroke-linejoin="round"/>'
+        . '<path d="M10 20h16M10 25h20M10 30h12" stroke="#3a3a4a" stroke-width="2" stroke-linecap="round"/>'
+        . '<rect x="1" y="34" width="' . (strlen($etiqueta) * 7 + 8) . '" height="11" rx="3" fill="' . $color . '"/>'
+        . '<text x="5" y="42.5" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="800" fill="#0b0b10">' . $etiqueta . '</text>'
+        . '</svg>';
+}

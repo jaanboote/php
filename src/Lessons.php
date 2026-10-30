@@ -93,6 +93,12 @@ final class Lessons
             'explicacio' => $q['explicacio'] ?? '',
             'xp' => $xp,
             'leccio_acabada' => $done['acabada'],
+            'leccio_nova' => $done['nova'],   // s'acaba d'acabar ara mateix: el navegador ho celebra
+            // XP total de la lliçó (preguntes + premi final), per mostrar-lo a la celebració
+            'xp_leccio' => $done['nova'] ? (int) Db::value(
+                "SELECT COALESCE(SUM(amount), 0) FROM xp_events WHERE (kind = 'lesson_q' AND ref LIKE ?) OR (kind = 'lesson_done' AND ref = ?)",
+                [$lesson['id'] . '#%', $lesson['id']]
+            ) : 0,
         ];
     }
 

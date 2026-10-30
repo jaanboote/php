@@ -16,7 +16,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=7">
+  <link rel="stylesheet" href="assets/css/app.css?v=9">
 </head>
 <body>
 <header class="topbar">
@@ -44,7 +44,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 </main>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <!-- La mascota que celebra la pujada de nivell (app.js la copia dins de la finestra) -->
-<template id="tpl-mascota"><?php $ratxa = 3; $humorForcat = 'eufòric'; $fraseForcada = 'Nivell nou!'; $mascotaClasse = 'mascota-nivell';
+<template id="tpl-mascota"><?php $ratxa = 3; $humorForcat = 'eufòric'; $fraseForcada = 'Molt bé!'; $mascotaClasse = 'mascota-nivell';
   require __DIR__ . '/_mascota.php'; ?></template>
 <a id="badge-pop" class="badge-pop" href="index.php?p=progres#insignies" role="status" aria-live="polite"></a>
 <script src="assets/vendor/codemirror/codemirror.js"></script>
@@ -57,8 +57,8 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/vendor/codemirror/addon/edit/matchbrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/edit/closebrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/hint/show-hint.js"></script>
-<script src="assets/js/app.js?v=6"></script>
-<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=5"></script><?php endif; ?>
+<script src="assets/js/app.js?v=7"></script>
+<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=6"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=5"></script><?php endif; ?>
 <?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=6"></script><?php endif; ?>
 </body>
