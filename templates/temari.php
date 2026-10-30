@@ -18,7 +18,7 @@ $maxPost = ini_get('post_max_size');
     <?php endif; ?>
     <p><strong>Índex:</strong> <?= count($ix['nous']) ?> nou(s), <?= count($ix['modificats']) ?> modificat(s), <?= count($ix['esborrats']) ?> esborrat(s), <?= e($ix['sense_canvis']) ?> sense canvis.</p>
     <?php if ($ix['temes_nous']): ?><p>🆕 <strong>Temes nous:</strong> <?= e(implode(' · ', $ix['temes_nous'])) ?></p><?php endif; ?>
-    <?php if ($ix['errors']): ?><ul class="small"><?php foreach ($ix['errors'] as $er): ?><li>⚠ <?= e($er['path']) ?>: <?= e($er['message']) ?></li><?php endforeach; ?></ul><?php endif; ?>
+    <?php if ($ix['errors']): ?><ul class="small"><?php foreach ($ix['errors'] as $er): ?><li><?= icona('avis') ?> <?= e($er['path']) ?>: <?= e($er['message']) ?></li><?php endforeach; ?></ul><?php endif; ?>
   </div>
 <?php endif; ?>
 
@@ -33,7 +33,7 @@ $maxPost = ini_get('post_max_size');
         <svg class="drop-icona" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 8"/><path d="M12 12v8M8.5 15.5 12 12l3.5 3.5"/></svg>
         <span>Tria fitxers o arrossega'ls aquí<br><small class="muted">PDF, ZIP, DOCX, PHP, HTML, TXT, MD · màxim <?= e($maxUpload) ?> per fitxer i <?= e($maxPost) ?> en total</small></span>
       </label>
-      <button class="btn primary" type="submit">⬆ Pujar temari</button>
+      <button class="btn primary" type="submit"><?= icona('puja') ?> Pujar temari</button>
     </form>
     <p class="small muted">Els ZIP s'extreuen (amb protecció contra «zip slip»). Si un fitxer ja existeix amb el mateix contingut, no es duplica.</p>
   </section>
@@ -44,7 +44,7 @@ $maxPost = ini_get('post_max_size');
     <form method="post">
       <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">
       <input type="hidden" name="accio" value="reindexar">
-      <button class="btn" type="submit">🔄 Actualitzar temari</button>
+      <button class="btn" type="submit"><?= icona('refresca') ?> Actualitzar temari</button>
     </form>
     <p class="small muted">Carpeta: <code><?= e(PhpLab\Indexer::temariDir()) ?></code></p>
   </section>
@@ -69,17 +69,17 @@ $maxPost = ini_get('post_max_size');
     <?php foreach ($grups as $tema => $llista): ?>
       <div class="temari-grup <?= e(tema_class($tema)) ?>">
         <h3 class="group-title"><?= tema_icona($tema, 18) ?><?= e($tema) ?>
-          <a class="btn small" href="index.php?p=llegir&amp;tema=<?= e(urlencode($tema)) ?>">📖 Llegir</a></h3>
+          <a class="btn small" href="index.php?p=llegir&amp;tema=<?= e(urlencode($tema)) ?>"><?= icona('llibre') ?> Llegir</a></h3>
         <div class="fitxers-grid">
           <?php foreach ($llista as $f): $dir = dirname(str_replace('\\', '/', $f['path'])); ?>
             <article class="fitxer-card <?= $f['status'] === 'ok' ? '' : 'amb-error' ?>">
               <?= fitxer_icona((string) $f['ext']) ?>
               <div class="fitxer-info">
                 <strong title="<?= e($f['path']) ?>"><?= e(basename(str_replace('\\', '/', $f['path']))) ?></strong>
-                <?php if ($dir !== '.'): ?><span class="fitxer-carpeta">📁 <?= e($dir) ?></span><?php endif; ?>
+                <?php if ($dir !== '.'): ?><span class="fitxer-carpeta"><?= icona('carpeta') ?> <?= e($dir) ?></span><?php endif; ?>
                 <span class="fitxer-meta"><?= e($f['kind']) ?> · <?= number_format((int) $f['chars'], 0, ',', '.') ?> caràcters</span>
                 <?php if ($f['status'] !== 'ok'): ?>
-                  <span class="pill err" title="<?= e($f['message']) ?>">⚠ <?= e($f['status']) ?></span>
+                  <span class="pill err" title="<?= e($f['message']) ?>"><?= icona('avis') ?> <?= e($f['status']) ?></span>
                   <span class="small muted"><?= e($f['message']) ?></span>
                 <?php endif; ?>
               </div>

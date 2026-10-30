@@ -25,7 +25,7 @@ $totalFonts = max(1, array_sum($xpFonts));
 <section class="stat-tiles">
   <div class="stat-tile"><span class="stat-label">Nivell</span><span class="stat-value"><?= e($progress['level']) ?></span><span class="stat-sub"><?= e($progress['name']) ?></span></div>
   <div class="stat-tile"><span class="stat-label">XP total</span><span class="stat-value"><?= e($progress['xp']) ?></span><span class="stat-sub"><?= e($totalMes) ?> els últims 30 dies</span></div>
-  <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value">🔥 <?= e($progress['streak']) ?></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> <?= $dies['millor_ratxa'] === 1 ? 'dia' : 'dies' ?></span></div>
+  <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value"><?= icona('flama', 'stat-ic') ?> <?= e($progress['streak']) ?></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> <?= $dies['millor_ratxa'] === 1 ? 'dia' : 'dies' ?></span></div>
   <div class="stat-tile"><span class="stat-label">Dies practicant</span><span class="stat-value"><?= e($dies['actius']) ?></span><span class="stat-sub">en total</span></div>
   <div class="stat-tile"><span class="stat-label">Insígnies</span><span class="stat-value"><?= e($aconseguides) ?><small>/<?= count($insignies) ?></small></span><span class="stat-sub"><a href="#insignies">veure-les</a></span></div>
 </section>
@@ -38,7 +38,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
 ?>
 <section class="card calendari-card">
   <div class="calendari-cap">
-    <h2>🔥 Calendari de pràctica</h2>
+    <h2><?= icona('flama', 'h-ic') ?> Calendari de pràctica</h2>
     <p class="muted small"><?= e($diesActius) ?> <?= $diesActius === 1 ? 'dia' : 'dies' ?> practicant l'últim any ·
       ratxa actual: <?= e($progress['streak']) ?> · la millor: <?= e($dies['millor_ratxa']) ?></p>
   </div>
@@ -60,13 +60,13 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
   <div class="calendari-llegenda small muted" aria-hidden="true">Menys <span class="dia n0"></span><span class="dia n1"></span><span class="dia n2"></span><span class="dia n3"></span><span class="dia n4"></span> Més</div>
 </section>
 
-<h2 class="section-title">🗺️ Mapa de temes</h2>
+<h2 class="section-title"><?= icona('mapa', 'h-ic') ?> Mapa de temes</h2>
 <div class="tema-map">
   <?php foreach ($temes as $t): $r = $t['reptes']; ?>
     <section class="card tema-card <?= e(tema_class($t['tema'])) ?> <?= $t['complet'] ? 'complet' : '' ?>">
       <header class="tema-head">
         <h3><span class="tema-badge"><?= tema_icona($t['tema']) ?></span><?= e($t['tema']) ?></h3>
-        <span class="pill <?= $t['complet'] ? 'ok' : ($t['fets'] ? 'doing' : '') ?>"><?= $t['complet'] ? '✔ Superat' : e($t['pct'] . ' %') ?></span>
+        <span class="pill <?= $t['complet'] ? 'ok' : ($t['fets'] ? 'doing' : '') ?>"><?= $t['complet'] ? icona('check') . ' Superat' : e($t['pct'] . ' %') ?></span>
       </header>
       <div class="meter" role="img" aria-label="<?= e("{$t['fets']} de " . count($t['passos']) . ' fets') ?>"><div class="meter-fill" style="width: <?= e($t['pct']) ?>%"></div></div>
 
@@ -110,7 +110,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
           <?php foreach ($t['passos'] as $i => $p): [$cx, $cy] = $camiPunts[$i]; ?>
             <li class="cami-node <?= e($p['estat']) ?><?= $i === $camiActual ? ' actual' : '' ?>" style="left: <?= (int) $cx ?>%; top: <?= (int) $cy ?>px">
               <a href="index.php?p=<?= $p['tipus'] === 'lab' ? 'lab' : 'leccio' ?>&amp;id=<?= e($p['id']) ?>" title="<?= e($estatText[$p['estat']]) ?>">
-                <span class="cami-bola"><?= $p['estat'] === 'fet' ? '✔' : ($p['tipus'] === 'lab' ? '🧪' : '📖') ?></span>
+                <span class="cami-bola"><?= $p['estat'] === 'fet' ? icona('check') : icona($p['tipus'] === 'lab' ? 'matras' : 'llibre') ?></span>
                 <span class="cami-nom"><?= e($p['titol']) ?><small><?= $p['tipus'] === 'lab' ? 'Laboratori' : 'Lliçó' ?> · <?= e($estatText[$p['estat']]) ?></small></span>
                 <?php if ($i === $camiActual): ?><span class="cami-aqui">Ets aquí</span><?php endif; ?>
               </a>
@@ -120,7 +120,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
       </div>
 
       <p class="small tema-reptes">
-        🎯 <?php if ($r['intents'] > 0): ?>Reptes: <strong><?= e((int) round($r['encerts'] * 100 / $r['intents'])) ?> %</strong> d'encerts (<?= e($r['intents']) ?> <?= $r['intents'] === 1 ? 'resposta' : 'respostes' ?>)
+        <?= icona('diana') ?> <?php if ($r['intents'] > 0): ?>Reptes: <strong><?= e((int) round($r['encerts'] * 100 / $r['intents'])) ?> %</strong> d'encerts (<?= e($r['intents']) ?> <?= $r['intents'] === 1 ? 'resposta' : 'respostes' ?>)
         <?php else: ?><span class="muted">Encara no has fet reptes d'aquest tema (<?= e($r['preguntes']) ?> preguntes).</span><?php endif; ?>
         <a href="index.php?p=reptes&amp;tema=<?= e(urlencode($t['tema'])) ?>">Practicar</a>
       </p>
@@ -141,7 +141,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
 </div>
 <p class="small muted legend-mastery">Conceptes: ● dominat (80 % d'encerts o més) · ◐ practicant · ◔ per reforçar · ○ sense practicar</p>
 
-<h2 class="section-title" id="insignies">🏅 Insígnies <small class="muted"><?= e($aconseguides) ?> de <?= count($insignies) ?></small></h2>
+<h2 class="section-title" id="insignies"><?= icona('medalla', 'h-ic') ?> Insígnies <small class="muted"><?= e($aconseguides) ?> de <?= count($insignies) ?></small></h2>
 <div class="badges">
   <?php foreach ($insignies as $b): $on = $b['data'] !== null; ?>
     <?php $nova = $on && strtotime($b['data']) > time() - 2 * 86400;   // aconseguida fa menys de 2 dies ?>
@@ -152,19 +152,19 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
         <strong><?= e($b['titol']) ?></strong>
         <span class="small muted"><?= e($b['descripcio']) ?></span>
         <?php if ($on): ?>
-          <span class="small badge-date">✔ <?= e(date('d/m/Y', strtotime($b['data']))) ?></span>
+          <span class="small badge-date"><?= icona('check') ?> <?= e(date('d/m/Y', strtotime($b['data']))) ?></span>
         <?php elseif ($b['progres']): [$fet, $cal] = $b['progres']; ?>
           <span class="meter mini"><span class="meter-fill" style="width: <?= e($cal > 0 ? min(100, (int) round($fet * 100 / $cal)) : 0) ?>%"></span></span>
           <span class="small muted"><?= e("$fet/$cal") ?></span>
         <?php else: ?>
-          <span class="small muted">🔒 Bloquejada</span>
+          <span class="small muted"><?= icona('cadenat') ?> Bloquejada</span>
         <?php endif; ?>
       </div>
     </div>
   <?php endforeach; ?>
 </div>
 
-<h2 class="section-title">📊 Estadístiques</h2>
+<h2 class="section-title"><?= icona('grafic', 'h-ic') ?> Estadístiques</h2>
 <div class="grid-2">
   <section class="card">
     <h3 class="chart-title">XP de cada dia <small class="muted">· últims 30 dies</small></h3>
@@ -221,7 +221,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
         <thead><tr><th>Mode</th><th>Partides</th><th>Encert</th><th>Rècord</th></tr></thead>
         <tbody>
           <?php foreach (Reptes::MODES as $mode => $cfg): if (!isset($reptes[$mode])) continue; $m = $reptes[$mode]; ?>
-            <tr><td><?= $cfg['icona'] ?> <?= e($cfg['titol']) ?></td><td><?= e($m['partides']) ?></td>
+            <tr><td><?= icona($cfg['icona']) ?> <?= e($cfg['titol']) ?></td><td><?= e($m['partides']) ?></td>
               <td><?= e($m['preguntes'] ? (int) round($m['encerts'] * 100 / $m['preguntes']) : 0) ?> %</td>
               <td><?= $mode === 'repas' ? '—' : e($m['millor']) ?></td></tr>
           <?php endforeach; ?>

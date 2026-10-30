@@ -10,7 +10,7 @@
     <p><b>[ OK ]</b> Base de dades connectada</p>
     <p class="boot-prompt">&gt; Identifica't per continuar<span class="cursor"></span></p>
   </div>
-  <h1>Entrar</h1>
+  <h1>Inicia la sessió</h1>
   <?php if ($error): ?><p class="alert error"><?= e($error) ?></p><?php endif; ?>
   <form method="post" action="index.php?p=login" class="form">
     <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">

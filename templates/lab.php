@@ -21,7 +21,7 @@ $step = $lab['passos'][$current];
   <!-- ============ Columna esquerra: enunciat i passos ============ -->
   <aside class="lab-steps">
     <h1><?= e($lab['titol']) ?></h1>
-    <p class="source small">📄 <?= e($lab['origen']['descripcio']) ?></p>
+    <p class="source small"><?= icona('document') ?> <?= e($lab['origen']['descripcio']) ?></p>
     <details class="context" <?= $current === 0 && !$finished ? 'open' : '' ?>>
       <summary>De què va?</summary>
       <?= $lab['context'] ?>
@@ -31,7 +31,7 @@ $step = $lab['passos'][$current];
       <section class="summary">
         <?php $ratxa = 3; $humorForcat = 'eufòric'; $fraseForcada = 'Laboratori superat! Quin crack!'; $mascotaClasse = 'mascota-resum';
               require __DIR__ . '/_mascota.php'; ?>
-        <h2>🎉 Laboratori acabat!</h2>
+        <h2><?= icona('estrelles', 'h-ic') ?> Laboratori acabat!</h2>
         <p><strong><?= e($summary['xp']) ?> XP</strong> guanyats · <?= e($summary['intents']) ?> comprovacions · <?= e($summary['pistes']) ?> pistes
           <?= $summary['minuts'] !== null ? ' · ' . e($summary['minuts']) . ' min' : '' ?></p>
         <h3>Què has après</h3>
@@ -45,7 +45,7 @@ $step = $lab['passos'][$current];
           <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">
           <input type="hidden" name="accio" value="reiniciar_lab">
           <input type="hidden" name="lab" value="<?= e($lab['id']) ?>">
-          <button class="btn small" type="submit">↺ Tornar a fer-lo</button>
+          <button class="btn small" type="submit"><?= icona('tornar') ?> Tornar a fer-lo</button>
         </form>
       </section>
     <?php endif; ?>
@@ -57,7 +57,7 @@ $step = $lab['passos'][$current];
           $cls = $passed ? 'passed' : ($isCurrent ? 'current' : 'locked'); ?>
         <li class="step <?= $cls ?>">
           <div class="step-head">
-            <span class="step-num"><?= $passed ? '✔' : ($cls === 'locked' ? '🔒' : $i + 1) ?></span>
+            <span class="step-num"><?= $passed ? icona('check') : ($cls === 'locked' ? icona('cadenat') : $i + 1) ?></span>
             <span class="step-title"><?= e($s['titol']) ?></span>
             <span class="step-xp muted small"><?= e($s['xp']) ?> XP</span>
           </div>
@@ -71,7 +71,7 @@ $step = $lab['passos'][$current];
               </div>
               <div class="step-actions">
                 <button class="btn small" id="btn-hint" type="button" <?= (int) $row['hints_used'] >= count($s['pistes']) ? 'hidden' : '' ?>>
-                  💡 Pista <span id="hint-level"><?= (int) $row['hints_used'] + 1 ?></span> (−5 XP)</button>
+                  <?= icona('bombeta') ?> Pista <span id="hint-level"><?= (int) $row['hints_used'] + 1 ?></span> (−5 XP)</button>
                 <button class="btn small warn" id="btn-solution" type="button" <?= Labs::canSeeSolution($row) ? '' : 'hidden' ?>>Veure la solució</button>
               </div>
               <div id="solution" hidden></div>
@@ -84,10 +84,10 @@ $step = $lab['passos'][$current];
     </ol>
     <?php if ($web): ?>
       <details class="tutor-inline">
-        <summary>🧑‍🏫 Pregunta al tutor</summary>
+        <summary><?= icona('xat') ?> Pregunta al tutor</summary>
   <aside class="lab-tutor">
     <div class="tutor-head">
-      <h2>🧑‍🏫 Tutor</h2>
+      <h2><?= icona('xat', 'h-ic') ?> Tutor</h2>
       <span class="pill <?= $ai ? 'ok' : '' ?>" title="<?= $ai ? 'Respostes amb la IA de Claude' : 'Sense clau d\'API: respostes predefinides' ?>"><?= $ai ? 'IA' : 'Sense connexió' ?></span>
     </div>
     <div class="chat" id="chat">
@@ -125,11 +125,11 @@ $step = $lab['passos'][$current];
     <div class="status-bar" aria-live="off"><span id="sb-pos">Ln 1, Col 1</span><span id="sb-lines"></span><span class="sb-right">PHP 8 · UTF-8</span></div>
     <div class="run-bar">
       <button class="btn" id="btn-open" type="button" title="Ctrl+Enter">▶ Desa i obre al navegador</button>
-      <button class="btn primary" id="btn-check" type="button" <?= $finished ? 'disabled' : '' ?>>✔ Comprova el pas</button>
+      <button class="btn primary" id="btn-check" type="button" <?= $finished ? 'disabled' : '' ?>><?= icona('check') ?> Comprova el pas</button>
     </div>
     <?php else: ?>
     <div class="editor-head">
-      <span class="filename">📄 <?= e($lab['fitxer']) ?></span>
+      <span class="filename"><?= icona('document') ?> <?= e($lab['fitxer']) ?></span>
       <span class="muted small" id="save-state"></span>
     </div>
     <textarea id="code"><?= e($state['code'] ?? $lab['codi_inicial']) ?></textarea>
@@ -138,7 +138,7 @@ $step = $lab['passos'][$current];
       <label class="inline">$ php <?= e($lab['fitxer']) ?>
         <input id="args" placeholder="arguments (p. ex. 754)" spellcheck="false" autocomplete="off"></label>
       <button class="btn" id="btn-run" type="button" title="Ctrl+Enter">Executa ▶</button>
-      <button class="btn primary" id="btn-check" type="button" <?= $finished ? 'disabled' : '' ?>>✔ Comprova el pas</button>
+      <button class="btn primary" id="btn-check" type="button" <?= $finished ? 'disabled' : '' ?>><?= icona('check') ?> Comprova el pas</button>
     </div>
     <details class="stdin-box">
       <summary class="small muted">Entrada per a readline() (opcional)</summary>
@@ -174,7 +174,7 @@ $step = $lab['passos'][$current];
   <!-- ============ Columna dreta: tutor ============ -->
   <aside class="lab-tutor">
     <div class="tutor-head">
-      <h2>🧑‍🏫 Tutor</h2>
+      <h2><?= icona('xat', 'h-ic') ?> Tutor</h2>
       <span class="pill <?= $ai ? 'ok' : '' ?>" title="<?= $ai ? 'Respostes amb la IA de Claude' : 'Sense clau d\'API: respostes predefinides' ?>"><?= $ai ? 'IA' : 'Sense connexió' ?></span>
     </div>
     <div class="chat" id="chat">

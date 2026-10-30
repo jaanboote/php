@@ -36,10 +36,10 @@ $errors = count(array_filter($checks, fn($c) => !$c[1] && empty($c[3])));
     </div>
   </div>
   <div class="panell-specs">
-    <span class="meta-chip">🐘 Sandbox: PHP <?= e($test['stdout'] ?: '—') ?></span>
-    <span class="meta-chip">⏱ <?= e(Config::get('sandbox.timeout')) ?> s per execució</span>
-    <span class="meta-chip">🧠 <?= e(Config::get('sandbox.memory_limit')) ?> de memòria</span>
-    <span class="meta-chip">🌐 La teva IP: <?= e($_SERVER['REMOTE_ADDR'] ?? '') ?></span>
+    <span class="meta-chip"><?= icona('codi') ?> Sandbox: PHP <?= e($test['stdout'] ?: '—') ?></span>
+    <span class="meta-chip"><?= icona('rellotge') ?> <?= e(Config::get('sandbox.timeout')) ?> s per execució</span>
+    <span class="meta-chip"><?= icona('xip') ?> <?= e(Config::get('sandbox.memory_limit')) ?> de memòria</span>
+    <span class="meta-chip"><?= icona('xarxa') ?> La teva IP: <?= e($_SERVER['REMOTE_ADDR'] ?? '') ?></span>
   </div>
 </section>
 

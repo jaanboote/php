@@ -35,7 +35,7 @@ $descripcions = [
 
 <section class="card repas-card">
   <div class="repas-info">
-    <h2>🔁 Repàs espaciat</h2>
+    <h2><?= icona('repas', 'h-ic') ?> Repàs espaciat</h2>
     <?php if ($pendents > 0): ?>
       <p>Avui toca repassar <strong><?= e($pendents) ?> <?= $pendents > 1 ? 'preguntes' : 'pregunta' ?></strong>.</p>
     <?php elseif ($proper): ?>
@@ -83,10 +83,10 @@ $descripcions = [
       <div class="mode-il">
         <?= $dibuixos[$mode] ?>
       </div>
-      <h2><span aria-hidden="true"><?= $cfg['icona'] ?></span> <?= e($cfg['titol']) ?></h2>
+      <h2><?= icona($cfg['icona'], 'h-ic') ?> <?= e($cfg['titol']) ?></h2>
       <p class="muted small"><?= e($desc) ?></p>
       <p class="small"><?= e($cfg['preguntes']) ?> preguntes · <?= $cfg['temps'] ? e($cfg['temps']) . ' s' : 'sense límit de temps' ?> · <?= e($cfg['xp']) ?> XP per encert</p>
-      <?php if ($m): ?><p class="small muted">🏆 Millor puntuació: <?= e($m['millor']) ?> · <?= e($m['partides']) ?> <?= $m['partides'] > 1 ? 'partides' : 'partida' ?></p><?php endif; ?>
+      <?php if ($m): ?><p class="small muted"><?= icona('trofeu') ?> Millor puntuació: <?= e($m['millor']) ?> · <?= e($m['partides']) ?> <?= $m['partides'] > 1 ? 'partides' : 'partida' ?></p><?php endif; ?>
     </a>
   <?php endforeach; ?>
 </div>

@@ -4,7 +4,7 @@
 (() => {
   const root = document.getElementById('repte');
   if (!root) return;
-  const { api, esc, toast, updateProgress } = PHPLab;
+  const { api, esc, ic, toast, updateProgress } = PHPLab;
 
   const card = document.getElementById('r-card');
   const st = { session: null, items: [], idx: 0, encerts: 0, combo: 0, temps: null, deadline: null, timer: null, finished: false, resultats: [] };
@@ -46,7 +46,7 @@
 
   function tick() {
     const left = Math.max(0, st.deadline - Date.now());
-    document.getElementById('r-timer').textContent = '⏱ ' + Math.ceil(left / 1000) + ' s';
+    document.getElementById('r-timer').innerHTML = ic('rellotge') + ' ' + Math.ceil(left / 1000) + ' s';
     document.getElementById('r-timebar').style.width = (left / (st.temps * 1000)) * 100 + '%';
     document.getElementById('r-timer').classList.toggle('urgent', left < 20000);
     if (left <= 0 && !st.finished) {
@@ -71,7 +71,7 @@
     const el = document.getElementById('r-combo');
     el.hidden = st.combo < 2;
     if (st.combo < 2) return;
-    el.textContent = '🔥 Combo ×' + st.combo;
+    el.innerHTML = ic('flama') + ' Combo ×' + st.combo;
     el.classList.toggle('calent', st.combo >= 4);
     el.classList.remove('salta'); void el.offsetWidth; el.classList.add('salta');
   }
@@ -177,7 +177,7 @@
 
   function showFeedback(it, answer, r) {
     const fb = card.querySelector('.feedback');
-    let html = (r.correcte ? '✔ Correcte! ' : '✖ No és correcte. ') + esc(r.explicacio);
+    let html = (r.correcte ? ic('check') + ' Correcte! ' : ic('creu') + ' No és correcte. ') + esc(r.explicacio);
     if (it.tipus === 'test') {
       card.querySelectorAll('.option').forEach((b) => {
         if (+b.dataset.value === r.correcta) b.classList.add('right');
@@ -197,7 +197,7 @@
     if (it.tipus === 'ordenar' && !r.correcte) {
       html += '<div class="small">Un ordre correcte:</div><pre class="code">' + esc(r.ordre.join('\n')) + '</pre>';
     }
-    if (!r.correcte) html += '<div class="small muted">🔁 Aquesta pregunta tornarà a sortir al repàs.</div>';
+    if (!r.correcte) html += '<div class="small muted">' + ic('repas') + ' Aquesta pregunta tornarà a sortir al repàs.</div>';
     fb.innerHTML = html;
     fb.className = 'feedback ' + (r.correcte ? 'right' : 'wrong');
     fb.hidden = false;
@@ -232,11 +232,11 @@
         '<div class="result-card rang-' + rang + '">' +
         '<div class="rc-top"><span class="rc-mode">' + esc(root.dataset.titol) + '</span><span class="rc-rang" title="Rang">' + rang + '</span></div>' +
         '<div class="result-score">' + r.score + '<small> punts</small></div>' +
-        (r.record ? '<div class="pill ok">🏆 Nou rècord!</div>' : '<div class="small muted">Millor puntuació: ' + r.millor + '</div>') +
+        (r.record ? '<div class="pill ok">' + ic('trofeu') + ' Nou rècord!</div>' : '<div class="small muted">Millor puntuació: ' + r.millor + '</div>') +
         '<div class="rc-stats">' + stat(r.encerts + '/' + r.total, 'encerts') + stat('×' + r.combo_max, 'millor combo') +
         stat(temps, 'temps') + stat('+' + r.xp, 'XP') + '</div></div>' +
         (r.limit_xp ? '<p class="small muted">Has arribat al límit d\'XP diari dels reptes. Pots continuar practicant, però sense XP fins demà.</p>' : '') +
-        (r.repas_pendent ? '<p>🔁 Tens <strong>' + r.repas_pendent + '</strong> ' + (r.repas_pendent > 1 ? 'preguntes' : 'pregunta') + ' per repassar avui.</p>' : '') +
+        (r.repas_pendent ? '<p>' + ic('repas') + ' Tens <strong>' + r.repas_pendent + '</strong> ' + (r.repas_pendent > 1 ? 'preguntes' : 'pregunta') + ' per repassar avui.</p>' : '') +
         '<div class="result-actions">' +
         (root.dataset.mode === 'repas' ? '' : '<a class="btn primary" href="index.php?p=repte&mode=' + root.dataset.mode + tema + '">Torna-hi</a>') +
         (r.repas_pendent && root.dataset.mode !== 'repas' ? '<a class="btn" href="index.php?p=repte&mode=repas">Repassar</a>' : '') +
