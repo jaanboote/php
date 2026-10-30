@@ -36,10 +36,11 @@ $targeta = function (array $ex, string $classe = '') use ($resum): void {
     <?php
 };
 ?>
-<h1>Exàmens</h1>
-<p class="muted">Simulacres per preparar l'examen de M0376. Cada un té una <strong>part teòrica</strong> (preguntes com les dels reptes)
-  i una <strong>part pràctica</strong> (programes que es corregeixen amb proves, com als laboratoris). No sabràs si encertes fins que
-  l'entreguis, igual que en un examen de veritat. S'aprova amb un 5, i el primer cop que aproves cada examen guanyes XP.</p>
+<header class="pagina-cap">
+  <h1>Exàmens</h1>
+  <p class="pagina-entradeta">Simulacres amb rellotge per preparar l'examen de M0376: preguntes de teoria i programes que es corregeixen
+    amb proves. No veuràs si encertes fins que l'entreguis, com en un examen de veritat.</p>
+</header>
 
 <?php foreach ($finals as $ex): ?>
   <section class="examen-final">

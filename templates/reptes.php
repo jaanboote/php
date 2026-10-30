@@ -29,9 +29,11 @@ $descripcions = [
     'ordenar' => 'Les línies estan barrejades: ordena-les perquè el programa funcioni.',
 ];
 ?>
-<h1>Reptes</h1>
-<p class="muted">Practica ràpid el que has après. Cada encert seguit suma més punts (combo). Les preguntes que falles tornen al repàs espaciat.
-  Avui has guanyat <strong><?= e($xpAvui) ?></strong> de <?= Reptes::DAILY_XP_CAP ?> XP possibles amb reptes (el repàs no té límit).</p>
+<header class="pagina-cap">
+  <h1>Reptes</h1>
+  <p class="pagina-entradeta">Partides curtes per practicar el que has après. Cada encert seguit suma més punts, i el que falles torna al repàs.</p>
+  <p class="pagina-dada"><?= icona('estrelles') ?> Avui: <strong><?= e($xpAvui) ?></strong> de <?= Reptes::DAILY_XP_CAP ?> XP amb reptes · el repàs no té límit</p>
+</header>
 
 <section class="card repas-card">
   <div class="repas-info">

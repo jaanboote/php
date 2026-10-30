@@ -2,7 +2,7 @@
 
 App web per aprendre PHP a partir del temari de classe (M0376 · Implantació d'aplicacions web · ASIX2).
 Funciona amb XAMPP a Windows, per a un sol usuari i només a la xarxa local. La presentació és al `README.md` i la guia
-d'instal·lació i seguretat a `docs/GUIA.md`.
+d'instal·lació i seguretat a `docs/GUIA.md`. El sistema de disseny (colors, tipografia, espais, components i moviment) és a `DESIGN.md`: fes servir els seus tokens, no valors directes.
 
 ## Estructura
 

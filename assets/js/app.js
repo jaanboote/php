@@ -65,7 +65,7 @@ const PHPLab = (() => {
       document.getElementById('p-level').textContent = p.level;
       countTo(document.getElementById('p-xp'), p.xp);
       document.getElementById('p-streak').textContent = p.streak;
-      document.getElementById('p-bar').style.width = Math.round((p.into * 100) / p.needed) + '%';
+      document.getElementById('p-bar').style.setProperty('--pct', Math.round((p.into * 100) / p.needed) + '%');
       const player = document.getElementById('player');
       player.classList.remove('gain'); void player.offsetWidth; player.classList.add('gain');
     };
@@ -285,6 +285,47 @@ const PHPLab = (() => {
     addEventListener('scroll', upd, { passive: true });
     upd();
   }
+
+  // Entrades en fer scroll: només el que encara no es veu en carregar la pàgina (el que ja és a la vista no s'anima).
+  // Les targetes que entren alhora surten escalonades; en acabar es treuen les classes i tornen les transicions de sempre.
+  if (!calm && 'IntersectionObserver' in window) {
+    const candidats = document.querySelectorAll('.main .card, .main .block, .stat-tile, .examen-card, .tema-card, .badge, .correccio');
+    const revela = new IntersectionObserver((entrades) => {
+      entrades.filter((en) => en.isIntersecting).forEach((en, i) => {
+        const el = en.target;
+        revela.unobserve(el);
+        el.style.setProperty('--rd', Math.min(i, 5) * 50 + 'ms');
+        el.classList.add('revelat');
+        const neteja = (e) => {
+          if (e.target !== el || e.propertyName !== 'transform') return;   // la del transform és la més llarga
+          el.removeEventListener('transitionend', neteja);
+          el.classList.remove('per-revelar', 'revelat');
+          el.style.removeProperty('--rd');
+        };
+        el.addEventListener('transitionend', neteja);
+      });
+    }, { rootMargin: '0px 0px -6% 0px' });
+    candidats.forEach((el) => {
+      if (el.getBoundingClientRect().top > innerHeight) {
+        el.classList.add('per-revelar');
+        revela.observe(el);
+      }
+    });
+  }
+
+  // Tema fosc (per defecte) o clar: es recorda al navegador i el script del <head> l'aplica abans de pintar
+  const temaBoto = document.getElementById('tema-boto');
+  const posaTema = (tema) => {
+    document.documentElement.dataset.theme = tema;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tema === 'light' ? '#f6f6f9' : '#000000');
+    temaBoto?.setAttribute('aria-label', tema === 'light' ? 'Canvia al mode fosc' : 'Canvia al mode clar');
+  };
+  posaTema(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+  temaBoto?.addEventListener('click', () => {
+    const nou = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    posaTema(nou);
+    try { localStorage.setItem('phplab-tema', nou); } catch (e) { /* sense emmagatzematge: només per a aquesta pàgina */ }
+  });
 
   // Els blocs de codi estàtics es pinten amb els mateixos colors que l'editor
   document.querySelectorAll('pre.code').forEach(pinta);
