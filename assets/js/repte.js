@@ -117,6 +117,7 @@
     }
     html += '<div class="feedback" hidden></div><div class="next-row" hidden><button type="button" class="btn primary next">Següent →</button></div>';
     card.innerHTML = html;
+    card.querySelectorAll('pre.code').forEach(PHPLab.pinta);
     bind(it);
   }
 

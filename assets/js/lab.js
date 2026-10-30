@@ -322,6 +322,7 @@
         : Object.entries(r.codi).map(([n, c]) => '<div class="file-name">' + ic('document') + ' ' + esc(n) + '</div><pre class="code">' + esc(c) + '</pre>').join('');
       box.innerHTML = '<h3>Solució del pas</h3><p class="small">' + esc(r.explicacio) + '</p>' + blocks +
         '<button class="btn small" type="button" id="copy-sol">Posa-la a l\'editor</button>';
+      box.querySelectorAll('pre.code').forEach(PHPLab.pinta);
       $('copy-sol').addEventListener('click', () => {
         if (confirm('Substituir el teu codi per la solució? Llegeix-la bé abans per entendre-la!')) setCode(r.codi);
       });

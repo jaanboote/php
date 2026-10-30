@@ -1,7 +1,33 @@
 <?php
 /** @var array $lesson @var array $answers @var array $progres @var ?array $seguent @var ?array $labLligat */
 ?>
+<?php
+// Índex lateral: una entrada per cada explicació, amb les preguntes que té fins a la següent
+$seccions = [];
+$sec = null;
+foreach ($lesson['blocs'] as $i => $b) {
+    if ($b['tipus'] === 'text') {
+        $sec = "sec-$i";
+        $seccions[$sec] = ['titol' => $b['titol'], 'preguntes' => 0, 'fetes' => 0];
+    } elseif ($b['tipus'] !== 'codi' && $sec !== null) {
+        $seccions[$sec]['preguntes']++;
+        if (!empty($answers[$b['id']]['correct'])) $seccions[$sec]['fetes']++;
+    }
+}
+?>
 <div class="crumbs"><a href="index.php">Inici</a> › Aprendre › <?= e($lesson['tema']) ?></div>
+<div class="leccio-amb-index">
+<nav class="toc" aria-label="Seccions de la lliçó">
+  <p class="toc-titol">En aquesta lliçó</p>
+  <ol>
+    <?php foreach ($seccions as $id => $s): ?>
+      <li class="<?= $s['preguntes'] && $s['fetes'] === $s['preguntes'] ? 'fet' : '' ?>" data-sec="<?= e($id) ?>">
+        <a href="#<?= e($id) ?>"><span class="toc-punt" aria-hidden="true"><?= icona('check') ?></span><span><?= e($s['titol']) ?></span></a>
+        <?php if ($s['preguntes']): ?><span class="toc-compte" title="Preguntes encertades"><?= e($s['fetes'] . '/' . $s['preguntes']) ?></span><?php endif; ?>
+      </li>
+    <?php endforeach; ?>
+  </ol>
+</nav>
 <article class="lesson <?= e(tema_class($lesson['tema'])) ?>" data-lesson="<?= e($lesson['id']) ?>"
          data-seguent-id="<?= e($seguent['id'] ?? '') ?>" data-seguent-titol="<?= e($seguent['titol'] ?? '') ?>"
          data-lab-id="<?= e($labLligat['id'] ?? '') ?>" data-lab-titol="<?= e($labLligat['titol'] ?? '') ?>">
@@ -22,9 +48,9 @@
     </div>
   </header>
 
-  <?php foreach ($lesson['blocs'] as $i => $b): ?>
-    <?php $amp = !empty($b['ampliacio']); ?>
-    <section class="block block-<?= e($b['tipus']) ?><?= $amp ? ' ampliacio' : '' ?>">
+  <?php $sec = null; foreach ($lesson['blocs'] as $i => $b): ?>
+    <?php $amp = !empty($b['ampliacio']); if ($b['tipus'] === 'text') $sec = "sec-$i"; ?>
+    <section class="block block-<?= e($b['tipus']) ?><?= $amp ? ' ampliacio' : '' ?>" <?= $b['tipus'] === 'text' ? 'id="' . e($sec) . '"' : ($sec !== null ? 'data-sec="' . e($sec) . '"' : '') ?>>
       <?php if ($amp): ?><span class="badge-amp" title="Aquest contingut no surt del temari de classe">Ampliació</span><?php endif; ?>
 
       <?php if ($b['tipus'] === 'text'): ?>
@@ -32,7 +58,7 @@
         <?= $b['html'] /* HTML de confiança: escrit per nosaltres a content/ */ ?>
 
       <?php elseif ($b['tipus'] === 'codi'): ?>
-        <h3>▶ <?= e($b['titol']) ?></h3>
+        <h3><?= icona('terminal', 'h-ic') ?> <?= e($b['titol']) ?></h3>
         <?= $b['html'] ?? '' ?>
         <div class="playground" data-fitxer="<?= e($b['fitxer'] ?? 'main.php') ?>" data-bloc="<?= (int) $i ?>">
           <textarea class="code-src"><?= e($b['codi']) ?></textarea>
@@ -94,6 +120,7 @@
   <section class="block next-step">
     <h2>I ara, a practicar!</h2>
     <p>Al laboratori faràs un programa complet pas a pas, amb el tutor al costat.</p>
-    <a class="btn primary" href="index.php?p=lab&amp;id=<?= e($lesson['lab']) ?>">Anar al laboratori →</a>
+    <a class="btn primary" href="index.php?p=lab&amp;id=<?= e($lesson['lab']) ?>"><?= icona('matras') ?> Anar al laboratori <?= icona('fletxa') ?></a>
   </section>
 </article>
+</div>
