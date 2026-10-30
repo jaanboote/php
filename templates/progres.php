@@ -23,11 +23,11 @@ $totalFonts = max(1, array_sum($xpFonts));
 <h1>El teu progrés</h1>
 
 <section class="stat-tiles">
-  <div class="stat-tile"><span class="stat-label">Nivell</span><span class="stat-value"><?= e($progress['level']) ?></span><span class="stat-sub"><?= e($progress['name']) ?></span></div>
-  <div class="stat-tile"><span class="stat-label">XP total</span><span class="stat-value"><?= e($progress['xp']) ?></span><span class="stat-sub"><?= e($totalMes) ?> els últims 30 dies</span></div>
-  <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value"><?= icona('flama', 'stat-ic') ?> <?= e($progress['streak']) ?></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> <?= $dies['millor_ratxa'] === 1 ? 'dia' : 'dies' ?></span></div>
-  <div class="stat-tile"><span class="stat-label">Dies practicant</span><span class="stat-value"><?= e($dies['actius']) ?></span><span class="stat-sub">en total</span></div>
-  <div class="stat-tile"><span class="stat-label">Insígnies</span><span class="stat-value"><?= e($aconseguides) ?><small>/<?= count($insignies) ?></small></span><span class="stat-sub"><a href="#insignies">veure-les</a></span></div>
+  <div class="stat-tile"><span class="stat-label">Nivell</span><span class="stat-value"><span data-compta><?= e($progress['level']) ?></span></span><span class="stat-sub"><?= e($progress['name']) ?></span></div>
+  <div class="stat-tile"><span class="stat-label">XP total</span><span class="stat-value"><span data-compta><?= e($progress['xp']) ?></span></span><span class="stat-sub"><?= e($totalMes) ?> els últims 30 dies</span></div>
+  <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value"><?= icona('flama', 'stat-ic') ?> <span data-compta><?= e($progress['streak']) ?></span></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> <?= $dies['millor_ratxa'] === 1 ? 'dia' : 'dies' ?></span></div>
+  <div class="stat-tile"><span class="stat-label">Dies practicant</span><span class="stat-value"><span data-compta><?= e($dies['actius']) ?></span></span><span class="stat-sub">en total</span></div>
+  <div class="stat-tile"><span class="stat-label">Insígnies</span><span class="stat-value"><span data-compta><?= e($aconseguides) ?></span><small>/<?= count($insignies) ?></small></span><span class="stat-sub"><a href="#insignies">veure-les</a></span></div>
 </section>
 
 <?php
