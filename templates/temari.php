@@ -54,7 +54,7 @@ $maxPost = ini_get('post_max_size');
   <h2>Fitxers indexats (<?= count($files) ?>)</h2>
   <?php if (!$files): ?>
     <div class="estat-buit petit">
-      <?php $ratxa = 0; $humorForcat = 'dorm'; $fraseForcada = 'Encara no tinc res per llegir...'; $mascotaClasse = 'mascota-petita';
+      <?php $ratxa = 0; $humorForcat = 'dorm'; $fraseForcada = 'Encara no tinc res per llegir…'; $mascotaClasse = 'mascota-petita';
             require __DIR__ . '/_mascota.php'; ?>
       <p class="muted">Encara no hi ha res. Puja els PDF o el ZIP de classe amb el formulari de dalt.</p>
     </div>

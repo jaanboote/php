@@ -8,8 +8,8 @@
  */
 $humor = $humorForcat ?? ($ratxa <= 0 ? 'dorm' : ($ratxa < 3 ? 'content' : 'eufòric'));
 $frase = $fraseForcada ?? match ($humor) {
-    'dorm' => 'Zzz... Fem una pregunta i em despertes?',
-    'confos' => 'Mmm... aquí no hi ha res.',
+    'dorm' => 'Zzz… Fem una pregunta i em despertes?',
+    'confos' => 'Mmm… aquí no hi ha res.',
     'content' => 'Som-hi! Una lliçó més i fem ratxa.',
     default => "$ratxa dies seguits! Imparable!",
 };
