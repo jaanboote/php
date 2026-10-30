@@ -3,11 +3,21 @@
 ?>
 <div class="crumbs"><a href="index.php">Inici</a> › Aprendre › <?= e($lesson['tema']) ?></div>
 <article class="lesson <?= e(tema_class($lesson['tema'])) ?>" data-lesson="<?= e($lesson['id']) ?>">
+  <div class="read-progress" id="read-progress" aria-hidden="true"></div>
   <header class="lesson-head">
-    <h1><?= e($lesson['titol']) ?></h1>
-    <p class="muted"><?= e($lesson['resum']) ?></p>
-    <p class="source">📄 Font: <?= e($lesson['origen']) ?> · <?= e($lesson['apartat']) ?></p>
-    <div class="lesson-progress"><span id="lesson-count"><?= e($progres['encertades']) ?></span>/<?= e($progres['total']) ?> preguntes encertades</div>
+    <div class="lesson-title">
+      <span class="tema-badge gran"><?= tema_icona($lesson['tema'], 30) ?></span>
+      <div>
+        <p class="lesson-tema"><?= e($lesson['tema']) ?></p>
+        <h1><?= e($lesson['titol']) ?></h1>
+      </div>
+    </div>
+    <p class="lesson-resum"><?= e($lesson['resum']) ?></p>
+    <div class="lesson-meta">
+      <span class="meta-chip">⏱ <?= e($lesson['minuts']) ?> min</span>
+      <span class="meta-chip" title="<?= e($lesson['origen']) ?>">📄 <?= e($lesson['apartat']) ?></span>
+      <span class="lesson-progress"><span id="lesson-count"><?= e($progres['encertades']) ?></span>/<?= e($progres['total']) ?> preguntes encertades</span>
+    </div>
   </header>
 
   <?php foreach ($lesson['blocs'] as $i => $b): ?>

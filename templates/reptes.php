@@ -17,7 +17,7 @@ $descripcions = [
   <div class="repas-info">
     <h2>🔁 Repàs espaciat</h2>
     <?php if ($pendents > 0): ?>
-      <p>Avui toca repassar <strong><?= e($pendents) ?> pregunta<?= $pendents > 1 ? 'es' : '' ?></strong>.</p>
+      <p>Avui toca repassar <strong><?= e($pendents) ?> <?= $pendents > 1 ? 'preguntes' : 'pregunta' ?></strong>.</p>
     <?php elseif ($proper): ?>
       <p class="muted">Avui no tens res per repassar. El proper repàs és el <?= e(date('d/m/Y', strtotime($proper))) ?>.</p>
     <?php else: ?>

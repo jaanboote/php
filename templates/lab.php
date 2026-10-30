@@ -120,6 +120,7 @@ $step = $lab['passos'][$current];
     </div>
     <textarea id="code" class="web-sources" hidden><?= e(json_encode($sources, JSON_UNESCAPED_UNICODE)) ?></textarea>
     <textarea id="code-editor"></textarea>
+    <div class="status-bar" aria-live="off"><span id="sb-pos">Ln 1, Col 1</span><span id="sb-lines"></span><span class="sb-right">PHP 8 · UTF-8</span></div>
     <div class="run-bar">
       <button class="btn" id="btn-open" type="button" title="Ctrl+Enter">▶ Desa i obre al navegador</button>
       <button class="btn primary" id="btn-check" type="button" <?= $finished ? 'disabled' : '' ?>>✔ Comprova el pas</button>
@@ -130,6 +131,7 @@ $step = $lab['passos'][$current];
       <span class="muted small" id="save-state"></span>
     </div>
     <textarea id="code"><?= e($state['code'] ?? $lab['codi_inicial']) ?></textarea>
+    <div class="status-bar" aria-live="off"><span id="sb-pos">Ln 1, Col 1</span><span id="sb-lines"></span><span class="sb-right">PHP 8 · UTF-8</span></div>
     <div class="run-bar">
       <label class="inline">$ php <?= e($lab['fitxer']) ?>
         <input id="args" placeholder="arguments (p. ex. 754)" spellcheck="false" autocomplete="off"></label>

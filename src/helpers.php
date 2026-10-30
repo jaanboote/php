@@ -26,3 +26,22 @@ function tema_class(?string $tema): string
 {
     return preg_match('/Tema\s+(\d+)/u', (string) $tema, $m) ? 't' . $m[1] : '';
 }
+
+/**
+ * Icona SVG d'un tema (dibuix propi, amb el color del text). És HTML nostre: es pot imprimir sense escapar.
+ * T1 finestra del navegador · T2 claus de codi · T3 engranatge · T4 fitxer amb avís · T5 formulari.
+ */
+function tema_icona(?string $tema, int $mida = 22): string
+{
+    $num = preg_match('/Tema\s+(\d+)/u', (string) $tema, $m) ? (int) $m[1] : 0;
+    $dibuix = match ($num) {
+        1 => '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18"/><circle cx="6.5" cy="6.5" r=".6"/><circle cx="9" cy="6.5" r=".6"/><path d="M8 14l2.5 2.5L8 19M13 19h3"/>',
+        2 => '<path d="M8 4c-2 0-3 1-3 3v2c0 1.5-.8 2.5-2 3 1.2.5 2 1.5 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1.5.8 2.5 2 3-1.2.5-2 1.5-2 3v2c0 2-1 3-3 3"/><circle cx="12" cy="12" r="1.2"/>',
+        3 => '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5"/>',
+        4 => '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v4M12 18h.01"/>',
+        5 => '<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M7 8h10M7 12.5h6"/><rect x="7" y="15.5" width="5" height="2.5" rx="1"/><path d="M15 16.7l1.2 1.2 2.3-2.4"/>',
+        default => '<path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>',
+    };
+    return '<svg class="tema-icona" width="' . $mida . '" height="' . $mida . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+        . 'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $dibuix . '</svg>';
+}

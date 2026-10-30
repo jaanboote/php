@@ -199,6 +199,69 @@ const PHPLab = (() => {
   }
   introHome();
 
+  // ---------- Efectes de la interfície ----------
+
+  // Llum que segueix el ratolí per sobre de les targetes (només hi posa la posició; el dibuix és CSS)
+  const LIT = '.card, .block, .stat-tile, .mode, .inspector, .lab-steps, .lab-editor, .lab-tutor, .badge';
+  if (!calm && window.matchMedia('(hover: hover)').matches) {
+    document.querySelectorAll(LIT).forEach((el) => el.classList.add('lit'));
+    document.addEventListener('pointermove', (e) => {
+      const el = e.target.closest?.('.lit');
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }, { passive: true });
+  }
+
+  // Transició entre pàgines: la targeta on fas clic «creix» fins a la capçalera de la pàgina nova
+  // (View Transitions entre documents; els navegadors que no en saben simplement canvien de pàgina).
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest?.('a.item, a.mode, .tema-path a');
+    if (a && !e.ctrlKey && !e.metaKey && !e.shiftKey) a.style.viewTransitionName = 'cap-pagina';
+  });
+  window.addEventListener('pageshow', () => {
+    document.querySelectorAll('[style*="view-transition-name"]').forEach((el) => { el.style.viewTransitionName = ''; });
+  });
+
+  // Barra de progrés de lectura (lliçons)
+  const readBar = document.getElementById('read-progress');
+  if (readBar) {
+    const upd = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      readBar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, scrollY / max) : 1) + ')';
+    };
+    addEventListener('scroll', upd, { passive: true });
+    upd();
+  }
+
+  // Botó per copiar els blocs de codi de les explicacions
+  document.querySelectorAll('.lesson pre.code, .lesson pre.term, .step-body pre').forEach((pre) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copia';
+    btn.setAttribute('aria-label', 'Copia el codi');
+    btn.addEventListener('click', async () => {
+      const text = [...pre.childNodes].filter((n) => n !== btn).map((n) => n.textContent).join('');
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Fora de localhost (http per la IP de la xarxa) no hi ha API del porta-retalls: mètode antic
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      btn.textContent = 'Copiat ✓';
+      setTimeout(() => { btn.textContent = 'Copia'; }, 1500);
+    });
+    pre.classList.add('has-copy');
+    pre.appendChild(btn);
+  });
+
   // Paraules per a l'autocompletat: funcions i paraules clau que surten al temari
   const WORDS = ('echo print print_r var_dump printf sprintf strlen strtolower strtoupper ucfirst ucwords str_repeat str_pad ' +
     'str_replace str_contains str_starts_with str_ends_with substr strpos strrev trim ltrim rtrim explode implode str_split ' +
