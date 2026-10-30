@@ -4,8 +4,11 @@ use PhpLab\{Auth, TextExtractor};
 $maxUpload = ini_get('upload_max_filesize');
 $maxPost = ini_get('post_max_size');
 ?>
-<h1>Temari</h1>
-<p class="muted">El material de classe es guarda fora del webroot (no es pot obrir des del navegador) i s'indexa per temes: el pots llegir des d'aquí i el tutor el fa servir per respondre't.</p>
+<header class="pagina-cap">
+  <h1>Temari</h1>
+  <p class="pagina-entradeta">Els apunts i els enunciats de classe, ordenats per temes. Els pots llegir des d'aquí, i el tutor els fa servir per respondre't.
+    Es desen fora del webroot: el navegador no els pot obrir directament.</p>
+</header>
 
 <?php if ($flash && $flash['type'] === 'error'): ?>
   <p class="alert error"><?= e($flash['msg']) ?></p>

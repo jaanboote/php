@@ -9,6 +9,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#000000">
+  <script>try { var t = localStorage.getItem('phplab-tema'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
   <meta name="csrf" content="<?= e(Auth::csrfToken()) ?>">
   <title><?= e($title) ?> · PHPLab</title>
   <link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
@@ -17,11 +18,11 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=15">
+  <link rel="stylesheet" href="assets/css/app.css?v=17">
 </head>
 <body>
 <?= icones_sprite() ?>
-<a class="salta" href="#contingut">Salta al contingut</a>
+<a class="salta-contingut" href="#contingut">Salta al contingut</a>
 <header class="topbar">
   <a class="brand" href="index.php"><span class="brand-mark">&lt;?</span>PHPLab</a>
   <nav class="nav">
@@ -33,10 +34,13 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   </nav>
   <div class="player" id="player" title="<?= e($progress['xp']) ?> XP en total">
     <span class="level-badge">Nv <span id="p-level"><?= e($progress['level']) ?></span></span>
-    <div class="xpbar"><div class="xpbar-fill" id="p-bar" style="width: <?= $pct ?>%"></div></div>
+    <div class="xpbar"><div class="xpbar-fill" id="p-bar" style="--pct: <?= $pct ?>%"></div></div>
     <span class="xp-text"><span id="p-xp"><?= e($progress['xp']) ?></span> XP</span>
     <span class="streak" title="Dies seguits practicant"><?= icona('flama') ?><span id="p-streak"><?= e($progress['streak']) ?></span></span>
   </div>
+  <button class="btn-link tema-boto" id="tema-boto" type="button" aria-label="Canvia el tema" title="Canvia entre el mode fosc i el clar">
+    <?= icona('sol', 'tema-sol') ?><?= icona('lluna', 'tema-lluna') ?>
+  </button>
   <form method="post" action="index.php?p=sortir" class="logout">
     <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">
     <button type="submit" class="btn-link" title="Tancar la sessió">Sortir</button>
@@ -45,6 +49,13 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <main class="main" id="contingut" tabindex="-1">
 <?= $content ?>
 </main>
+<footer class="peu">
+  <span>PHPLab · aprendre PHP amb el temari de M0376 (ASIX2)</span>
+  <nav aria-label="Enllaços del peu">
+    <a href="index.php?p=temari">Temari</a>
+    <a href="index.php?p=diagnostic">Diagnòstic</a>
+  </nav>
+</footer>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <!-- La mascota que celebra la pujada de nivell (app.js la copia dins de la finestra) -->
 <template id="tpl-mascota"><?php $ratxa = 3; $humorForcat = 'eufòric'; $fraseForcada = 'Molt bé!'; $mascotaClasse = 'mascota-nivell';
@@ -60,7 +71,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/vendor/codemirror/addon/edit/matchbrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/edit/closebrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/hint/show-hint.js"></script>
-<script src="assets/js/app.js?v=10"></script>
+<script src="assets/js/app.js?v=12"></script>
 <?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=8"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=7"></script><?php endif; ?>
 <?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=10"></script><?php endif; ?>

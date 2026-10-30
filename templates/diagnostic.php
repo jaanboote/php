@@ -26,7 +26,10 @@ $checks = [
 <?php
 $errors = count(array_filter($checks, fn($c) => !$c[1] && empty($c[3])));
 ?>
-<h1>Diagnòstic</h1>
+<header class="pagina-cap">
+  <h1>Diagnòstic</h1>
+  <p class="pagina-entradeta">Comprova que PHPLab té tot el que necessita per funcionar en aquest ordinador.</p>
+</header>
 <section class="card panell <?= $errors ? 'amb-errors' : 'tot-ok' ?>">
   <div class="panell-estat">
     <span class="led gran <?= $errors ? 'ko' : 'ok' ?>" aria-hidden="true"></span>

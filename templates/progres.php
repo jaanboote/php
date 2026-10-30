@@ -20,7 +20,10 @@ $y = fn(int $v) => $base - ($v / $maxXp) * ($base - $padT);
 $totalMes = array_sum(array_column($xpDies, 'xp'));
 $totalFonts = max(1, array_sum($xpFonts));
 ?>
-<h1>El teu progrés</h1>
+<header class="pagina-cap">
+  <h1>El teu progrés</h1>
+  <p class="pagina-entradeta">On ets de cada tema, què domines i què et convé reforçar.</p>
+</header>
 
 <section class="stat-tiles">
   <div class="stat-tile"><span class="stat-label">Nivell</span><span class="stat-value"><span data-compta><?= e($progress['level']) ?></span></span><span class="stat-sub"><?= e($progress['name']) ?></span></div>
@@ -68,7 +71,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
         <h3><span class="tema-badge"><?= tema_icona($t['tema']) ?></span><?= e($t['tema']) ?></h3>
         <span class="pill <?= $t['complet'] ? 'ok' : ($t['fets'] ? 'doing' : '') ?>"><?= $t['complet'] ? icona('check') . ' Superat' : e($t['pct'] . ' %') ?></span>
       </header>
-      <div class="meter" role="img" aria-label="<?= e("{$t['fets']} de " . count($t['passos']) . ' fets') ?>"><div class="meter-fill" style="width: <?= e($t['pct']) ?>%"></div></div>
+      <div class="meter" role="img" aria-label="<?= e("{$t['fets']} de " . count($t['passos']) . ' fets') ?>"><div class="meter-fill" style="--pct: <?= e($t['pct']) ?>%"></div></div>
 
       <?php
       // Camí de nivells: cada pas fa ziga-zaga (x en %, y en px) i una corba els uneix
@@ -154,7 +157,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
         <?php if ($on): ?>
           <span class="small badge-date"><?= icona('check') ?> <?= e(date('d/m/Y', strtotime($b['data']))) ?></span>
         <?php elseif ($b['progres']): [$fet, $cal] = $b['progres']; ?>
-          <span class="meter mini"><span class="meter-fill" style="width: <?= e($cal > 0 ? min(100, (int) round($fet * 100 / $cal)) : 0) ?>%"></span></span>
+          <span class="meter mini"><span class="meter-fill" style="--pct: <?= e($cal > 0 ? min(100, (int) round($fet * 100 / $cal)) : 0) ?>%"></span></span>
           <span class="small muted"><?= e("$fet/$cal") ?></span>
         <?php else: ?>
           <span class="small muted"><?= icona('cadenat') ?> Bloquejada</span>
@@ -208,7 +211,7 @@ $mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.
     <ul class="hbars">
       <?php foreach ($xpFonts as $font => $xp): ?>
         <li><span class="hbar-label"><?= e($font) ?></span>
-          <span class="meter"><span class="meter-fill" style="width: <?= e((int) round($xp * 100 / $totalFonts)) ?>%"></span></span>
+          <span class="meter"><span class="meter-fill" style="--pct: <?= e((int) round($xp * 100 / $totalFonts)) ?>%"></span></span>
           <span class="hbar-value"><?= e($xp) ?> XP</span></li>
       <?php endforeach; ?>
     </ul>
