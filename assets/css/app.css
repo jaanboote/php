@@ -731,8 +731,151 @@ table.kv th { font-family: var(--mono); font-weight: 600; color: var(--accent-2)
 }
 @media (max-width: 800px) { .lab.web { grid-template-columns: 1fr; } }
 
+/* ---------- Estètica 2: fons viu, vidre, llum, transicions, mascota, lliçons i laboratori ---------- */
+
+/* Fons viu: tres taques de llum que es mouen molt a poc a poc, i un gra fi perquè el negre no sigui pla */
+:root { --glass: var(--surface); --aurora: .55; }
+:root[data-theme="dark"] { --glass: rgba(12, 12, 19, .74); --aurora: 1; }
+body::before, body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+body::before {
+  opacity: var(--aurora);
+  background:
+    radial-gradient(42vmax 30vmax at 12% 8%, rgba(143, 147, 245, .17), transparent 70%),
+    radial-gradient(36vmax 28vmax at 88% 28%, rgba(92, 180, 238, .09), transparent 70%),
+    radial-gradient(32vmax 26vmax at 50% 100%, rgba(255, 143, 163, .07), transparent 70%);
+  animation: aurora 40s ease-in-out infinite alternate;
+}
+body::after {
+  opacity: .045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes aurora {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-4vw, 3vh, 0) scale(1.08); }
+  100% { transform: translate3d(3vw, -2vh, 0) scale(1.03); }
+}
+
+/* Panells de vidre: deixen veure el fons de llum a través */
+.card, .block, .stat-tile, .lab-steps, .lab-editor, .lab-tutor, .inspector, .badge, .mode { background-color: var(--glass); }
+
+/* Llum que segueix el ratolí (app.js posa --mx i --my) */
+.lit:not(.reptes-banner):not(.next-step):not(.badge.on) {
+  background-image: radial-gradient(380px circle at var(--mx, -500px) var(--my, -500px), rgba(143, 147, 245, .12), transparent 45%);
+}
+.lit { transition: border-color .25s; }
+.lit:hover { border-color: color-mix(in srgb, var(--accent) 38%, var(--border)); }
+
+/* Transicions entre pàgines (View Transitions entre documents) */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: vt-surt .2s ease both; }
+::view-transition-new(root) { animation: vt-entra .34s var(--ease-out) both; }
+::view-transition-group(cap-pagina) { animation-duration: .45s; animation-timing-function: var(--ease-out); }
+.topbar { view-transition-name: barra; }
+.lesson-head, .lab-steps, .repte-head { view-transition-name: cap-pagina; }
+@keyframes vt-surt { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes vt-entra { from { opacity: 0; transform: translateY(12px); } }
+
+/* Icones dels temes */
+.tema-icona { flex: none; }
+.group-title::before { display: none; }
+.group-title .tema-icona { color: var(--tema); }
+.tema-badge { display: inline-grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; margin-right: 10px; vertical-align: middle;
+  color: var(--tema); background: color-mix(in srgb, var(--tema) 15%, transparent); border: 1px solid color-mix(in srgb, var(--tema) 35%, transparent); }
+.tema-badge.gran { width: 60px; height: 60px; border-radius: 17px; margin-right: 0; box-shadow: 0 0 34px -8px var(--tema); }
+.tema-head h3 { display: flex; align-items: center; }
+
+/* La mascota (templates/_mascota.php), dins del terminal d'Inici */
+.term-body { position: relative; padding-right: 215px; }
+.mascota { position: absolute; right: 14px; bottom: 8px; width: 172px; margin: 0; }
+.mascota svg { display: block; width: 100%; height: auto; overflow: visible; }
+.m-tronc, .m-pota { fill: #8f93f5; }
+.m-cara { fill: #9ca0fa; }
+.m-pota.fosca { fill: #7177dc; }
+.m-cua { fill: none; stroke: #7177dc; stroke-width: 5; stroke-linecap: round; }
+.m-ullal { fill: none; stroke: #f4f4ff; stroke-width: 3.5; stroke-linecap: round; }
+.m-orella { fill: #7177dc; }
+.m-orella-dins { fill: #ffb3c4; opacity: .35; }
+.m-trompa { fill: none; stroke: #9ca0fa; stroke-width: 13; stroke-linecap: round; }
+.m-galta { fill: #ff8fa3; opacity: .45; }
+.m-pupila { fill: #08081a; }
+.m-brillantor { fill: #fff; }
+.m-ull-tancat { fill: none; stroke: #08081a; stroke-width: 3; stroke-linecap: round; }
+.m-php { font: 800 15px var(--mono); fill: #08081a; opacity: .3; }
+.m-ombra { fill: #000; opacity: .45; }
+.m-cos { transform-box: view-box; transform-origin: 92px 140px; animation: m-bota 3.4s ease-in-out infinite; }
+.m-ull { transform-box: fill-box; transform-origin: center; animation: m-parpelleja 5s infinite; }
+.m-trompa { transform-box: fill-box; transform-origin: 100% 0; animation: m-trompa 4.2s ease-in-out infinite; }
+.m-zzz text { font: 800 16px var(--display); fill: #b4b7ff; animation: m-zzz 3s ease-in-out infinite; }
+.m-zzz text:nth-child(2) { font-size: 22px; animation-delay: 1.2s; }
+.m-espurnes path { fill: var(--spark); transform-box: fill-box; transform-origin: center; animation: m-espurna 1.6s ease-in-out infinite; }
+.m-espurnes path:nth-child(2) { animation-delay: .5s; }
+.m-espurnes path:nth-child(3) { animation-delay: 1s; }
+.humor-dorm .m-cos { animation-duration: 6s; }
+.humor-euforic .m-cos { animation: m-salta 1.4s var(--ease-spring) infinite; }
+.mascota-bafarada { position: absolute; right: 4px; bottom: calc(100% - 6px); width: max-content; max-width: 185px; text-align: left; padding: 7px 12px; border-radius: 12px 12px 4px 12px;
+  background: #15151d; border: 1px solid #2c2c3a; color: #e4e6f5; font: 500 .8rem/1.35 var(--sans); animation: rise .4s var(--ease-out) 3.4s both; }
+@keyframes m-bota { 50% { transform: translateY(-4px) rotate(-1deg); } }
+@keyframes m-salta { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-12px) rotate(-3deg); } }
+@keyframes m-parpelleja { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes m-trompa { 50% { transform: rotate(-6deg); } }
+@keyframes m-zzz { 0% { opacity: 0; transform: translate(0, 6px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(-8px, -10px); } }
+@keyframes m-espurna { 50% { transform: scale(.5) rotate(45deg); opacity: .5; } }
+
+/* Lliçons: capçalera amb el color del tema, barra de lectura i botó de copiar */
+.lesson-head { padding: 26px 28px; margin-bottom: 22px; border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tema) 30%, var(--border));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--tema) 22%, transparent), transparent 62%), var(--glass); }
+.lesson-head::before { display: none; }
+.lesson-title { display: flex; align-items: center; gap: 18px; }
+.lesson-tema { margin: 0; color: var(--tema); font-weight: 700; font-size: .9rem; }
+.lesson-title h1 { margin: 2px 0 0; }
+.lesson-resum { color: var(--muted); max-width: 68ch; margin: 16px 0 14px; }
+.lesson-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.meta-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 999px; font-size: .84rem; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--border); }
+.read-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 30; transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--tema), var(--spark)); box-shadow: 0 0 12px var(--tema); }
+.block-text > h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 10px; vertical-align: .08em;
+  background: var(--tema); box-shadow: 0 0 10px var(--tema); }
+pre.has-copy { position: relative; }
+.copy-btn { position: absolute; top: 8px; right: 8px; padding: 3px 9px; border-radius: 7px; cursor: pointer; font: 600 .72rem var(--sans);
+  color: #c9ccec; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); opacity: 0; transition: opacity .15s, background .15s; }
+.copy-btn:hover { background: rgba(255, 255, 255, .16); }
+pre.has-copy:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
+@media (hover: none) { .copy-btn { opacity: 1; } }
+
+/* Laboratori: passos com a línia temporal, editor amb aspecte d'IDE i proves que s'encenen */
+.steps { position: relative; }
+.steps::before { content: ""; position: absolute; left: 25px; top: 20px; bottom: 20px; width: 2px; border-radius: 2px;
+  background: linear-gradient(var(--ok), var(--accent) 50%, var(--border)); }
+.step { position: relative; background: var(--surface); }
+.step.current { box-shadow: 0 0 0 4px var(--accent-soft), 0 0 30px -10px var(--accent); }
+.editor-head { align-items: flex-end; margin-bottom: 0; }
+.editor-head .filename, .file-tab.active { position: relative; z-index: 1; margin-bottom: -1px; border-radius: 10px 10px 0 0;
+  background: var(--sunken); border: 1px solid var(--border-strong); border-bottom-color: var(--sunken); }
+.editor-head .filename { padding: 6px 14px; font-size: .84rem; }
+.file-tab { border-bottom-width: 1px; border-radius: 10px 10px 0 0; }
+.lab-editor .CodeMirror { border-radius: 0 12px 0 0; }
+.status-bar { display: flex; gap: 14px; padding: 5px 12px; margin-top: -1px; border: 1px solid var(--border-strong); border-radius: 0 0 12px 12px;
+  background: var(--sunken); color: var(--muted); font: .74rem var(--mono); }
+.status-bar .sb-right { margin-left: auto; }
+.test.ok { border-color: color-mix(in srgb, var(--ok) 35%, var(--border));
+  animation: rise .35s var(--ease-out) both, encen .9s ease-out both; animation-delay: calc(var(--i, 0) * 70ms), calc(var(--i, 0) * 70ms + .2s); }
+@keyframes encen { 0% { box-shadow: 0 0 0 0 rgba(63, 211, 154, .55); } 100% { box-shadow: 0 0 0 12px rgba(63, 211, 154, 0); } }
+
+@media (max-width: 860px) {
+  .term-body { padding-right: 130px; }
+  .mascota { width: 112px; }
+  .mascota-bafarada { display: none; }
+}
+@media (max-width: 560px) {
+  .term-body { padding-right: 16px; padding-bottom: 120px; }
+  .mascota { width: 100px; right: 10px; }
+}
+
 /* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment) */
 @media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
     transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

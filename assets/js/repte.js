@@ -191,7 +191,7 @@
         (r.record ? '<div class="pill ok">🏆 Nou rècord!</div>' : '<div class="small muted">Millor puntuació: ' + r.millor + '</div>') +
         '<p><strong>' + r.encerts + ' de ' + r.total + '</strong> encerts (' + pct + ' %) · <strong>+' + r.xp + ' XP</strong></p>' +
         (r.limit_xp ? '<p class="small muted">Has arribat al límit d\'XP diari dels reptes. Pots continuar practicant, però sense XP fins demà.</p>' : '') +
-        (r.repas_pendent ? '<p>🔁 Tens <strong>' + r.repas_pendent + '</strong> pregunta' + (r.repas_pendent > 1 ? 'es' : '') + ' per repassar avui.</p>' : '') +
+        (r.repas_pendent ? '<p>🔁 Tens <strong>' + r.repas_pendent + '</strong> ' + (r.repas_pendent > 1 ? 'preguntes' : 'pregunta') + ' per repassar avui.</p>' : '') +
         '<div class="result-actions">' +
         (root.dataset.mode === 'repas' ? '' : '<a class="btn primary" href="index.php?p=repte&mode=' + root.dataset.mode + tema + '">Torna-hi</a>') +
         (r.repas_pendent && root.dataset.mode !== 'repas' ? '<a class="btn" href="index.php?p=repte&mode=repas">Repassar</a>' : '') +

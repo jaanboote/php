@@ -29,9 +29,10 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
       <p class="hello" data-type><?= e("$salutacio, $usuari!") ?></p>
       <p class="out" data-type>Nivell <?= e($progress['level']) ?>: <?= e($progress['name']) ?>. Et falten <b><?= e($progress['needed'] - $progress['into']) ?> XP</b> per al nivell <?= e($progress['level'] + 1) ?>.</p>
       <?php if ($pendents > 0): ?>
-        <p class="out" data-type>Tens <b><?= e($pendents) ?> pregunta<?= $pendents > 1 ? 'es' : '' ?></b> per repassar avui.</p>
+        <p class="out" data-type>Tens <b><?= e($pendents) ?> <?= $pendents > 1 ? 'preguntes' : 'pregunta' ?></b> per repassar avui.</p>
       <?php endif; ?>
       <p class="prompt caret" data-type><b><?= e($usuari) ?>@phplab</b>:~$ </p>
+      <?php $ratxa = (int) $progress['streak']; require __DIR__ . '/_mascota.php'; ?>
       <div class="term-actions">
         <?php if ($continua): ?>
           <a class="btn primary" href="<?= e($continua[2]) ?>">Continua: <?= e($continua[1]) ?></a>
@@ -63,7 +64,7 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
   <section class="card">
     <h2>📖 Lliçons</h2>
     <?php $temaActual = null; foreach ($lessons as $l): $p = $l['progres']; ?>
-      <?php if ($l['tema'] !== $temaActual): $temaActual = $l['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= e($temaActual) ?></h3><?php endif; ?>
+      <?php if ($l['tema'] !== $temaActual): $temaActual = $l['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= tema_icona($temaActual, 18) ?><?= e($temaActual) ?></h3><?php endif; ?>
       <a class="item <?= e(tema_class($l['tema'])) ?>" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
         <div>
           <div class="item-title"><?= e($l['titol']) ?></div>
@@ -79,7 +80,7 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
   <section class="card">
     <h2>🧪 Laboratoris</h2>
     <?php $temaActual = null; foreach ($labs as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
-      <?php if ($lab['tema'] !== $temaActual): $temaActual = $lab['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= e($temaActual) ?></h3><?php endif; ?>
+      <?php if ($lab['tema'] !== $temaActual): $temaActual = $lab['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= tema_icona($temaActual, 18) ?><?= e($temaActual) ?></h3><?php endif; ?>
       <a class="item <?= e(tema_class($lab['tema'])) ?>" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
         <div>
           <div class="item-title"><?= e($lab['titol']) ?></div>

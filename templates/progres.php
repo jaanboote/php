@@ -35,7 +35,7 @@ $totalFonts = max(1, array_sum($xpFonts));
   <?php foreach ($temes as $t): $r = $t['reptes']; ?>
     <section class="card tema-card <?= e(tema_class($t['tema'])) ?> <?= $t['complet'] ? 'complet' : '' ?>">
       <header class="tema-head">
-        <h3><?= e($t['tema']) ?></h3>
+        <h3><span class="tema-badge"><?= tema_icona($t['tema']) ?></span><?= e($t['tema']) ?></h3>
         <span class="pill <?= $t['complet'] ? 'ok' : ($t['fets'] ? 'doing' : '') ?>"><?= $t['complet'] ? '✔ Superat' : e($t['pct'] . ' %') ?></span>
       </header>
       <div class="meter" role="img" aria-label="<?= e("{$t['fets']} de " . count($t['passos']) . ' fets') ?>"><div class="meter-fill" style="width: <?= e($t['pct']) ?>%"></div></div>

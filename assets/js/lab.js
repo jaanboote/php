@@ -76,6 +76,18 @@
       }
     }, 1200);
   };
+  // Barra d'estat de l'editor: línia i columna del cursor, i quantes línies té el fitxer
+  const updateStatus = () => {
+    if (!cm || !$('sb-pos')) return;
+    const c = cm.getCursor();
+    $('sb-pos').textContent = 'Ln ' + (c.line + 1) + ', Col ' + (c.ch + 1);
+    $('sb-lines').textContent = cm.lineCount() + ' línies';
+  };
+  if (cm) {
+    cm.on('cursorActivity', updateStatus);
+    cm.on('swapDoc', updateStatus);
+    updateStatus();
+  }
   cm ? cm.on('changes', scheduleSave) : (web ? $('code-editor') : textarea).addEventListener('input', scheduleSave);
 
   const updateArgv = () => { if (argsInput) $('argv-preview').textContent = argvPreview(fitxer, argsInput.value); };
