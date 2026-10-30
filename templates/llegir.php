@@ -12,7 +12,7 @@
 <?php foreach ($files as $i => $f): ?>
   <section class="card">
     <details class="reading-file" <?= $i === 0 ? 'open' : '' ?>>
-      <summary>📄 <?= e(basename($f['path'])) ?> <span class="pill"><?= e($f['kind']) ?></span></summary>
+      <summary><?= icona('document') ?> <?= e(basename($f['path'])) ?> <span class="pill"><?= e($f['kind']) ?></span></summary>
       <?php // Les marques [[Pàgina N]] que posa l'extractor de PDF es mostren com a separadors ?>
       <div class="reading"><?= preg_replace('/\[\[Pàgina (\d+)\]\]/u', '<span class="page-mark">— Pàgina $1 —</span>', e($f['text'])) ?></div>
     </details>

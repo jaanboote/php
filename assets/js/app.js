@@ -39,6 +39,8 @@ const PHPLab = (() => {
     }, 1800 + i * 4600));
   }
 
+  /** Icona del joc d'icones (el sprite és a layout.php). */
+  const ic = (nom, cls) => '<svg class="ic' + (cls ? ' ' + cls : '') + '" aria-hidden="true" focusable="false"><use href="#i-' + nom + '"/></svg>';
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   function toast(text) {
@@ -317,9 +319,9 @@ const PHPLab = (() => {
   }
 
   /** Llista de fitxers (nom, mida i contingut) que ha deixat el programa. */
-  function filesHtml(files, title = '📁 Fitxers del programa') {
+  function filesHtml(files, title = 'Fitxers del programa', icona = 'carpeta') {
     if (!files || !files.length) return '';
-    let html = '<details class="files"><summary>' + esc(title) + ' (' + files.length + ')</summary>';
+    let html = '<details class="files"><summary>' + ic(icona) + ' ' + esc(title) + ' (' + files.length + ')</summary>';
     for (const f of files) {
       html += '<div class="file"><div class="file-name">' + esc(f.nom) + (f.nom.endsWith('/') ? '' : ' <span class="muted">· ' + f.size + ' bytes</span>') + '</div>';
       if (f.contingut !== null && !f.nom.endsWith('/')) {
@@ -336,7 +338,7 @@ const PHPLab = (() => {
   function renderOutput(box, r, cm, showFiles = true) {
     box.hidden = false;
     const meta = [];
-    if (r.timeout) meta.push('⏱ aturat per temps');
+    if (r.timeout) meta.push('aturat per temps');
     else if (r.exit_code !== null && r.exit_code !== undefined) meta.push('codi de sortida ' + r.exit_code);
     if (r.ms) meta.push(r.ms + ' ms');
     let html = '<div class="out-meta">' + meta.map(esc).join(' · ') + '</div>';
@@ -387,7 +389,7 @@ const PHPLab = (() => {
       const n = input.files.length;
       let info = d.querySelector('.drop-triats');
       if (!info) { info = document.createElement('span'); info.className = 'drop-triats'; d.appendChild(info); }
-      info.textContent = n ? (n === 1 ? '📄 ' + input.files[0].name : '📄 ' + n + ' fitxers triats') : '';
+      info.innerHTML = n ? ic('document') + ' ' + esc(n === 1 ? input.files[0].name : n + ' fitxers triats') : '';
     };
     input.addEventListener('change', mostra);
     d.addEventListener('drop', (e) => { e.preventDefault(); input.files = e.dataTransfer.files; mostra(); });
@@ -397,5 +399,5 @@ const PHPLab = (() => {
     if (e.submitter) e.submitter.textContent = 'Pujant i indexant…';
   });
 
-  return { api, esc, toast, updateProgress, celebrate, shake, makeEditor, renderOutput, markErrorLines, argvPreview, filesHtml };
+  return { api, esc, ic, toast, updateProgress, celebrate, shake, makeEditor, renderOutput, markErrorLines, argvPreview, filesHtml };
 })();

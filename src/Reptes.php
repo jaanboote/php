@@ -15,11 +15,11 @@ final class Reptes
 {
     /** Configuració de cada mode. */
     public const MODES = [
-        'rapid'   => ['titol' => 'Contrarellotge',   'icona' => '⏱', 'preguntes' => 10, 'temps' => 150,  'xp' => 3, 'tipus' => null],
-        'error'   => ['titol' => 'Troba l\'error',   'icona' => '🐞', 'preguntes' => 6,  'temps' => null, 'xp' => 2, 'tipus' => 'error'],
-        'sortida' => ['titol' => 'Què imprimeix?',   'icona' => '🖨️', 'preguntes' => 8,  'temps' => null, 'xp' => 2, 'tipus' => 'sortida'],
-        'ordenar' => ['titol' => 'Ordena el codi',   'icona' => '↕️', 'preguntes' => 5,  'temps' => null, 'xp' => 3, 'tipus' => 'ordenar'],
-        'repas'   => ['titol' => 'Repàs espaciat',   'icona' => '🔁', 'preguntes' => 15, 'temps' => null, 'xp' => 3, 'tipus' => null],
+        'rapid'   => ['titol' => 'Contrarellotge',   'icona' => 'rellotge', 'preguntes' => 10, 'temps' => 150,  'xp' => 3, 'tipus' => null],
+        'error'   => ['titol' => 'Troba l\'error',   'icona' => 'bitxo', 'preguntes' => 6,  'temps' => null, 'xp' => 2, 'tipus' => 'error'],
+        'sortida' => ['titol' => 'Què imprimeix?',   'icona' => 'impressora', 'preguntes' => 8,  'temps' => null, 'xp' => 2, 'tipus' => 'sortida'],
+        'ordenar' => ['titol' => 'Ordena el codi',   'icona' => 'ordena', 'preguntes' => 5,  'temps' => null, 'xp' => 3, 'tipus' => 'ordenar'],
+        'repas'   => ['titol' => 'Repàs espaciat',   'icona' => 'repas', 'preguntes' => 15, 'temps' => null, 'xp' => 3, 'tipus' => null],
     ];
 
     /** XP màxim que es pot guanyar cada dia amb els reptes (el repàs no hi compta). */

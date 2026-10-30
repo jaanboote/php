@@ -12,19 +12,19 @@ $cfg = Reptes::MODES[$mode];
   <h1>Avui no tens res per repassar</h1>
   <p class="muted"><?= $proper ? 'El proper repàs és el ' . e(date('d/m/Y', strtotime($proper))) . '. ' : '' ?>Les preguntes que falles a les lliçons i als reptes tornaran aquí.</p>
   <div class="error-accions">
-    <a class="btn primary" href="index.php?p=repte&amp;mode=rapid">⏱ Fes una contrarellotge</a>
+    <a class="btn primary" href="index.php?p=repte&amp;mode=rapid"><?= icona('rellotge') ?> Fes una contrarellotge</a>
     <a class="btn" href="index.php?p=reptes">Tornar als reptes</a>
   </div>
 </section>
 <?php else: ?>
-<div class="repte" id="repte" data-mode="<?= e($mode) ?>" data-tema="<?= e($tema) ?>" data-titol="<?= e($cfg['icona'] . ' ' . $cfg['titol']) ?>">
+<div class="repte" id="repte" data-mode="<?= e($mode) ?>" data-tema="<?= e($tema) ?>" data-titol="<?= e($cfg['titol']) ?>">
   <header class="repte-head">
-    <h1><?= $cfg['icona'] ?> <?= e($cfg['titol']) ?><?= $tema !== '' ? ' <small class="muted">· ' . e($tema) . '</small>' : '' ?></h1>
+    <h1><?= icona($cfg['icona'], 'h-ic') ?> <?= e($cfg['titol']) ?><?= $tema !== '' ? ' <small class="muted">· ' . e($tema) . '</small>' : '' ?></h1>
     <div class="repte-stats">
       <span id="r-progress" class="pill">–</span>
       <span id="r-encerts" class="pill ok">0 encerts</span>
-      <span id="r-combo" class="pill combo" hidden>🔥 Combo ×2</span>
-      <?php if ($cfg['temps']): ?><span id="r-timer" class="pill timer">⏱ <?= e($cfg['temps']) ?> s</span><?php endif; ?>
+      <span id="r-combo" class="pill combo" hidden><?= icona('flama') ?> Combo ×2</span>
+      <?php if ($cfg['temps']): ?><span id="r-timer" class="pill timer"><?= icona('rellotge') ?> <?= e($cfg['temps']) ?> s</span><?php endif; ?>
     </div>
   </header>
   <div class="timebar" <?= $cfg['temps'] ? '' : 'hidden' ?>><div class="timebar-fill" id="r-timebar"></div></div>

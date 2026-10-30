@@ -10,16 +10,24 @@ $usuari = (string) PhpLab\Auth::user();
 // On continuar: la primera lliçó o laboratori començat i no acabat; si no n'hi ha, la primera lliçó pendent
 $continua = null;
 foreach ($lessons as $l) {
-    if (!$l['progres']['acabada'] && $l['progres']['encertades'] > 0) { $continua = ['Lliçó', $l['titol'], "index.php?p=leccio&id={$l['id']}"]; break; }
+    if (!$l['progres']['acabada'] && $l['progres']['encertades'] > 0) { $continua = ['Lliçó', $l['titol'], "index.php?p=leccio&id={$l['id']}", $l['tema']]; break; }
 }
 foreach ($labs as $lab) {
-    if ($continua === null && !$lab['estat']['completed_at'] && (int) $lab['estat']['current_step'] > 0) { $continua = ['Laboratori', $lab['titol'], "index.php?p=lab&id={$lab['id']}"]; }
+    if ($continua === null && !$lab['estat']['completed_at'] && (int) $lab['estat']['current_step'] > 0) { $continua = ['Laboratori', $lab['titol'], "index.php?p=lab&id={$lab['id']}", $lab['tema']]; }
 }
 foreach ($lessons as $l) {
-    if ($continua === null && !$l['progres']['acabada']) { $continua = ['Lliçó', $l['titol'], "index.php?p=leccio&id={$l['id']}"]; }
+    if ($continua === null && !$l['progres']['acabada']) { $continua = ['Lliçó', $l['titol'], "index.php?p=leccio&id={$l['id']}", $l['tema']]; }
 }
 $pctNivell = $progress['needed'] > 0 ? $progress['into'] / $progress['needed'] : 0;
 $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
+
+// Les llistes s'agrupen per tema i només queda obert el tema on toca continuar: la pàgina no fa quilòmetres
+$temaObert = $continua[3] ?? null;
+$perTema = static function (array $items): array {
+    $grups = [];
+    foreach ($items as $it) { $grups[$it['tema']][] = $it; }
+    return $grups;
+};
 ?>
 <section class="hero">
   <div class="term-window">
@@ -37,8 +45,8 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
         <?php if ($continua): ?>
           <a class="btn primary" href="<?= e($continua[2]) ?>">Continua: <?= e($continua[1]) ?></a>
         <?php endif; ?>
-        <?php if ($pendents > 0): ?><a class="btn" href="index.php?p=repte&amp;mode=repas">🔁 Repassar</a><?php endif; ?>
-        <a class="btn" href="index.php?p=reptes">🎯 Reptes</a>
+        <?php if ($pendents > 0): ?><a class="btn" href="index.php?p=repte&amp;mode=repas"><?= icona('repas') ?> Repassar</a><?php endif; ?>
+        <a class="btn" href="index.php?p=reptes"><?= icona('diana') ?> Reptes</a>
       </div>
     </div>
   </div>
@@ -55,32 +63,38 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
     <p class="level-name"><?= e($progress['name']) ?></p>
     <p class="muted"><?= e($progress['into']) ?> / <?= e($progress['needed']) ?> XP</p>
     <?php if ($progress['streak'] > 0): ?>
-      <span class="streak-big"><span class="flame" aria-hidden="true">🔥</span> <?= e($progress['streak']) ?> <?= $progress['streak'] > 1 ? 'dies seguits' : 'dia seguit' ?></span>
+      <span class="streak-big"><span class="flame"><?= icona('flama') ?></span> <?= e($progress['streak']) ?> <?= $progress['streak'] > 1 ? 'dies seguits' : 'dia seguit' ?></span>
     <?php endif; ?>
   </div>
 </section>
 
 <div class="grid-2">
   <section class="card">
-    <h2>📖 Lliçons</h2>
-    <?php $temaActual = null; foreach ($lessons as $l): $p = $l['progres']; ?>
-      <?php if ($l['tema'] !== $temaActual): $temaActual = $l['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= tema_icona($temaActual, 18) ?><?= e($temaActual) ?></h3><?php endif; ?>
+    <h2><?= icona('llibre', 'h-ic') ?> Lliçons</h2>
+    <?php foreach ($perTema($lessons) as $tema => $grup): $fetes = count(array_filter($grup, fn ($l) => $l['progres']['acabada'])); ?>
+    <details class="grup-tema <?= e(tema_class($tema)) ?>" <?= $tema === $temaObert ? 'open' : '' ?>>
+      <summary class="group-title"><?= tema_icona($tema, 18) ?><span><?= e($tema) ?></span><span class="grup-compte"><?= e($fetes . '/' . count($grup)) ?></span></summary>
+      <?php foreach ($grup as $l): $p = $l['progres']; ?>
       <a class="item <?= e(tema_class($l['tema'])) ?>" href="index.php?p=leccio&amp;id=<?= e($l['id']) ?>">
         <div>
           <div class="item-title"><?= e($l['titol']) ?></div>
           <div class="muted small"><?= e($l['apartat']) ?> · <?= e($l['minuts']) ?> min</div>
         </div>
         <span class="pill <?= $p['acabada'] ? 'ok' : ($p['encertades'] ? 'doing' : '') ?>">
-          <?= $p['acabada'] ? '✔ Feta' : e($p['encertades'] . '/' . $p['total']) ?>
+          <?= $p['acabada'] ? icona('check') . ' Feta' : e($p['encertades'] . '/' . $p['total']) ?>
         </span>
       </a>
+      <?php endforeach; ?>
+    </details>
     <?php endforeach; ?>
   </section>
 
   <section class="card">
-    <h2>🧪 Laboratoris</h2>
-    <?php $temaActual = null; foreach ($labs as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
-      <?php if ($lab['tema'] !== $temaActual): $temaActual = $lab['tema']; ?><h3 class="group-title <?= e(tema_class($temaActual)) ?>"><?= tema_icona($temaActual, 18) ?><?= e($temaActual) ?></h3><?php endif; ?>
+    <h2><?= icona('matras', 'h-ic') ?> Laboratoris</h2>
+    <?php foreach ($perTema($labs) as $tema => $grup): $fets = count(array_filter($grup, fn ($lab) => (bool) $lab['estat']['completed_at'])); ?>
+    <details class="grup-tema <?= e(tema_class($tema)) ?>" <?= $tema === $temaObert ? 'open' : '' ?>>
+      <summary class="group-title"><?= tema_icona($tema, 18) ?><span><?= e($tema) ?></span><span class="grup-compte"><?= e($fets . '/' . count($grup)) ?></span></summary>
+      <?php foreach ($grup as $lab): $st = $lab['estat']; $n = count($lab['passos']); $done = $st['completed_at'] ? $n : (int) $st['current_step']; ?>
       <a class="item <?= e(tema_class($lab['tema'])) ?>" href="index.php?p=lab&amp;id=<?= e($lab['id']) ?>">
         <div>
           <div class="item-title"><?= e($lab['titol']) ?></div>
@@ -89,8 +103,10 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
             <?php for ($i = 0; $i < $n; $i++): ?><span class="<?= $i < $done ? 'on' : '' ?>"></span><?php endfor; ?>
           </div>
         </div>
-        <span class="pill <?= $st['completed_at'] ? 'ok' : ($done ? 'doing' : '') ?>"><?= $st['completed_at'] ? '✔ Acabat' : e("$done/$n") ?></span>
+        <span class="pill <?= $st['completed_at'] ? 'ok' : ($done ? 'doing' : '') ?>"><?= $st['completed_at'] ? icona('check') . ' Acabat' : e("$done/$n") ?></span>
       </a>
+      <?php endforeach; ?>
+    </details>
     <?php endforeach; ?>
   </section>
 </div>
@@ -130,7 +146,3 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
   </section>
 </div>
 
-<section class="card soon">
-  <h2>Properament</h2>
-  <p class="muted">Més exercicis d'Exercicis 01 · Bases de dades amb PDO i MySQL (apartat 6 del mòdul) · Lliçons noves quan pugis el Tema 5 del professor.</p>
-</section>

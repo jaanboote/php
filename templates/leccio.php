@@ -16,8 +16,8 @@
     </div>
     <p class="lesson-resum"><?= e($lesson['resum']) ?></p>
     <div class="lesson-meta">
-      <span class="meta-chip">⏱ <?= e($lesson['minuts']) ?> min</span>
-      <span class="meta-chip" title="<?= e($lesson['origen']) ?>">📄 <?= e($lesson['apartat']) ?></span>
+      <span class="meta-chip"><?= icona('rellotge') ?> <?= e($lesson['minuts']) ?> min</span>
+      <span class="meta-chip" title="<?= e($lesson['origen']) ?>"><?= icona('document') ?> <?= e($lesson['apartat']) ?></span>
       <span class="lesson-progress"><span id="lesson-count"><?= e($progres['encertades']) ?></span>/<?= e($progres['total']) ?> preguntes encertades</span>
     </div>
   </header>
@@ -40,14 +40,14 @@
             <label class="inline">$ php <?= e($b['fitxer'] ?? 'main.php') ?>
               <input class="args" value="<?= e($b['args'] ?? '') ?>" placeholder="arguments" spellcheck="false"></label>
             <button class="btn primary run" type="button">Executa ▶</button>
-            <button class="btn small reset" type="button" title="Torna al codi original" aria-label="Torna al codi original">↺</button>
+            <button class="btn small reset" type="button" title="Torna al codi original" aria-label="Torna al codi original"><?= icona('tornar') ?></button>
           </div>
           <?php if (isset($b['stdin'])): ?>
             <label class="stdin-label">Entrada (respostes a readline, una per línia)
               <textarea class="stdin" rows="2"><?= e($b['stdin']) ?></textarea></label>
           <?php endif; ?>
           <?php if (!empty($b['fitxers'])): ?>
-            <p class="small muted">📁 Fitxers que hi ha a la carpeta abans d'executar: <?= e(implode(', ', array_keys($b['fitxers']))) ?></p>
+            <p class="small muted"><?= icona('carpeta') ?> Fitxers que hi ha a la carpeta abans d'executar: <?= e(implode(', ', array_keys($b['fitxers']))) ?></p>
           <?php endif; ?>
           <div class="output" hidden></div>
         </div>
@@ -55,7 +55,7 @@
       <?php else: /* preguntes */ ?>
         <?php $ans = $answers[$b['id']] ?? null; $done = $ans && $ans['correct']; ?>
         <div class="quiz <?= $done ? 'done' : '' ?>" data-q="<?= e($b['id']) ?>" data-tipus="<?= e($b['tipus']) ?>">
-          <div class="quiz-kind"><?= ['test' => '❓ Pregunta', 'completa' => '🧩 Completa el codi', 'sortida' => '🖨️ Què imprimeix?', 'ordenar' => '↕️ Ordena-ho'][$b['tipus']] ?></div>
+          <div class="quiz-kind"><?= ['test' => icona('pregunta') . ' Pregunta', 'completa' => icona('codi') . ' Completa el codi', 'sortida' => icona('impressora') . ' Què imprimeix?', 'ordenar' => icona('ordena') . ' Ordena-ho'][$b['tipus']] ?></div>
           <p class="quiz-q"><?= $b['pregunta'] ?></p>
           <?php if (isset($b['codi'])): ?><pre class="code"><?= e($b['codi']) ?></pre><?php endif; ?>
 
@@ -83,11 +83,11 @@
               <button type="button" class="btn primary check">Comprova</button>
             </div>
           <?php endif; ?>
-          <div class="feedback" <?= $done ? '' : 'hidden' ?>><?= $done ? '✔ Ja l\'has encertat. ' . e($b['explicacio']) : '' ?></div>
+          <div class="feedback" <?= $done ? '' : 'hidden' ?>><?= $done ? icona('check') . ' Ja l\'has encertat. ' . e($b['explicacio']) : '' ?></div>
         </div>
       <?php endif; ?>
 
-      <?php if (!empty($b['origen'])): ?><p class="source small">📄 <?= e($b['origen']) ?></p><?php endif; ?>
+      <?php if (!empty($b['origen'])): ?><p class="source small"><?= icona('document') ?> <?= e($b['origen']) ?></p><?php endif; ?>
     </section>
   <?php endforeach; ?>
 

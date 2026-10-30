@@ -17,9 +17,10 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=11">
+  <link rel="stylesheet" href="assets/css/app.css?v=12">
 </head>
 <body>
+<?= icones_sprite() ?>
 <a class="salta" href="#contingut">Salta al contingut</a>
 <header class="topbar">
   <a class="brand" href="index.php"><span class="brand-mark">&lt;?</span>PHPLab</a>
@@ -34,7 +35,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
     <span class="level-badge">Nv <span id="p-level"><?= e($progress['level']) ?></span></span>
     <div class="xpbar"><div class="xpbar-fill" id="p-bar" style="width: <?= $pct ?>%"></div></div>
     <span class="xp-text"><span id="p-xp"><?= e($progress['xp']) ?></span> XP</span>
-    <span class="streak" title="Dies seguits practicant">🔥 <span id="p-streak"><?= e($progress['streak']) ?></span></span>
+    <span class="streak" title="Dies seguits practicant"><?= icona('flama') ?><span id="p-streak"><?= e($progress['streak']) ?></span></span>
   </div>
   <form method="post" action="index.php?p=sortir" class="logout">
     <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">
@@ -59,9 +60,9 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/vendor/codemirror/addon/edit/matchbrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/edit/closebrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/hint/show-hint.js"></script>
-<script src="assets/js/app.js?v=7"></script>
-<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=6"></script><?php endif; ?>
-<?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=5"></script><?php endif; ?>
-<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=7"></script><?php endif; ?>
+<script src="assets/js/app.js?v=8"></script>
+<?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=7"></script><?php endif; ?>
+<?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=6"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=8"></script><?php endif; ?>
 </body>
 </html>

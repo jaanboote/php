@@ -44,7 +44,7 @@
       fb.hidden = false;
       fb.className = 'feedback ' + (r.correcte ? 'right' : 'wrong');
       if (r.correcte) {
-        fb.textContent = '✔ Correcte! ' + r.explicacio;
+        fb.innerHTML = PHPLab.ic('check') + ' Correcte! ' + PHPLab.esc(r.explicacio);
         quiz.classList.add('done');
         optionBtn?.classList.add('right');
         const c = document.getElementById('lesson-count');
@@ -52,7 +52,7 @@
         c.parentElement.classList.remove('bump'); void c.offsetWidth; c.parentElement.classList.add('bump');
         PHPLab.celebrate(optionBtn || fb, 22);
       } else {
-        fb.textContent = '✖ No és correcte. Torna-ho a provar (pots fer servir els exemples de dalt per comprovar-ho).';
+        fb.innerHTML = PHPLab.ic('creu') + ' No és correcte. Torna-ho a provar (pots fer servir els exemples de dalt per comprovar-ho).';
         if (optionBtn) {
           optionBtn.classList.add('wrong');
           setTimeout(() => optionBtn.classList.remove('wrong'), 600);
@@ -77,13 +77,13 @@
       return;
     }
     const art = document.querySelector('.lesson');
-    const { esc } = PHPLab;
+    const { esc, ic } = PHPLab;
     let accions = '';
     if (art.dataset.labId) {
-      accions += '<a class="btn primary" href="index.php?p=lab&amp;id=' + encodeURIComponent(art.dataset.labId) + '">🧪 Practica-ho: ' + esc(art.dataset.labTitol) + '</a>';
+      accions += '<a class="btn primary" href="index.php?p=lab&amp;id=' + encodeURIComponent(art.dataset.labId) + '">' + ic('matras') + ' Practica-ho: ' + esc(art.dataset.labTitol) + '</a>';
     }
     if (art.dataset.seguentId) {
-      accions += '<a class="btn' + (art.dataset.labId ? '' : ' primary') + '" href="index.php?p=leccio&amp;id=' + encodeURIComponent(art.dataset.seguentId) + '">📖 Següent: ' + esc(art.dataset.seguentTitol) + '</a>';
+      accions += '<a class="btn' + (art.dataset.labId ? '' : ' primary') + '" href="index.php?p=leccio&amp;id=' + encodeURIComponent(art.dataset.seguentId) + '">' + ic('llibre') + ' Següent: ' + esc(art.dataset.seguentTitol) + '</a>';
     }
     accions += '<button class="btn" type="button" data-tanca>Quedar-me aquí</button>';
     const box = document.createElement('div');

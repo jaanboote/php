@@ -12,6 +12,6 @@
   <p class="muted"><?= e($missatge) ?></p>
   <div class="error-accions">
     <a class="btn primary" href="index.php">Torna a l'inici</a>
-    <a class="btn" href="index.php?p=reptes">🎯 Fes un repte</a>
+    <a class="btn" href="index.php?p=reptes"><?= icona('diana') ?> Fes un repte</a>
   </div>
 </section>

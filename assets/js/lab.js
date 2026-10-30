@@ -4,7 +4,7 @@
 (() => {
   const root = document.getElementById('lab');
   if (!root) return;
-  const { api, esc, toast, updateProgress, makeEditor, renderOutput, argvPreview, filesHtml } = PHPLab;
+  const { api, esc, ic, toast, updateProgress, makeEditor, renderOutput, argvPreview, filesHtml } = PHPLab;
 
   const labId = root.dataset.lab;
   const web = root.dataset.web === '1';   // laboratori web: diversos fitxers i navegador integrat
@@ -178,15 +178,15 @@
       html += '</div>';
     }
     const cookies = Object.entries(r.galetes || {});
-    html += '<details class="insp-more"' + (cookies.length ? ' open' : '') + '><summary>🍪 Galetes i sessió</summary>' +
+    html += '<details class="insp-more"' + (cookies.length ? ' open' : '') + '><summary>' + ic('galeta') + ' Galetes i sessió</summary>' +
       table(cookies.map(([k, v]) => [k, '<code>' + esc(v) + '</code>']), 'El navegador no té cap galeta.') +
       (r.sessio !== null ? '<div class="small muted">Dades de la sessió al servidor ($_SESSION):</div><pre class="code">' + esc(r.sessio || '(buida)') + '</pre>' : '') +
       '</details>';
-    html += '<details class="insp-more"' + (r.fitxers.length ? ' open' : '') + '><summary>🗄 Fitxers del servidor (' + r.fitxers.length + ')</summary>' +
+    html += '<details class="insp-more"' + (r.fitxers.length ? ' open' : '') + '><summary>' + ic('servidor') + ' Fitxers del servidor (' + r.fitxers.length + ')</summary>' +
       (r.fitxers.length ? '<ul class="server-files">' + r.fitxers.map((f) => '<li><code>' + esc(f.nom) + '</code>' + (f.size ? ' <span class="muted small">' + Math.ceil(f.size / 1024) + ' KB</span>' : '') + '</li>').join('') + '</ul>' : '<p class="muted small">Encara no hi ha cap fitxer (p. ex. les imatges pujades a uploads/).</p>') +
-      '<button class="btn small" type="button" id="br-reset">🗑 Reinicia el servidor i les galetes</button></details>';
+      '<button class="btn small" type="button" id="br-reset">' + ic('paperera') + ' Reinicia el servidor i les galetes</button></details>';
     if (r.historial.length > 1) {
-      html += '<details class="insp-more"><summary>🕘 Peticions anteriors</summary><ol class="history">' +
+      html += '<details class="insp-more"><summary>' + ic('historial') + ' Peticions anteriors</summary><ol class="history">' +
         r.historial.slice(1).map((h) => '<li><span class="small muted">' + esc(h.hora) + '</span> ' + esc(h.method) + ' <code>' + esc(h.path) + '</code> ' + h.status + '</li>').join('') + '</ol></details>';
     }
     $('inspector').innerHTML = html;
@@ -206,8 +206,8 @@
       return;
     }
     box.hidden = false;
-    box.innerHTML = filesHtml(files, '📁 Carpeta del programa') +
-      '<button class="btn small" type="button" id="btn-clear-files">🗑 Buidar la carpeta</button>';
+    box.innerHTML = filesHtml(files, 'Carpeta del programa') +
+      '<button class="btn small" type="button" id="btn-clear-files">' + ic('paperera') + ' Buidar la carpeta</button>';
     box.querySelector('details').open = true;
     $('btn-clear-files').addEventListener('click', async () => {
       if (!confirm('Esborrar tots els fitxers que ha creat el programa?')) return;
@@ -249,9 +249,9 @@
     box.hidden = false;
     let html = '';
     if (r.superat) {
-      html += '<div class="banner ok">✔ Pas superat!' + (r.xp ? ' +' + r.xp + ' XP' : '') +
+      html += '<div class="banner ok">' + ic('check') + ' Pas superat!' + (r.xp ? ' +' + r.xp + ' XP' : '') +
         (r.acabat
-          ? ' <button class="btn primary small" onclick="location.reload()">Veure el resum 🎉</button>'
+          ? ' <button class="btn primary small" onclick="location.reload()">' + ic('estrelles') + ' Veure el resum</button>'
           : ' <button class="btn primary small" onclick="location.reload()">Següent pas →</button>') + '</div>';
     } else {
       const n = r.proves.filter((t) => !t.ok).length + r.codi.filter((c) => !c.ok).length;
@@ -259,13 +259,13 @@
         '. Mira el detall i, si et cal, pregunta al tutor.</div>';
     }
     for (const c of r.codi) {
-      html += '<div class="code-check">' + (c.ok ? '✔' : '✖') + ' ' + esc(c.missatge) + '</div>';
+      html += '<div class="code-check ' + (c.ok ? 'ok' : 'ko') + '">' + ic(c.ok ? 'check' : 'creu') + ' ' + esc(c.missatge) + '</div>';
     }
     html += '<h3>Proves</h3>';
     r.proves.forEach((t, i) => {
-      html += '<details class="test ' + (t.ok ? 'ok' : 'ko') + '" style="--i:' + i + '"' + (t.ok ? '' : ' open') + '><summary>' + (t.ok ? '✔' : '✖') + ' ' +
+      html += '<details class="test ' + (t.ok ? 'ok' : 'ko') + '" style="--i:' + i + '"' + (t.ok ? '' : ' open') + '><summary>' + ic(t.ok ? 'check' : 'creu') + ' ' +
         esc(t.nom) + (web ? '' : '<span class="test-cmd">$ ' + esc(t.ordre) + '</span>') + '</summary><div class="test-body">' +
-        (web ? '<p class="test-steps small">🧭 ' + esc(t.ordre) + '</p>' : '');
+        (web ? '<p class="test-steps small">' + ic('llista') + ' ' + esc(t.ordre) + '</p>' : '');
       if (!t.ok) html += '<p><strong>' + esc(t.motiu) + '</strong></p>';
       if (t.esperat !== null && !t.ok) {
         html += '<div class="compare"><div>Esperat<pre>' + esc(t.esperat) + '</pre></div><div>Has mostrat<pre>' + esc(t.obtingut || '(res)') + '</pre></div></div>';
@@ -278,7 +278,7 @@
       if (t.fitxers_inicials && t.fitxers_inicials.length) {
         html += '<p class="small muted">Fitxers preparats abans d\'executar: ' + t.fitxers_inicials.map(esc).join(', ') + '</p>';
       }
-      html += filesHtml(t.fitxers, web ? '🗄 Fitxers del servidor després de la prova' : '📁 Fitxers després de l\'execució');
+      html += filesHtml(t.fitxers, web ? 'Fitxers del servidor després de la prova' : 'Fitxers després de l\'execució', web ? 'servidor' : 'carpeta');
       for (const ex of t.errors || []) {
         html += '<div class="explain ' + esc(ex.tipus) + '"><strong>' + (ex.linia ? 'Línia ' + ex.linia + ' · ' : '') + esc(ex.titol) + '</strong><br>' + esc(ex.explicacio) + '</div>';
       }
@@ -319,7 +319,7 @@
       const box = $('solution');
       box.hidden = false;
       const blocks = typeof r.codi === 'string' ? '<pre class="code">' + esc(r.codi) + '</pre>'
-        : Object.entries(r.codi).map(([n, c]) => '<div class="file-name">📄 ' + esc(n) + '</div><pre class="code">' + esc(c) + '</pre>').join('');
+        : Object.entries(r.codi).map(([n, c]) => '<div class="file-name">' + ic('document') + ' ' + esc(n) + '</div><pre class="code">' + esc(c) + '</pre>').join('');
       box.innerHTML = '<h3>Solució del pas</h3><p class="small">' + esc(r.explicacio) + '</p>' + blocks +
         '<button class="btn small" type="button" id="copy-sol">Posa-la a l\'editor</button>';
       $('copy-sol').addEventListener('click', () => {
