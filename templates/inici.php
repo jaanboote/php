@@ -99,9 +99,9 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
   <section class="card">
     <h2>El teu temari</h2>
     <?php if (!$topics): ?>
-      <?php $ratxa = 0; $humorForcat = 'dorm'; $fraseForcada = 'Encara no tinc res per llegir...'; $mascotaClasse = 'mascota-petita';
+      <?php $ratxa = 0; $humorForcat = 'dorm'; $fraseForcada = 'Encara no tinc res per llegir…'; $mascotaClasse = 'mascota-petita';
             require __DIR__ . '/_mascota.php'; ?>
-      <p class="muted">Encara no has pujat cap fitxer. <a href="index.php?p=temari">Puja el temari</a> (PDF, ZIP, DOCX...) i el podràs llegir per temes, i el tutor el farà servir per respondre't.</p>
+      <p class="muted">Encara no has pujat cap fitxer. <a href="index.php?p=temari">Puja el temari</a> (PDF, ZIP, DOCX…) i el podràs llegir per temes, i el tutor el farà servir per respondre't.</p>
     <?php else: ?>
       <ul class="topics">
         <?php foreach ($topics as $t): ?>

@@ -40,7 +40,7 @@
             <label class="inline">$ php <?= e($b['fitxer'] ?? 'main.php') ?>
               <input class="args" value="<?= e($b['args'] ?? '') ?>" placeholder="arguments" spellcheck="false"></label>
             <button class="btn primary run" type="button">Executa ▶</button>
-            <button class="btn small reset" type="button" title="Torna al codi original">↺</button>
+            <button class="btn small reset" type="button" title="Torna al codi original" aria-label="Torna al codi original">↺</button>
           </div>
           <?php if (isset($b['stdin'])): ?>
             <label class="stdin-label">Entrada (respostes a readline, una per línia)

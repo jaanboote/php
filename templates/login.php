@@ -14,7 +14,7 @@
   <?php if ($error): ?><p class="alert error"><?= e($error) ?></p><?php endif; ?>
   <form method="post" action="index.php?p=login" class="form">
     <input type="hidden" name="csrf" value="<?= e(Auth::csrfToken()) ?>">
-    <label>Usuari <input name="usuari" required autocomplete="username" autofocus></label>
+    <label>Usuari <input name="usuari" required autocomplete="username" autocapitalize="none" spellcheck="false" autofocus></label>
     <label>Contrasenya <input type="password" name="contrasenya" required autocomplete="current-password"></label>
     <button class="btn primary" type="submit">Entrar</button>
   </form>

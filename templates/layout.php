@@ -8,6 +8,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
   <meta name="csrf" content="<?= e(Auth::csrfToken()) ?>">
   <title><?= e($title) ?> · PHPLab</title>
   <link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
@@ -16,9 +17,10 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=9">
+  <link rel="stylesheet" href="assets/css/app.css?v=10">
 </head>
 <body>
+<a class="salta" href="#contingut">Salta al contingut</a>
 <header class="topbar">
   <a class="brand" href="index.php"><span class="brand-mark">&lt;?</span>PHPLab</a>
   <nav class="nav">
@@ -39,7 +41,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
     <button type="submit" class="btn-link" title="Tancar la sessió">Sortir</button>
   </form>
 </header>
-<main class="main">
+<main class="main" id="contingut" tabindex="-1">
 <?= $content ?>
 </main>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
