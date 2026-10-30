@@ -64,12 +64,14 @@ final class Sandbox
             return $result;
         }
 
-        $id     = bin2hex(random_bytes(8));
-        $jobDir = Config::dataPath('sandbox' . DIRECTORY_SEPARATOR . 'jobs') . DIRECTORY_SEPARATOR . $id;
-        $ioDir  = $jobDir . '-io'; // fora de l'open_basedir: el codi de l'alumne no hi pot tocar
-        mkdir($jobDir, 0770);
-        mkdir($ioDir, 0770);
-        $jobDir = realpath($jobDir);
+        $dirs = self::createJobDirs();
+        if ($dirs === null) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            $result['stderr'] = self::JOB_DIR_ERROR;
+            return $result;
+        }
+        [$jobDir, $ioDir] = $dirs;
 
         try {
             $script = self::safeScriptName($script);
@@ -213,12 +215,13 @@ final class Sandbox
         if ($lock === null) {
             return ['status' => 503, 'busy' => true, 'body' => 'Hi ha massa execucions en curs. Torna-ho a provar en un moment.'] + $res;
         }
-        $id     = bin2hex(random_bytes(8));
-        $jobDir = Config::dataPath('sandbox' . DIRECTORY_SEPARATOR . 'jobs') . DIRECTORY_SEPARATOR . $id;
-        $ioDir  = $jobDir . '-io';
-        mkdir($jobDir, 0770);
-        mkdir($ioDir, 0770);
-        $jobDir = realpath($jobDir);
+        $dirs = self::createJobDirs();
+        if ($dirs === null) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            return ['status' => 500, 'body' => self::JOB_DIR_ERROR] + $res;
+        }
+        [$jobDir, $ioDir] = $dirs;
         $sep = DIRECTORY_SEPARATOR;
 
         try {
@@ -459,6 +462,34 @@ final class Sandbox
         return $res;
     }
 
+    private const JOB_DIR_ERROR = "No s'ha pogut crear la carpeta temporal del sandbox. Revisa els permisos de la carpeta de dades (Diagnòstic).";
+
+    /**
+     * Crea la carpeta del job (on s'executa el codi, i límit d'open_basedir) i la d'entrada/sortida,
+     * que queda fora de l'open_basedir perquè el codi de l'alumne no hi pugui tocar.
+     * Si alguna cosa falla retorna null i no s'ha d'executar res: amb una ruta buida o falsa,
+     * open_basedir deixaria de limitar l'accés als fitxers.
+     * @return array{0:string, 1:string}|null [carpeta del job (ruta real), carpeta d'entrada/sortida]
+     */
+    private static function createJobDirs(): ?array
+    {
+        $jobs   = Config::dataPath('sandbox' . DIRECTORY_SEPARATOR . 'jobs');
+        $jobDir = $jobs . DIRECTORY_SEPARATOR . bin2hex(random_bytes(8));
+        $ioDir  = $jobDir . '-io';
+        $okJob  = @mkdir($jobDir, 0770);
+        $okIo   = $okJob && @mkdir($ioDir, 0770);
+        $real   = $okIo ? realpath($jobDir) : false;
+        $realJobs = realpath($jobs);
+        // La ruta real ha de ser una carpeta dins de jobs/ (mai l'arrel ni una ruta buida)
+        if ($real === false || $realJobs === false || !is_dir($real)
+            || !str_starts_with($real, $realJobs . DIRECTORY_SEPARATOR)) {
+            self::removeDir($ioDir);
+            self::removeDir($jobDir);
+            return null;
+        }
+        return [$real, $ioDir];
+    }
+
     /** Mida màxima dels fitxers que es conserven entre execucions d'un laboratori. */
     private const WORKSPACE_MAX_BYTES = 1048576;
 
@@ -547,6 +578,7 @@ final class Sandbox
             'allow_url_fopen'         => '0',
             'allow_url_include'       => '0',
             'enable_dl'               => '0',
+            'ffi.enable'              => '0',      // FFI cridaria funcions de C i se saltaria disable_functions
             'file_uploads'            => '0',
             'display_errors'          => 'stderr',
             'display_startup_errors'  => '0',
