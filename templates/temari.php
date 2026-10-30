@@ -5,7 +5,7 @@ $maxUpload = ini_get('upload_max_filesize');
 $maxPost = ini_get('post_max_size');
 ?>
 <h1>Temari</h1>
-<p class="muted">El material de classe es guarda fora del webroot (no es pot obrir des del navegador) i s'indexa per fer-lo servir al tutor i, més endavant, per generar contingut nou.</p>
+<p class="muted">El material de classe es guarda fora del webroot (no es pot obrir des del navegador) i s'indexa per temes: el pots llegir des d'aquí i el tutor el fa servir per respondre't.</p>
 
 <?php if ($flash && $flash['type'] === 'error'): ?>
   <p class="alert error"><?= e($flash['msg']) ?></p>
@@ -30,6 +30,7 @@ $maxPost = ini_get('post_max_size');
       <input type="hidden" name="accio" value="pujar">
       <label class="drop">
         <input type="file" name="fitxers[]" multiple required accept=".<?= e(implode(',.', array_merge(TextExtractor::EXTENSIONS, ['zip']))) ?>">
+        <svg class="drop-icona" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9a4 4 0 0 1 0 8"/><path d="M12 12v8M8.5 15.5 12 12l3.5 3.5"/></svg>
         <span>Tria fitxers o arrossega'ls aquí<br><small class="muted">PDF, ZIP, DOCX, PHP, HTML, TXT, MD · màxim <?= e($maxUpload) ?> per fitxer i <?= e($maxPost) ?> en total</small></span>
       </label>
       <button class="btn primary" type="submit">⬆ Pujar temari</button>
@@ -52,25 +53,40 @@ $maxPost = ini_get('post_max_size');
 <section class="card">
   <h2>Fitxers indexats (<?= count($files) ?>)</h2>
   <?php if (!$files): ?>
-    <p class="muted">Encara no hi ha res.</p>
-  <?php else: ?>
-    <div class="table-wrap">
-      <table class="files">
-        <thead><tr><th>Tema</th><th>Fitxer</th><th>Tipus</th><th>Text</th><th>Estat</th></tr></thead>
-        <tbody>
-          <?php foreach ($files as $f): ?>
-            <tr>
-              <td><a href="index.php?p=llegir&amp;tema=<?= e(urlencode($f['topic_name'])) ?>"><?= e($f['topic_name']) ?></a></td>
-              <td class="path"><?= e($f['path']) ?></td>
-              <td><?= e($f['kind']) ?></td>
-              <td class="small"><?= number_format((int) $f['chars'], 0, ',', '.') ?> car.</td>
-              <td><?php if ($f['status'] === 'ok'): ?><span class="pill ok">ok</span><?php else: ?>
-                <span class="pill err" title="<?= e($f['message']) ?>"><?= e($f['status']) ?></span>
-                <div class="small muted"><?= e($f['message']) ?></div><?php endif; ?></td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+    <div class="estat-buit petit">
+      <?php $ratxa = 0; $humorForcat = 'dorm'; $fraseForcada = 'Encara no tinc res per llegir...'; $mascotaClasse = 'mascota-petita';
+            require __DIR__ . '/_mascota.php'; ?>
+      <p class="muted">Encara no hi ha res. Puja els PDF o el ZIP de classe amb el formulari de dalt.</p>
     </div>
+  <?php else: ?>
+    <?php
+    // Agrupats per tema, en el mateix ordre que la consulta (per número de tema)
+    $grups = [];
+    foreach ($files as $f) {
+        $grups[$f['topic_name']][] = $f;
+    }
+    ?>
+    <?php foreach ($grups as $tema => $llista): ?>
+      <div class="temari-grup <?= e(tema_class($tema)) ?>">
+        <h3 class="group-title"><?= tema_icona($tema, 18) ?><?= e($tema) ?>
+          <a class="btn small" href="index.php?p=llegir&amp;tema=<?= e(urlencode($tema)) ?>">📖 Llegir</a></h3>
+        <div class="fitxers-grid">
+          <?php foreach ($llista as $f): $dir = dirname(str_replace('\\', '/', $f['path'])); ?>
+            <article class="fitxer-card <?= $f['status'] === 'ok' ? '' : 'amb-error' ?>">
+              <?= fitxer_icona((string) $f['ext']) ?>
+              <div class="fitxer-info">
+                <strong title="<?= e($f['path']) ?>"><?= e(basename(str_replace('\\', '/', $f['path']))) ?></strong>
+                <?php if ($dir !== '.'): ?><span class="fitxer-carpeta">📁 <?= e($dir) ?></span><?php endif; ?>
+                <span class="fitxer-meta"><?= e($f['kind']) ?> · <?= number_format((int) $f['chars'], 0, ',', '.') ?> caràcters</span>
+                <?php if ($f['status'] !== 'ok'): ?>
+                  <span class="pill err" title="<?= e($f['message']) ?>">⚠ <?= e($f['status']) ?></span>
+                  <span class="small muted"><?= e($f['message']) ?></span>
+                <?php endif; ?>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    <?php endforeach; ?>
   <?php endif; ?>
 </section>

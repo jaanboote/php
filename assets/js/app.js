@@ -381,7 +381,16 @@ const PHPLab = (() => {
   document.querySelectorAll('.drop').forEach((d) => {
     ['dragenter', 'dragover'].forEach((ev) => d.addEventListener(ev, (e) => { e.preventDefault(); d.classList.add('over'); }));
     ['dragleave', 'drop'].forEach((ev) => d.addEventListener(ev, () => d.classList.remove('over')));
-    d.addEventListener('drop', (e) => { e.preventDefault(); d.querySelector('input').files = e.dataTransfer.files; });
+    const input = d.querySelector('input');
+    // Mostra quants fitxers hi ha triats (el camp natiu està amagat)
+    const mostra = () => {
+      const n = input.files.length;
+      let info = d.querySelector('.drop-triats');
+      if (!info) { info = document.createElement('span'); info.className = 'drop-triats'; d.appendChild(info); }
+      info.textContent = n ? (n === 1 ? '📄 ' + input.files[0].name : '📄 ' + n + ' fitxers triats') : '';
+    };
+    input.addEventListener('change', mostra);
+    d.addEventListener('drop', (e) => { e.preventDefault(); input.files = e.dataTransfer.files; mostra(); });
   });
   document.getElementById('upload-form')?.addEventListener('submit', (e) => {
     e.submitter?.classList.add('loading', 'keep-text');

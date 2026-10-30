@@ -1,8 +1,10 @@
 <?php
-/** @var array $lesson @var array $answers @var array $progres */
+/** @var array $lesson @var array $answers @var array $progres @var ?array $seguent @var ?array $labLligat */
 ?>
 <div class="crumbs"><a href="index.php">Inici</a> › Aprendre › <?= e($lesson['tema']) ?></div>
-<article class="lesson <?= e(tema_class($lesson['tema'])) ?>" data-lesson="<?= e($lesson['id']) ?>">
+<article class="lesson <?= e(tema_class($lesson['tema'])) ?>" data-lesson="<?= e($lesson['id']) ?>"
+         data-seguent-id="<?= e($seguent['id'] ?? '') ?>" data-seguent-titol="<?= e($seguent['titol'] ?? '') ?>"
+         data-lab-id="<?= e($labLligat['id'] ?? '') ?>" data-lab-titol="<?= e($labLligat['titol'] ?? '') ?>">
   <div class="read-progress" id="read-progress" aria-hidden="true"></div>
   <header class="lesson-head">
     <div class="lesson-title">

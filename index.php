@@ -103,6 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $common = ['progress' => Progress::summary(), 'page' => $page];
 
+/** Pàgina 404 amb la mascota (en lloc d'un text pla) i atura l'execució. */
+$noTrobat = function (string $titol, string $missatge) use ($common): never {
+    http_response_code(404);
+    View::render('error', $common + ['title' => $titol, 'titol' => $titol, 'missatge' => $missatge]);
+    exit;
+};
+
 switch ($page) {
     case 'inici':
         $topics = Db::all("SELECT topic_name, topic_num, COUNT(*) n, SUM(status = 'ok') ok
@@ -124,12 +131,18 @@ switch ($page) {
     case 'leccio':
         $lesson = Lessons::get($_GET['id'] ?? '');
         if (!$lesson) {
-            http_response_code(404);
-            exit('Lliçó no trobada');
+            $noTrobat('Lliçó no trobada', 'Aquesta lliçó no existeix. Potser l\'enllaç és antic o hi ha un error a l\'adreça.');
         }
+        // Cap on anar després: la lliçó següent (en l'ordre del temari) i el laboratori per practicar-ho
+        $ids = array_keys(Lessons::all());
+        $pos = array_search($lesson['id'], $ids, true);
+        $seguent = $pos !== false && isset($ids[$pos + 1]) ? Lessons::get($ids[$pos + 1]) : null;
+        $labLligat = isset($lesson['lab']) ? Labs::get($lesson['lab']) : null;
         View::render('leccio', $common + [
             'title' => $lesson['titol'],
             'lesson' => $lesson,
+            'seguent' => $seguent,
+            'labLligat' => $labLligat,
             'answers' => Lessons::answers($lesson['id']),
             'progres' => Lessons::progress($lesson),
         ]);
@@ -138,8 +151,7 @@ switch ($page) {
     case 'lab':
         $lab = Labs::get($_GET['id'] ?? '');
         if (!$lab) {
-            http_response_code(404);
-            exit('Laboratori no trobat');
+            $noTrobat('Laboratori no trobat', 'Aquest laboratori no existeix. Torna a l\'inici per veure els que hi ha.');
         }
         $state = Labs::state($lab);
         View::render('lab', $common + [
@@ -179,10 +191,13 @@ switch ($page) {
     case 'repte':
         $mode = (string) ($_GET['mode'] ?? '');
         if (!isset(Reptes::MODES[$mode])) {
-            http_response_code(404);
-            exit('Mode de repte desconegut');
+            $noTrobat('Repte no trobat', 'Aquest mode de repte no existeix.');
         }
-        View::render('repte', $common + ['title' => Reptes::MODES[$mode]['titol'], 'mode' => $mode, 'tema' => (string) ($_GET['tema'] ?? '')]);
+        View::render('repte', $common + [
+            'title' => Reptes::MODES[$mode]['titol'], 'mode' => $mode, 'tema' => (string) ($_GET['tema'] ?? ''),
+            'buit' => $mode === 'repas' && Review::countDue() === 0,   // res per repassar: pantalla buida, sense partida
+            'proper' => Review::nextDue(),
+        ]);
         break;
 
     case 'progres':
@@ -192,6 +207,7 @@ switch ($page) {
             'temes' => Stats::temaMap(),
             'insignies' => Badges::all(),
             'xpDies' => Stats::xpByDay(30),
+            'calendari' => Stats::calendari(53),
             'xpFonts' => Stats::xpBySource(),
             'reptes' => Stats::reptesByMode(),
             'dies' => Stats::days(),
@@ -204,6 +220,5 @@ switch ($page) {
         break;
 
     default:
-        http_response_code(404);
-        echo 'Pàgina no trobada';
+        $noTrobat('Pàgina no trobada', 'L\'adreça no correspon a cap pàgina de PHPLab.');
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * Pàgina de progrés: mapa de temes, insígnies i estadístiques.
- * @var array $temes @var array $insignies @var array $xpDies @var array $xpFonts @var array $reptes @var array $dies @var array $fluixos
+ * @var array $temes @var array $insignies @var array $xpDies @var array $calendari @var array $xpFonts @var array $reptes @var array $dies @var array $fluixos
  */
 use PhpLab\Reptes;
 
@@ -28,6 +28,36 @@ $totalFonts = max(1, array_sum($xpFonts));
   <div class="stat-tile"><span class="stat-label">Ratxa</span><span class="stat-value">🔥 <?= e($progress['streak']) ?></span><span class="stat-sub">la millor: <?= e($dies['millor_ratxa']) ?> <?= $dies['millor_ratxa'] === 1 ? 'dia' : 'dies' ?></span></div>
   <div class="stat-tile"><span class="stat-label">Dies practicant</span><span class="stat-value"><?= e($dies['actius']) ?></span><span class="stat-sub">en total</span></div>
   <div class="stat-tile"><span class="stat-label">Insígnies</span><span class="stat-value"><?= e($aconseguides) ?><small>/<?= count($insignies) ?></small></span><span class="stat-sub"><a href="#insignies">veure-les</a></span></div>
+</section>
+
+<?php
+// Calendari de pràctica: intensitat segons l'XP del dia (0 = cap activitat)
+$nivellDia = fn(int $xp) => $xp === 0 ? 0 : ($xp < 20 ? 1 : ($xp < 60 ? 2 : ($xp < 120 ? 3 : 4)));
+$diesActius = count(array_filter($calendari, fn($d) => $d['xp'] > 0));
+$mesos = ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.', 'oct.', 'nov.', 'des.'];
+?>
+<section class="card calendari-card">
+  <div class="calendari-cap">
+    <h2>🔥 Calendari de pràctica</h2>
+    <p class="muted small"><?= e($diesActius) ?> <?= $diesActius === 1 ? 'dia' : 'dies' ?> practicant l'últim any ·
+      ratxa actual: <?= e($progress['streak']) ?> · la millor: <?= e($dies['millor_ratxa']) ?></p>
+  </div>
+  <div class="calendari-scroll">
+    <div class="calendari" role="img" aria-label="<?= e("Has practicat $diesActius dies l'últim any") ?>">
+      <div class="calendari-dies" aria-hidden="true"><span>dl</span><span></span><span>dc</span><span></span><span>dv</span><span></span><span>dg</span></div>
+      <div class="calendari-graella">
+        <?php foreach ($calendari as $i => $d): $t = strtotime($d['dia']); ?>
+          <?php if ($i % 7 === 0 && (int) date('j', $t) <= 7): ?>
+            <span class="calendari-mes" style="grid-column: <?= intdiv($i, 7) + 1 ?>"><?= e($mesos[(int) date('n', $t) - 1]) ?></span>
+          <?php endif; ?>
+          <span class="dia n<?= $nivellDia($d['xp']) ?><?= $d['dia'] === date('Y-m-d') ? ' avui' : '' ?>"
+                style="grid-column: <?= intdiv($i, 7) + 1 ?>; grid-row: <?= $i % 7 + 2 ?>"
+                title="<?= e(date('d/m/Y', $t) . ': ' . ($d['xp'] ? $d['xp'] . ' XP' : 'sense activitat')) ?>"></span>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+  <div class="calendari-llegenda small muted" aria-hidden="true">Menys <span class="dia n0"></span><span class="dia n1"></span><span class="dia n2"></span><span class="dia n3"></span><span class="dia n4"></span> Més</div>
 </section>
 
 <h2 class="section-title">🗺️ Mapa de temes</h2>

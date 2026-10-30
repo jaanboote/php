@@ -33,6 +33,9 @@ $descripcions = [
   </div>
   <?php if ($pendents > 0): ?>
     <a class="btn primary" href="index.php?p=repte&amp;mode=repas">Començar el repàs</a>
+  <?php else: ?>
+    <?php $ratxa = 0; $humorForcat = 'dorm'; $fraseForcada = 'Res per repassar avui!'; $mascotaClasse = 'mascota-petita';
+          require __DIR__ . '/_mascota.php'; ?>
   <?php endif; ?>
 </section>
 
