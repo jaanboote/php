@@ -39,20 +39,21 @@ només la línia que has canviat. Si un punt deixa de complir-se, atura't i expl
 
 ## 2. Carpeta del job i noms de fitxer
 
-- [ ] **Comprova que `mkdir()` i `realpath()` de la carpeta del job no fallen abans d'executar res.** Si `realpath()` retorna
-      `false`, `open_basedir` quedaria buit o apuntaria a l'arrel, i el codi de l'alumne tindria accés a tota la unitat.
-      Si falla, no s'executa res i es retorna un error (punt pendent a `run()` i `runWeb()`: avui no es comprova el resultat).
+- [ ] **La carpeta del job es crea amb `createJobDirs()`**, que comprova `mkdir()` i `realpath()` i que la ruta real sigui una
+      carpeta dins de `sandbox/jobs/`. Si `realpath()` retornés `false`, `open_basedir` quedaria buit o apuntaria a l'arrel, i el codi
+      de l'alumne tindria accés a tota la unitat. Si falla, `run()` i `runWeb()` alliberen el bloqueig i retornen un error sense executar res.
+      No creïs mai la carpeta del job d'una altra manera.
 - [ ] Noms de fitxer que venen de l'alumne o del contingut: només **rutes relatives segures** (`safeRelativePath`):
       sense `..`, sense ruta absoluta (`/` inicial) i sense lletra d'unitat (`C:`).
 - [ ] El nom del programa passa per `safeScriptName()` (només `[a-zA-Z0-9_-]` i `.php`).
 - [ ] `copyDir()` no segueix enllaços simbòlics.
 - [ ] Les carpetes que es conserven entre execucions (`workspaces/`) tenen límit de mida (1 MB de consola, 8 MB web).
 
-## 3. Proposta pendent a revisar
+## 3. FFI desactivat
 
-- [ ] Afegir `'ffi.enable' => '0'` a `Sandbox::iniSettings()`. FFI permet cridar funcions de C des de PHP i se saltaria
-      `disable_functions`. A XAMPP sol venir desactivat, però no s'ha de dependre del `php.ini`. Si es fa el canvi,
-      executa la verificació (punt 7) per comprovar que cap laboratori se'n ressent.
+- [ ] `Sandbox::iniSettings()` té `'ffi.enable' => '0'`. FFI permet cridar funcions de C des de PHP i se saltaria
+      `disable_functions` (abans del canvi, `FFI::cdef("int getpid(void);")->getpid()` funcionava). No depenem del `php.ini`:
+      no el treguis. Comprovació: aquest codi ha de donar «FFI API is restricted by "ffi.enable"».
 
 ## 4. Laboratoris web (`src/WebLab.php`, `web.php`, `templates/lab.php`)
 
