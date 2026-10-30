@@ -102,6 +102,41 @@ const PHPLab = (() => {
     document.querySelectorAll('[data-compta]').forEach((el) => obs.observe(el));
   }
 
+  /**
+   * Pinta un <pre class="code"> amb el mode PHP de CodeMirror (sense crear cap editor): el mateix que fa el seu
+   * complement runmode, que no tenim copiat. HTML sol fa servir el mode HTML; PHP sense «<?php», el de PHP pur.
+   */
+  function pinta(pre) {
+    if (!window.CodeMirror || pre.dataset.pintat || pre.children.length) return;
+    const text = pre.textContent;
+    // Només el que sembla codi: una sortida de programa en text pla es quedaria pintada de colors sense sentit
+    if (!/<\?|;\s*$|\$\w|^\s*<\/?[a-z!]/im.test(text)) return;
+    const spec = /<\?(php|=)/.test(text) ? 'application/x-httpd-php' : /^\s*</.test(text) ? 'text/html' : 'text/x-php';
+    const mode = CodeMirror.getMode(CodeMirror.defaults, spec);
+    const state = CodeMirror.startState(mode);
+    const frag = document.createDocumentFragment();
+    text.split('\n').forEach((linia, n) => {
+      if (n) frag.appendChild(document.createTextNode('\n'));
+      if (!linia && mode.blankLine) mode.blankLine(state);
+      const stream = new CodeMirror.StringStream(linia, 4);
+      while (!stream.eol()) {
+        const estil = mode.token(stream, state);
+        const tros = stream.current();
+        if (estil) {
+          const span = document.createElement('span');
+          span.className = estil.split(' ').map((c) => 'cm-' + c).join(' ');
+          span.textContent = tros;
+          frag.appendChild(span);
+        } else frag.appendChild(document.createTextNode(tros));
+        stream.start = stream.pos;
+      }
+    });
+    pre.textContent = '';
+    pre.appendChild(frag);
+    pre.classList.add('cm-s-default');
+    pre.dataset.pintat = '1';
+  }
+
   /** «+N XP» que surt de l'element i vola fins al comptador d'XP de la capçalera. */
   function flyXp(from, amount, done) {
     const a = from.getBoundingClientRect();
@@ -250,6 +285,9 @@ const PHPLab = (() => {
     addEventListener('scroll', upd, { passive: true });
     upd();
   }
+
+  // Els blocs de codi estàtics es pinten amb els mateixos colors que l'editor
+  document.querySelectorAll('pre.code').forEach(pinta);
 
   // Botó per copiar els blocs de codi de les explicacions
   document.querySelectorAll('.lesson pre.code, .lesson pre.term, .step-body pre').forEach((pre) => {
@@ -411,5 +449,5 @@ const PHPLab = (() => {
     if (e.submitter) e.submitter.textContent = 'Pujant i indexant…';
   });
 
-  return { api, esc, ic, toast, updateProgress, celebrate, shake, makeEditor, renderOutput, markErrorLines, argvPreview, filesHtml };
+  return { api, esc, ic, pinta, toast, updateProgress, celebrate, shake, makeEditor, renderOutput, markErrorLines, argvPreview, filesHtml };
 })();

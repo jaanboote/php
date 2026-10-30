@@ -6,6 +6,32 @@
   if (!lessonEl) return;
   const lessonId = lessonEl.dataset.lesson;
 
+  // ---------- Índex lateral ----------
+  const toc = document.querySelector('.toc');
+  /** Torna a comptar les preguntes encertades d'una secció i la marca com a feta si ja les té totes. */
+  function actualitzaIndex(sec) {
+    const li = sec && toc?.querySelector('li[data-sec="' + sec + '"]');
+    if (!li) return;
+    const total = document.querySelectorAll('[data-sec="' + sec + '"] .quiz').length;
+    const fetes = document.querySelectorAll('[data-sec="' + sec + '"] .quiz.done').length;
+    const compte = li.querySelector('.toc-compte');
+    if (compte) compte.textContent = fetes + '/' + total;
+    li.classList.toggle('fet', total > 0 && fetes === total);
+  }
+  if (toc && 'IntersectionObserver' in window) {
+    // La secció actual és la darrera explicació que ha passat per la franja superior de la pantalla
+    const enllacos = new Map([...toc.querySelectorAll('li')].map((li) => [li.dataset.sec, li]));
+    const visibles = new Set();
+    const obs = new IntersectionObserver((entrades) => {
+      entrades.forEach((en) => (en.isIntersecting ? visibles.add(en.target.id) : visibles.delete(en.target.id)));
+      const ordre = [...enllacos.keys()];
+      const actual = ordre.filter((id) => visibles.has(id)).shift();
+      if (!actual) return;
+      enllacos.forEach((li, id) => li.classList.toggle('actiu', id === actual));
+    }, { rootMargin: '-80px 0px -55% 0px' });
+    enllacos.forEach((li, id) => { const el = document.getElementById(id); if (el) obs.observe(el); });
+  }
+
   // ---------- Exemples executables ----------
   document.querySelectorAll('.playground').forEach((pg) => {
     const ta = pg.querySelector('.code-src');
@@ -50,6 +76,7 @@
         const c = document.getElementById('lesson-count');
         c.textContent = +c.textContent + 1;
         c.parentElement.classList.remove('bump'); void c.offsetWidth; c.parentElement.classList.add('bump');
+        actualitzaIndex(quiz.closest('[data-sec]')?.dataset.sec);
         PHPLab.celebrate(optionBtn || fb, 22);
       } else {
         fb.innerHTML = PHPLab.ic('creu') + ' No és correcte. Torna-ho a provar (pots fer servir els exemples de dalt per comprovar-ho).';
