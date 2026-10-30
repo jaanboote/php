@@ -173,6 +173,11 @@
     } catch (e) {
       toast(e.message);
       if (/temps/.test(e.message)) finish();
+      else if (!/Ja has respost|acabat/.test(e.message)) {
+        // La resposta no s'ha comptat (servidor ocupat, connexió...): es pot tornar a enviar
+        delete card.dataset.answered;
+        card.querySelectorAll('button.send, .option').forEach((b) => (b.disabled = false));
+      }
     }
   }
 

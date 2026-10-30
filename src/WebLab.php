@@ -28,19 +28,10 @@ final class WebLab
 
     // ------------------------------------------------------------------ Testimoni de la URL
 
-    private static function secret(): string
-    {
-        $file = Config::dataPath() . DIRECTORY_SEPARATOR . 'secret.key';
-        if (!is_file($file)) {
-            file_put_contents($file, bin2hex(random_bytes(32)));
-        }
-        return (string) file_get_contents($file);
-    }
-
     public static function token(string $labId): string
     {
         $exp = time() + self::TOKEN_HOURS * 3600;
-        return $exp . '-' . substr(hash_hmac('sha256', "$labId|$exp", self::secret()), 0, 32);
+        return $exp . '-' . substr(hash_hmac('sha256', "$labId|$exp", Config::secret()), 0, 32);
     }
 
     public static function checkToken(string $labId, string $token): bool
@@ -48,7 +39,7 @@ final class WebLab
         if (!preg_match('/^(\d{10})-([0-9a-f]{32})$/', $token, $m) || (int) $m[1] < time()) {
             return false;
         }
-        return hash_equals(substr(hash_hmac('sha256', "$labId|{$m[1]}", self::secret()), 0, 32), $m[2]);
+        return hash_equals(substr(hash_hmac('sha256', "$labId|{$m[1]}", Config::secret()), 0, 32), $m[2]);
     }
 
     /** URL (relativa a la app) per obrir un fitxer de la web de l'alumne al navegador integrat. */
@@ -90,9 +81,26 @@ final class WebLab
         return is_file($file) ? (json_decode((string) file_get_contents($file), true) ?: []) : [];
     }
 
-    private static function save(string $kind, string $labId, array $data): void
+    /**
+     * Llegeix, modifica i desa un fitxer d'estat amb bloqueig: la pàgina i les seves imatges arriben alhora, i sense
+     * bloqueig una petició lenta tornaria a escriure el pot de galetes antic i esborraria la sessió que acaba de crear l'altra.
+     */
+    private static function update(string $kind, string $labId, callable $fn): void
     {
-        file_put_contents(self::stateFile($kind, $labId), json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
+        $fh = fopen(self::stateFile($kind, $labId), 'c+');
+        if ($fh === false) {
+            return;
+        }
+        try {
+            flock($fh, LOCK_EX);
+            $data = json_decode((string) stream_get_contents($fh), true) ?: [];
+            ftruncate($fh, 0);
+            rewind($fh);
+            fwrite($fh, json_encode($fn($data), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE));
+        } finally {
+            flock($fh, LOCK_UN);
+            fclose($fh);
+        }
     }
 
     /** Aplica les capçaleres Set-Cookie al pot de galetes (esborra les caducades o buides). */
@@ -132,15 +140,16 @@ final class WebLab
     {
         $jar = self::load('cookies', $lab['id']);
         $r = Sandbox::runWeb(self::sources($lab, $code), $req + ['cookies' => $jar, 'base' => $base], Sandbox::workspace($lab['id']));
-        self::save('cookies', $lab['id'], self::applyCookies($jar, $r['set_cookies']));
+        if ($r['set_cookies'] !== []) {
+            self::update('cookies', $lab['id'], fn(array $actual) => self::applyCookies($actual, $r['set_cookies']));
+        }
 
         // Registre de les últimes peticions per a l'inspector. Els fitxers estàtics (CSS, imatges) no hi surten:
         // els demana la pàgina, no la persona, i canviarien l'adreça del navegador.
         if (strtolower(pathinfo((string) $req['path'], PATHINFO_EXTENSION)) !== 'php') {
             return $r;
         }
-        $log = self::load('log', $lab['id']);
-        $log[] = [
+        $entrada = [
             'hora' => date('H:i:s'),
             'method' => $req['method'],
             'path' => $req['path'],
@@ -155,7 +164,7 @@ final class WebLab
             'errors' => trim($r['errors']),
             'ms' => $r['ms'],
         ];
-        self::save('log', $lab['id'], array_slice($log, -15));
+        self::update('log', $lab['id'], fn(array $log) => array_slice([...$log, $entrada], -15));
         return $r;
     }
 
@@ -284,14 +293,15 @@ final class WebLab
                     $jar = self::applyCookies($jar, $r['set_cookies']);
                     $errors .= $r['errors'];
                     if ($r['busy'] || $r['timeout']) {
+                        $last = $r;
                         break 2;
                     }
                     if ($r['location'] === null || $r['status'] < 300 || $r['status'] >= 400) {
                         break;
                     }
                     $locations[] = $r['location'];
-                    [$lp, $lq] = array_pad(explode('?', ltrim(preg_replace('#^https?://[^/]+#', '', $r['location']), '/'), 2), 2, '');
-                    $req = ['method' => 'GET', 'path' => $lp === '' ? 'index.php' : $lp, 'query' => $lq];
+                    [$lp, $lq] = self::resolLocation((string) $req['path'], $r['location']);
+                    $req = ['method' => 'GET', 'path' => $lp, 'query' => $lq];
                     $passos[] = '↪ redirecció a ' . $r['location'];
                 }
                 $last = $r;
@@ -384,6 +394,33 @@ final class WebLab
             }
         }
         return $res;
+    }
+
+    /**
+     * On porta una capçalera Location des de la pàgina $actual, com ho resoldria el navegador: amb domini o «/» inicial
+     * és des de l'arrel del laboratori; si no, és relativa a la carpeta de la pàgina («./fet.php», «../index.php»).
+     * @return array{0:string,1:string} [ruta, query]
+     */
+    private static function resolLocation(string $actual, string $location): array
+    {
+        [$loc, $query] = array_pad(explode('?', preg_replace('#^https?://[^/]+#', '', $location), 2), 2, '');
+        $loc = explode('#', $loc, 2)[0];
+        if ($loc === '') {
+            return [$actual, $query];   // «Location: ?pas=2» torna a la mateixa pàgina
+        }
+        $dir = str_contains($actual, '/') ? substr($actual, 0, strrpos($actual, '/')) : '';
+        $parts = [];
+        foreach (explode('/', str_starts_with($loc, '/') ? $loc : "$dir/$loc") as $seg) {
+            if ($seg === '..') {
+                array_pop($parts);
+            } elseif ($seg !== '' && $seg !== '.') {
+                $parts[] = $seg;
+            }
+        }
+        if (str_ends_with($loc, '/') || $parts === []) {
+            $parts[] = 'index.php';
+        }
+        return [implode('/', $parts), $query];
     }
 
     /**

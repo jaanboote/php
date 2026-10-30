@@ -88,7 +88,7 @@ foreach ($lesson['blocs'] as $i => $b) {
           <?php if ($b['tipus'] === 'ordenar'): ?>
             <ol class="sortable">
               <?php foreach ($done ? array_keys($b['elements']) : PhpLab\Lessons::shuffled($b) as $k): /* ja encertada: en l'ordre correcte */ ?>
-                <li data-idx="<?= (int) $k ?>"><span class="sort-text"><?= e($b['elements'][$k]) ?></span>
+                <li data-idx="<?= e(PhpLab\Lessons::ordreToken($b, (int) $k)) ?>"><span class="sort-text"><?= e($b['elements'][$k]) ?></span>
                   <span class="sort-buttons"><button type="button" class="btn small up" aria-label="Amunt">↑</button><button type="button" class="btn small down" aria-label="Avall">↓</button></span></li>
               <?php endforeach; ?>
             </ol>

@@ -47,7 +47,8 @@ només la línia que has canviat. Si un punt deixa de complir-se, atura't i expl
       sense `..`, sense ruta absoluta (`/` inicial) i sense lletra d'unitat (`C:`).
 - [ ] El nom del programa passa per `safeScriptName()` (només `[a-zA-Z0-9_-]` i `.php`).
 - [ ] `copyDir()` no segueix enllaços simbòlics.
-- [ ] Les carpetes que es conserven entre execucions (`workspaces/`) tenen límit de mida (1 MB de consola, 8 MB web).
+- [ ] Les carpetes que es conserven entre execucions (`workspaces/`) tenen límit de mida (1 MB de consola, 8 MB web) i
+      d'entrades (`WORKSPACE_MAX_FILES`), comptats amb `dirUsage()` sobre tota la carpeta (no amb `listFiles()`, que en mostra 50).
 
 ## 3. FFI desactivat
 

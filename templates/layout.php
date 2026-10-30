@@ -63,6 +63,6 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/js/app.js?v=10"></script>
 <?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=8"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=7"></script><?php endif; ?>
-<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=9"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=10"></script><?php endif; ?>
 </body>
 </html>

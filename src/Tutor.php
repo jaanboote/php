@@ -26,6 +26,10 @@ final class Tutor
         $step = $lab['passos'][$stepIdx];
         $row = Labs::stepRow($lab['id'], $stepIdx);
         $message = mb_substr(trim($message), 0, 2000);
+        // El botó Envia amb la caixa buida: es desa amb text perquè l'historial no tingui missatges buits (l'API els rebutja)
+        if ($message === '') {
+            $message = 'No sé com continuar. Em pots ajudar?';
+        }
 
         $avis = null;
         $result = null;
@@ -73,7 +77,14 @@ final class Tutor
         $messages = [];
         $hist = Db::all('SELECT role, content FROM tutor_messages WHERE lab_id = ? AND step = ? ORDER BY id DESC LIMIT 8', [$lab['id'], $stepIdx]);
         foreach (array_reverse($hist) as $h) {
+            if (trim((string) $h['content']) === '') {
+                continue;   // missatges buits desats abans de la correcció
+            }
             $messages[] = ['role' => $h['role'], 'content' => $h['content']];
+        }
+        // La conversa ha de començar amb un missatge de l'alumne
+        while ($messages !== [] && $messages[0]['role'] !== 'user') {
+            array_shift($messages);
         }
         $messages[] = ['role' => 'user', 'content' => self::situation($lab, $stepIdx, $step, $row, $ctx) . "\n\n<missatge_alumne>\n" . ($message !== '' ? $message : 'No sé com continuar. Em pots ajudar?') . "\n</missatge_alumne>"];
 

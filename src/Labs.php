@@ -14,13 +14,18 @@ final class Labs
 
     public static function all(): array
     {
+        // El contingut no canvia durant una petició: les insígnies i les estadístiques el demanen moltes vegades
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
         $labs = [];
         foreach (glob(APP_ROOT . '/content/labs/*.php') as $file) {
             $lab = require $file;
             $labs[$lab['id']] = $lab;
         }
         uasort($labs, fn($a, $b) => ($a['ordre'] ?? 99) <=> ($b['ordre'] ?? 99));
-        return $labs;
+        return $cache = $labs;
     }
 
     public static function get(string $id): ?array

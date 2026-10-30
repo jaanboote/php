@@ -128,7 +128,7 @@ final class Reptes
             do {
                 shuffle($order);
             } while (count($order) > 1 && $order === array_keys($lines));
-            $pub['linies'] = array_map(fn($k) => ['idx' => $k, 'text' => $lines[$k]], $order);
+            $pub['linies'] = array_map(fn($k) => ['idx' => Lessons::ordreToken($item, $k), 'text' => $lines[$k]], $order);
             $pub['codi_ordenar'] = isset($item['linies'], $item['sortida']);   // codi (monoespai) o text
         }
         return $pub;
@@ -281,7 +281,7 @@ final class Reptes
     private static function checkOrder(array $item, string $answer): bool
     {
         $lines = $item['linies'] ?? $item['elements'];
-        $order = array_map('intval', explode(',', $answer));
+        $order = Lessons::ordreIndexos($item, count($lines), $answer) ?? [];
         $sorted = $order;
         sort($sorted);
         if ($sorted !== array_keys($lines)) {
@@ -295,6 +295,10 @@ final class Reptes
             return false;   // text (no codi): només val l'ordre exacte
         }
         $r = Sandbox::run(implode("\n", $user) . "\n", [], '', 'ordena.php', null, $item['fitxers'] ?? []);
+        if ($r['busy']) {
+            // No és culpa de l'alumne: no es pot comptar com a resposta fallada (seria definitiva i aniria al repàs)
+            throw new \InvalidArgumentException('Hi ha massa programes executant-se ara mateix. Torna a prémer Comprova d\'aquí a un moment.');
+        }
         return trim($r['stderr']) === '' && !$r['timeout'] && Labs::normalize($r['stdout']) === Labs::normalize($item['sortida']);
     }
 
