@@ -90,6 +90,7 @@
 
 /* ---------- Base ---------- */
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* que cap display: flex/inline-flex el torni a mostrar */
 html, body { margin: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -872,6 +873,93 @@ pre.has-copy:hover .copy-btn, .copy-btn:focus-visible { opacity: 1; }
   .term-body { padding-right: 16px; padding-bottom: 120px; }
   .mascota { width: 100px; right: 10px; }
 }
+
+/* ---------- Estètica 3: login, reptes de joc, insígnies, mascota celebrant i camí de nivells ---------- */
+
+/* Login: el terminal «arrenca» i després apareix el formulari */
+.auth-card.login { max-width: 440px; }
+.boot { background: var(--code-bg); border: 1px solid var(--border-strong); border-radius: 12px; padding: 14px 16px; margin: 4px 0 18px;
+  font: .82rem/1.75 var(--mono); color: #c9ccec; }
+.boot p { margin: 0; opacity: 0; animation: boot-linia .01s linear forwards; }
+.boot p:nth-child(1) { animation-delay: .15s; color: #8b8fb0; }
+.boot p:nth-child(2) { animation-delay: .45s; } .boot p:nth-child(3) { animation-delay: .7s; }
+.boot p:nth-child(4) { animation-delay: .95s; } .boot p:nth-child(5) { animation-delay: 1.2s; }
+.boot p:nth-child(6) { animation-delay: 1.5s; color: #fff; }
+.boot b { color: #3fd39a; font-weight: 700; }
+.boot .cursor { display: inline-block; width: .55em; height: 1.05em; margin-left: 4px; vertical-align: -.2em; background: #7ee2b8; animation: blink 1s steps(1) infinite; }
+.auth-card.login h1, .auth-card.login .alert, .auth-card.login form { animation: rise .45s var(--ease-out) 1.7s both; }
+@keyframes boot-linia { to { opacity: 1; } }
+
+/* Reptes: compte enrere, combo i carta de resultat */
+.countdown { display: grid; place-items: center; min-height: 240px; }
+.countdown span { font: 800 7rem/1 var(--display); color: var(--accent-2); letter-spacing: -.05em; animation: compte .65s var(--ease-out) both;
+  text-shadow: 0 0 40px color-mix(in srgb, var(--accent) 60%, transparent); }
+.countdown span.go { font-size: 4rem; color: var(--spark); text-shadow: 0 0 40px rgba(255, 207, 77, .5); }
+@keyframes compte { 0% { opacity: 0; transform: scale(1.8); } 30% { opacity: 1; transform: scale(1); } 100% { opacity: .15; transform: scale(.85); } }
+.pill.combo { background: var(--spark-soft); color: var(--spark-ink); }
+.pill.combo.calent { background: linear-gradient(90deg, #f7a531, #ff6b7a); color: #1a0d00; box-shadow: 0 0 18px -4px #ff6b7a; }
+.pill.combo.salta { animation: pop .45s var(--ease-spring); }
+.result-card { position: relative; overflow: hidden; max-width: 420px; margin: 4px auto 16px; padding: 18px 22px 20px; border-radius: 20px;
+  border: 1px solid var(--rang); background: linear-gradient(160deg, color-mix(in srgb, var(--rang) 22%, var(--surface)), var(--surface) 65%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .04), 0 24px 50px -24px var(--rang); animation: carta .7s var(--ease-spring) both; }
+.result-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-120%);
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, .16) 50%, transparent 65%); animation: lluu 2.6s ease-in-out .8s 2; }
+.rang-S { --rang: #ffcf4d; } .rang-A { --rang: #3fd39a; } .rang-B { --rang: #5cb4ee; } .rang-C { --rang: #9a9ef0; } .rang-D { --rang: #8d8ea4; }
+.rc-top { display: flex; justify-content: space-between; align-items: center; }
+.rc-mode { font-weight: 700; color: var(--muted); }
+.rc-rang { font: 800 2.6rem/1 var(--display); color: var(--rang); text-shadow: 0 0 24px var(--rang); }
+.rc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.rc-stats div { display: flex; flex-direction: column; }
+.rc-stats b { font: 800 1.25rem var(--display); font-variant-numeric: tabular-nums; }
+.rc-stats span { font-size: .74rem; color: var(--muted); }
+@keyframes carta { from { opacity: 0; transform: perspective(800px) rotateX(25deg) translateY(30px) scale(.9); } }
+@keyframes lluu { to { transform: translateX(120%); } }
+
+/* Insígnies: disc metàl·lic, reflex en passar el ratolí i animació de les noves */
+.badge { position: relative; overflow: hidden; }
+.badge-icon { display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 50%; font-size: 1.45rem; transition: transform .35s var(--ease-spring); }
+.badge.on .badge-icon { background: conic-gradient(from 210deg, #ffe08a, #b98a2e, #fff2c4, #c99a3a, #ffe08a);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .35), 0 6px 18px -6px rgba(255, 207, 77, .7); }
+.badge.off .badge-icon { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--border); }
+.badge.on:hover .badge-icon { transform: rotate(-10deg) scale(1.1); }
+.badge.on::after { content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-120%);
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 236, 170, .18) 50%, transparent 65%); }
+.badge.on:hover::after { animation: lluu .9s ease-out; }
+.badge.nova { border-color: var(--spark); animation: nova 1.4s var(--ease-out) both; }
+.badge.nova .badge-icon { animation: nova-icona 1s var(--ease-spring) .2s both; }
+.badge-nova { position: absolute; top: 8px; right: 8px; padding: 1px 8px; border-radius: 999px; font-size: .7rem; font-weight: 800;
+  color: #1a0d00; background: var(--spark); }
+@keyframes nova { 0% { box-shadow: 0 0 0 0 rgba(255, 207, 77, .6); } 100% { box-shadow: 0 0 0 16px rgba(255, 207, 77, 0); } }
+@keyframes nova-icona { from { transform: scale(0) rotate(-180deg); } }
+
+/* Mascota celebrant: al resum del laboratori i a la pujada de nivell */
+.mascota.mascota-resum { position: relative; right: auto; bottom: auto; float: right; width: 120px; margin: -6px -4px 4px 10px; }
+.mascota.mascota-nivell { position: relative; right: auto; bottom: auto; width: 150px; margin: -10px auto 4px; }
+.mascota-resum .mascota-bafarada, .mascota-nivell .mascota-bafarada { display: none; }
+
+/* Camí de nivells (Progrés) */
+.cami { position: relative; margin: 16px 0 6px; }
+.cami-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.cami-base, .cami-fet { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.cami-base { stroke: color-mix(in srgb, var(--muted) 45%, transparent); stroke-width: 6; stroke-dasharray: 1 13; }
+.cami-fet { stroke: var(--ok); stroke-width: 6; filter: drop-shadow(0 0 6px rgba(63, 211, 154, .5)); }
+.cami-nodes { list-style: none; margin: 0; padding: 0; }
+.cami-node { position: absolute; transform: translate(-50%, -24px); width: 138px; text-align: center; }
+.cami-node a { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text); text-decoration: none; }
+.cami-bola { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; font-size: 1.1rem;
+  background: var(--surface-2); border: 2px solid var(--border-strong); box-shadow: 0 4px 0 var(--border); transition: transform .25s var(--ease-spring); }
+.cami-node a:hover .cami-bola { transform: translateY(-3px) scale(1.06); }
+.cami-node.fet .cami-bola { background: var(--ok); border-color: var(--ok); color: #04130c; font-weight: 800; box-shadow: 0 4px 0 color-mix(in srgb, var(--ok) 55%, #000); }
+.cami-node.fent .cami-bola { background: var(--surface); border-color: var(--tema); }
+.cami-node.actual .cami-bola { border-color: var(--tema); animation: aqui 1.8s ease-out infinite; }
+.cami-nom { font-size: .8rem; line-height: 1.3; padding: 2px 8px; border-radius: 8px; background: color-mix(in srgb, var(--surface) 85%, transparent);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.cami-nom small { display: block; color: var(--muted); font-size: .7rem; white-space: nowrap; }
+.cami-node.pendent .cami-nom { color: var(--muted); }
+.cami-aqui { position: absolute; top: -4px; left: calc(50% + 28px); padding: 1px 8px; border-radius: 999px; white-space: nowrap;
+  font-size: .68rem; font-weight: 800; color: var(--on-accent); background: var(--accent); }
+@keyframes aqui { 0% { box-shadow: 0 4px 0 var(--border), 0 0 0 0 color-mix(in srgb, var(--tema) 60%, transparent); }
+  100% { box-shadow: 0 4px 0 var(--border), 0 0 0 14px transparent; } }
 
 /* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment) */
 @media (prefers-reduced-motion: reduce) {

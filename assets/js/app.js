@@ -150,6 +150,8 @@ const PHPLab = (() => {
     box.setAttribute('aria-label', 'Has pujat al nivell ' + p.level);
     box.innerHTML = '<div class="level-up-card"><small>Has pujat de nivell!</small><div class="level-up-num">' + esc(p.level) + '</div>' +
       '<div class="level-up-name">' + esc(p.name) + '</div><button class="btn primary" type="button">Som-hi!</button></div>';
+    const tpl = document.getElementById('tpl-mascota');
+    if (tpl) box.querySelector('.level-up-card').prepend(tpl.content.cloneNode(true));
     document.body.appendChild(box);
     const btn = box.querySelector('button');
     btn.focus();
@@ -217,7 +219,7 @@ const PHPLab = (() => {
   // Transició entre pàgines: la targeta on fas clic «creix» fins a la capçalera de la pàgina nova
   // (View Transitions entre documents; els navegadors que no en saben simplement canvien de pàgina).
   document.addEventListener('click', (e) => {
-    const a = e.target.closest?.('a.item, a.mode, .tema-path a');
+    const a = e.target.closest?.('a.item, a.mode, .cami-node a');
     if (a && !e.ctrlKey && !e.metaKey && !e.shiftKey) a.style.viewTransitionName = 'cap-pagina';
   });
   window.addEventListener('pageshow', () => {

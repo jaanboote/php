@@ -55,7 +55,7 @@ $circ = 2 * M_PI * 64;   // perímetre de l'anell (radi 64)
     <p class="level-name"><?= e($progress['name']) ?></p>
     <p class="muted"><?= e($progress['into']) ?> / <?= e($progress['needed']) ?> XP</p>
     <?php if ($progress['streak'] > 0): ?>
-      <span class="streak-big"><span class="flame" aria-hidden="true">🔥</span> <?= e($progress['streak']) ?> dia<?= $progress['streak'] > 1 ? 'es' : '' ?> seguit<?= $progress['streak'] > 1 ? 's' : '' ?></span>
+      <span class="streak-big"><span class="flame" aria-hidden="true">🔥</span> <?= e($progress['streak']) ?> <?= $progress['streak'] > 1 ? 'dies seguits' : 'dia seguit' ?></span>
     <?php endif; ?>
   </div>
 </section>
