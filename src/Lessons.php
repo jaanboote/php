@@ -11,13 +11,18 @@ final class Lessons
 {
     public static function all(): array
     {
+        // El contingut no canvia durant una petició: les insígnies i les estadístiques el demanen moltes vegades
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
         $list = [];
         foreach (glob(APP_ROOT . '/content/lessons/*.php') as $file) {
             $l = require $file;
             $list[$l['id']] = $l;
         }
         uasort($list, fn($a, $b) => ($a['ordre'] ?? 99) <=> ($b['ordre'] ?? 99));
-        return $list;
+        return $cache = $list;
     }
 
     public static function get(string $id): ?array
@@ -109,8 +114,8 @@ final class Lessons
             'test'     => (int) $answer === (int) $q['correcta'],
             'completa' => in_array(self::squash($answer), array_map([self::class, 'squash'], $q['respostes']), true),
             'sortida'  => Labs::normalize($answer) === Labs::normalize($q['resposta']),
-            // ordenar: el navegador envia els índexs originals en l'ordre triat ("2,0,1"); correcte = 0, 1, 2...
-            'ordenar'  => array_map('intval', explode(',', $answer)) === range(0, count($q['elements']) - 1),
+            // ordenar: el navegador envia els testimonis en l'ordre triat; correcte = els índexs originals 0, 1, 2...
+            'ordenar'  => self::ordreIndexos($q, count($q['elements']), $answer) === range(0, count($q['elements']) - 1),
             default    => false,
         };
     }
@@ -142,6 +147,32 @@ final class Lessons
      * Ordre en què es mostren els elements d'una pregunta «ordenar»: barrejat, però sempre igual
      * per a la mateixa pregunta (i mai en l'ordre correcte).
      */
+    /**
+     * Testimoni opac d'un element d'una pregunta d'ordenar. Si el navegador rebés l'índex original, l'ordre correcte
+     * seria simplement ordenar-los de petit a gran: la resposta quedaria a l'HTML.
+     */
+    public static function ordreToken(array $q, int $k): string
+    {
+        return substr(hash_hmac('sha256', 'ordre|' . ($q['id'] ?? $q['ref']) . '|' . $k, Config::secret()), 0, 12);
+    }
+
+    /** Converteix «tA,tB,tC» (testimonis en l'ordre de l'alumne) en els índexs originals, o null si n'hi ha cap de desconegut. */
+    public static function ordreIndexos(array $q, int $n, string $answer): ?array
+    {
+        $mapa = [];
+        for ($k = 0; $k < $n; $k++) {
+            $mapa[self::ordreToken($q, $k)] = $k;
+        }
+        $out = [];
+        foreach (explode(',', $answer) as $tok) {
+            if (!isset($mapa[$tok])) {
+                return null;
+            }
+            $out[] = $mapa[$tok];
+        }
+        return $out;
+    }
+
     public static function shuffled(array $q): array
     {
         $idx = array_keys($q['elements']);

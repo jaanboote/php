@@ -128,9 +128,9 @@ final class Sandbox
             // Fitxers que han quedat a la carpeta (sense el programa ni el fitxer intern)
             $result['files'] = self::listFiles($jobDir, [$script, '_phplab_prepend.php']);
             if ($workspace !== null) {
-                $total = array_sum(array_column($result['files'], 'size'));
-                if ($total > self::WORKSPACE_MAX_BYTES) {
-                    $result['avis_fitxers'] = 'Els fitxers ocupen massa (més d\'1 MB): no s\'han desat per a la propera execució.';
+                [$bytes, $count] = self::dirUsage($jobDir, [$script, '_phplab_prepend.php']);
+                if ($bytes > self::WORKSPACE_MAX_BYTES || $count > self::WORKSPACE_MAX_FILES) {
+                    $result['avis_fitxers'] = 'Els fitxers ocupen massa (més d\'1 MB o més de ' . self::WORKSPACE_MAX_FILES . ' fitxers): no s\'han desat per a la propera execució.';
                 } else {
                     self::removeDir($workspace);
                     @mkdir($workspace, 0770, true);
@@ -319,13 +319,13 @@ final class Sandbox
 
             // Desem l'estat del «servidor» (fitxers pujats, sessions...) per a la petició següent
             $exclude = array_merge(array_keys($sources), self::WEB_INTERNAL);
-            $total = array_sum(array_column(self::listFiles($jobDir, $exclude), 'size'));
-            if ($total <= 8 * self::WORKSPACE_MAX_BYTES) {
+            [$bytes, $count] = self::dirUsage($jobDir, $exclude);
+            if ($bytes <= 8 * self::WORKSPACE_MAX_BYTES && $count <= self::WORKSPACE_MAX_FILES) {
                 self::removeDir($workspace);
                 @mkdir($workspace, 0770, true);
                 self::copyDir($jobDir, $workspace, $exclude);
             } else {
-                $res['errors'] .= "\n[PHPLab] Els fitxers del servidor ocupen més de 8 MB: no s'han desat.";
+                $res['errors'] .= "\n[PHPLab] Els fitxers del servidor ocupen més de 8 MB o són més de " . self::WORKSPACE_MAX_FILES . ": no s'han desat.";
             }
             return $res;
         } finally {
@@ -344,7 +344,7 @@ final class Sandbox
     /** Fitxers del «servidor» d'un laboratori web, sense les sessions (que són internes de PHP). */
     public static function webFiles(string $workspace): array
     {
-        return array_values(array_filter(self::listFiles($workspace), fn($f) => !str_starts_with($f['nom'], '.')));
+        return array_values(array_filter(self::listFiles($workspace, [], 500), fn($f) => !str_starts_with($f['nom'], '.')));
     }
 
     /**
@@ -383,26 +383,33 @@ final class Sandbox
         return $out;
     }
 
-    /** Converteix $_FILES (també amb camps nom[]) en [camp, nom_fitxer, tipus, contingut] per tornar-los a enviar. */
+    /**
+     * Converteix $_FILES en [camp, nom_fitxer, tipus, contingut] per tornar-los a enviar. Accepta camps niats amb el
+     * mateix format de noms que flattenFields(): «docs[cv]» conserva la clau i «fotos[]» es torna a numerar.
+     */
     public static function flattenFiles(array $files): array
     {
         $out = [];
         foreach ($files as $field => $f) {
-            if (is_array($f['name'])) {
-                foreach (array_keys($f['name']) as $i) {
-                    if ((int) $f['error'][$i] === UPLOAD_ERR_NO_FILE) {
-                        $out[] = [$field . '[]', '', 'application/octet-stream', ''];
-                    } elseif (is_uploaded_file($f['tmp_name'][$i])) {
-                        $out[] = [$field . '[]', $f['name'][$i], $f['type'][$i] ?: 'application/octet-stream', (string) file_get_contents($f['tmp_name'][$i])];
-                    }
-                }
-            } elseif ((int) $f['error'] === UPLOAD_ERR_NO_FILE) {
-                $out[] = [$field, '', 'application/octet-stream', ''];
-            } elseif (is_uploaded_file($f['tmp_name'])) {
-                $out[] = [$field, $f['name'], $f['type'] ?: 'application/octet-stream', (string) file_get_contents($f['tmp_name'])];
-            }
+            self::flattenFile((string) $field, $f['name'], $f['type'], $f['tmp_name'], $f['error'], $out);
         }
         return $out;
+    }
+
+    /** Recorre en paral·lel les branques name/type/tmp_name/error de $_FILES fins a cada fitxer. */
+    private static function flattenFile(string $name, mixed $n, mixed $type, mixed $tmp, mixed $error, array &$out): void
+    {
+        if (is_array($n)) {
+            foreach ($n as $k => $sub) {
+                self::flattenFile($name . '[' . (is_int($k) ? '' : $k) . ']', $sub, $type[$k] ?? '', $tmp[$k] ?? '', $error[$k] ?? UPLOAD_ERR_NO_FILE, $out);
+            }
+            return;
+        }
+        if ((int) $error === UPLOAD_ERR_NO_FILE) {
+            $out[] = [$name, '', 'application/octet-stream', ''];
+        } elseif (is_string($tmp) && is_uploaded_file($tmp)) {
+            $out[] = [$name, (string) $n, (string) $type ?: 'application/octet-stream', (string) file_get_contents($tmp)];
+        }
     }
 
     /**
@@ -492,6 +499,8 @@ final class Sandbox
 
     /** Mida màxima dels fitxers que es conserven entre execucions d'un laboratori. */
     private const WORKSPACE_MAX_BYTES = 1048576;
+    /** Com a molt tantes entrades (fitxers i carpetes) al workspace: el límit de bytes sol no frena mil fitxers buits. */
+    private const WORKSPACE_MAX_FILES = 300;
 
     /** Carpeta de fitxers persistents d'un laboratori (data_dir/sandbox/workspaces/<id>). */
     public static function workspace(string $labId): string
@@ -511,7 +520,7 @@ final class Sandbox
     }
 
     /** Llista els fitxers d'una carpeta amb el contingut dels petits (per mostrar-los a l'alumne). */
-    public static function listFiles(string $dir, array $exclude = []): array
+    public static function listFiles(string $dir, array $exclude = [], int $max = 50): array
     {
         if (!is_dir($dir)) {
             return [];
@@ -534,12 +543,35 @@ final class Sandbox
                 'size' => $f->getSize(),
                 'contingut' => mb_check_encoding($content, 'UTF-8') ? $content : null,   // null = binari
             ];
-            if (count($out) >= 50) {
+            if (count($out) >= $max) {
                 break;
             }
         }
         usort($out, fn($a, $b) => strcmp($a['nom'], $b['nom']));
         return $out;
+    }
+
+    /**
+     * Bytes i nombre d'entrades reals d'una carpeta, sense el límit de listFiles(): és el que decideix si es desa el
+     * workspace. Comptar només el que es mostra deixaria passar mil fitxers petits.
+     */
+    private static function dirUsage(string $dir, array $exclude = []): array
+    {
+        $bytes = 0;
+        $count = 0;
+        if (!is_dir($dir)) {
+            return [0, 0];
+        }
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($it as $f) {
+            /** @var \SplFileInfo $f */
+            if (in_array(str_replace('\\', '/', substr($f->getPathname(), strlen($dir) + 1)), $exclude, true) || $f->isLink()) {
+                continue;
+            }
+            $count++;
+            $bytes += $f->isFile() ? $f->getSize() : 0;
+        }
+        return [$bytes, $count];
     }
 
     /** Copia el contingut d'una carpeta a una altra (recursiu). */
@@ -563,7 +595,9 @@ final class Sandbox
         if ($name === '' || str_contains($name, '..') || preg_match('/^[a-zA-Z]:/', $name)) {
             return null;
         }
-        return $name;
+        // «./fet.php» i «a//b.php» són el mateix fitxer que «fet.php» i «a/b.php»
+        $parts = array_filter(explode('/', $name), fn($p) => $p !== '' && $p !== '.');
+        return $parts === [] ? null : implode('/', $parts);
     }
 
     /** Directives php.ini que s'apliquen al procés de l'alumne (amb -d). */

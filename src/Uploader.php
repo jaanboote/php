@@ -18,6 +18,8 @@ final class Uploader
     private array $report = ['guardats' => [], 'duplicats' => [], 'rebutjats' => []];
     private array $knownHashes = [];
     private int $unzippedBytes = 0;
+    /** Entrades de ZIP de tota la pujada (els ZIP de dins compten): el límit per ZIP es multiplicaria amb ZIPs niats. */
+    private int $zipEntries = 0;
 
     public static function handle(array $files): array
     {
@@ -112,7 +114,8 @@ final class Uploader
             $this->reject($folder . '.zip', 'ZIP malmès o no vàlid');
             return;
         }
-        if ($zip->numFiles > (int) Config::get('upload.max_zip_entries', 500)) {
+        $this->zipEntries += $zip->numFiles;
+        if ($this->zipEntries > (int) Config::get('upload.max_zip_entries', 500)) {
             $this->reject($folder . '.zip', 'té massa fitxers');
             $zip->close();
             return;

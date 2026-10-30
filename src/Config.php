@@ -37,4 +37,14 @@ final class Config
         }
         return $path;
     }
+
+    /** Clau secreta de la instal·lació (secret.key a la carpeta de dades, fora del webroot); es crea el primer cop. */
+    public static function secret(): string
+    {
+        $file = self::dataPath() . DIRECTORY_SEPARATOR . 'secret.key';
+        if (!is_file($file)) {
+            file_put_contents($file, bin2hex(random_bytes(32)));
+        }
+        return (string) file_get_contents($file);
+    }
 }

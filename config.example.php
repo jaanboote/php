@@ -42,7 +42,7 @@ return [
     // Pujada de temari.
     'upload' => [
         'max_file_mb'       => 50,     // mida màxima per fitxer pujat
-        'max_zip_entries'   => 500,    // fitxers màxims dins d'un ZIP
+        'max_zip_entries'   => 500,    // fitxers màxims de ZIP a tota la pujada (els ZIP de dins compten)
         'max_unzipped_mb'   => 200,    // mida màxima descomprimida (protecció "zip bomb")
     ],
 
