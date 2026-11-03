@@ -1,320 +1,222 @@
-# Guia completa de PHPLab
+# Guia d'instal·lació de PHPLab
 
-> Instal·lació pas a pas, configuració, seguretat i resolució de problemes. La presentació del projecte és al [README](../README.md).
+> Aquesta guia és per a qualsevol persona, encara que no hagi instal·lat mai res d'aquest tipus.
+> Si vols saber com funciona PHPLab per dins (codi, seguretat...), mira [PHPLab per dins](TECNIC.md).
 
-Aplicació web per aprendre PHP de manera pràctica a partir del temari de classe
-(M0376 · Implantació d'aplicacions web · ASIX2). Està feta en **PHP 8 sense framework**
-perquè també puguis llegir i entendre com funciona per dins.
+## Abans de començar
 
-**Què hi ha ara:**
+**Què tindràs al final:** PHPLab funcionant al teu ordinador. L'obriràs amb el navegador (Chrome, Edge, Firefox...), com
+qualsevol web, i també el podràs obrir des del mòbil o d'un altre ordinador de casa teva.
 
-- Login d'un sol usuari, accés només des de la xarxa de casa.
-- **Temari:** pujar-lo (PDF, ZIP, DOCX, PHP, HTML, TXT, MD), indexador amb detecció de canvis i lectura per temes.
-- **Aprendre:** 19 lliçons dels Temes 1 a 5, amb exemples «prova-ho» executables i preguntes (test, completa, què imprimeix, ordena).
-- **Laboratori:** 17 exercicis guiats pas a pas (basats en Exercicis 01 i 02, les activitats dels temes i l'Activitat de Nadal), amb proves
-  automàtiques, pistes de 3 nivells, solució després de 3 intents i un tutor socràtic (IA de Claude o sense connexió).
-- **Reptes:** contrarellotge, «Troba l'error», «Què imprimeix?», «Ordena el codi» i repàs espaciat.
-- **Progrés:** mapa de temes, insígnies i estadístiques.
-- **Laboratoris web:** escrius una web amb formularis i la proves en un navegador integrat (POST, pujada d'imatges, sessions), amb un inspector de `$_GET`, `$_POST`, `$_FILES`, galetes i sessió.
-- **Sandbox** segur per executar el codi, amb fitxers que es conserven per laboratori.
-- XP, nivells i ratxa diària.
+**Què necessites:**
+
+- Un ordinador amb **Windows 10 o 11**.
+- **Internet**, només mentre ho instal·les. Després PHPLab funciona sense connexió.
+- Uns **30 minuts**.
+
+**Tres paraules que sortiran:**
+
+| Paraula | Què vol dir |
+|---|---|
+| **XAMPP** | Un programa gratuït que converteix el teu ordinador en un petit servidor web. PHPLab funciona a dins seu. |
+| **Carpeta** | Una carpeta normal de Windows, com «Documents». Les obriràs amb l'Explorador de fitxers (la icona de la carpeta groga). |
+| **Terminal** | Una finestra negra on s'escriuen ordres. Només l'hauràs de fer servir per copiar i enganxar dues o tres ordres que et donem. |
+
+> **Com obrir el terminal:** prem la tecla **Windows** del teclat, escriu `cmd` i prem **Retorn**. S'obrirà una finestra negra.
+> Per enganxar-hi una ordre que has copiat, fes **clic amb el botó dret** a dins de la finestra.
 
 ---
 
-## 1. Instal·lació (Windows + XAMPP)
+## Pas 1 · Instal·la XAMPP
 
-### 1.1 Activa l'extensió `zip` de PHP
+1. Entra a <https://www.apachefriends.org> i descarrega **XAMPP per a Windows**, la versió amb **PHP 8.2**.
+2. Obre el fitxer que has descarregat i ves prement **Next** (Següent). No cal canviar res: deixa que s'instal·li a
+   `C:\xampp`, que és la carpeta que dona per defecte.
+   - Si surt un avís sobre el «Control de comptes d'usuari» (UAC), prem **OK**: no afecta PHPLab.
+   - Si Windows pregunta si vols permetre l'accés a la xarxa a «Apache HTTP Server», marca **Xarxes privades** i prem **Permet l'accés**.
+3. En acabar, obre el **XAMPP Control Panel** (el trobaràs al menú Inici escrivint «XAMPP»).
+4. A la fila **Apache**, prem **Start**. El nom «Apache» es posarà en **verd**.
+5. Comprova-ho: obre el navegador i escriu a la barra d'adreces `localhost`. Ha de sortir la pàgina de benvinguda de XAMPP.
 
-Al teu XAMPP (PHP 8.2.12) l'extensió `zip` està desactivada, i cal per als ZIP i els DOCX.
+> **Apache no es posa en verd?** Normalment és perquè un altre programa (com Skype o un altre servidor) ja fa servir el
+> mateix «port». Tanca aquest programa i torna a prémer Start.
 
-1. Obre `C:\xampp\php\php.ini` amb un editor de text.
-2. Busca la línia `;extension=zip` i treu-li el `;` del davant: `extension=zip`.
-3. Al mateix fitxer, revisa aquests valors per poder pujar fitxers grans:
-   ```ini
-   upload_max_filesize = 50M
-   post_max_size = 120M
+## Pas 2 · Activa una opció de PHP (l'extensió «zip»)
+
+PHPLab la necessita per llegir els fitxers ZIP i els documents de Word del temari.
+
+1. Al **XAMPP Control Panel**, a la fila **Apache**, prem **Config** i tria **PHP (php.ini)**. S'obrirà un fitxer de text al Bloc de notes.
+2. Prem **Ctrl + F** (cercar) i escriu `;extension=zip`. Prem **Retorn**.
+3. Esborra **només el punt i coma** del davant, perquè quedi així: `extension=zip`
+4. Desa el fitxer (menú **Fitxer** → **Desa**) i tanca el Bloc de notes.
+5. Al **XAMPP Control Panel**, prem **Stop** a la fila Apache i, quan s'aturi, **Start** una altra vegada.
+
+## Pas 3 · Descarrega PHPLab
+
+1. Entra a <https://github.com/jaanboote/php>.
+2. Prem el botó verd **Code** i després **Download ZIP**.
+3. Ves a la carpeta **Baixades**, fes clic amb el botó dret al fitxer `php-main.zip` i tria **Extreu-ho tot** → **Extreu**.
+4. Dins de la carpeta que s'ha creat hi ha una altra carpeta que també es diu `php-main`. Canvia-li el nom a **`phplab`**
+   (botó dret → **Canvia el nom**).
+5. Mou aquesta carpeta `phplab` a `C:\xampp\htdocs`. Per arribar-hi: obre l'Explorador de fitxers, fes clic a
+   **Aquest ordinador**, després a **Disc local (C:)**, després a **xampp** i després a **htdocs**.
+
+Al final has de tenir la carpeta `C:\xampp\htdocs\phplab`, i a dins hi has de veure fitxers com `index.php` i `README.md`.
+
+> **Si saps fer servir Git**, en lloc dels passos anteriors pots fer `git clone https://github.com/jaanboote/php C:\xampp\htdocs\phplab`.
+> Així, per actualitzar, només caldrà `git pull`.
+
+## Pas 4 · Crea el fitxer de configuració
+
+PHPLab necessita un fitxer anomenat `config.php`. El crearàs copiant la plantilla que ja porta.
+
+1. Obre el **terminal** (tecla Windows, escriu `cmd`, Retorn).
+2. Copia aquesta ordre, enganxa-la al terminal (clic amb el botó dret) i prem **Retorn**:
+   ```bat
+   copy C:\xampp\htdocs\phplab\config.example.php C:\xampp\htdocs\phplab\config.php
    ```
-4. Reinicia Apache des del panell de control de XAMPP (Stop → Start).
+3. Ha de respondre `1 arxius copiats` (o `1 file(s) copied`). Ja pots tancar el terminal.
 
-### 1.2 Descarrega el projecte
+No cal canviar res d'aquest fitxer per començar. Només si vols entrar des d'altres aparells (pas 7) o fer servir el tutor amb IA (pas 8).
 
-Amb [Git per a Windows](https://git-scm.com/download/win), obre un terminal (`cmd`):
+## Pas 5 · Entra per primera vegada
 
-```bat
-cd C:\xampp\htdocs
-git clone https://github.com/jaanboote/php phplab
-```
+1. Al navegador, ves a <http://localhost/phplab>.
+2. Sortirà una pantalla per **crear el teu usuari**. Tria un nom i una contrasenya d'**almenys 10 caràcters**, i apunta-la en un lloc segur.
+   Aquesta pantalla només surt la primera vegada.
+3. Ja ets a dins. Al menú de dalt, ves a **Diagnòstic**: totes les caselles han d'estar en **verd**.
+   - La casella «Clau de l'API de Claude» pot quedar en gris: és opcional (pas 8).
+   - «Dependències de Composer» en vermell vol dir que no llegirà els PDF del temari. Per arreglar-ho, mira el pas 6.
+   - Qualsevol altra en vermell porta escrit a sota què has de fer.
 
-El projecte queda a `C:\xampp\htdocs\phplab`.
+**Ja pots fer servir PHPLab.** Els passos que queden són opcionals.
 
-### 1.3 Instal·la Composer i les dependències
+## Pas 6 (opcional) · Perquè llegeixi els PDF: Composer
 
-Composer és el gestor de llibreries de PHP. PHPLab en fa servir tres: `smalot/pdfparser` (llegir PDF),
-`anthropic-ai/sdk` (l'SDK oficial de Claude) i `guzzlehttp/guzzle` (connexions HTTPS).
+Sense aquest pas PHPLab funciona igual, però no podrà llegir els PDF que pugis a **Temari** ni connectar-se amb el tutor amb IA.
 
-1. Descarrega i executa **Composer-Setup.exe** des de <https://getcomposer.org/download/>.
-   Quan et demani el PHP, tria `C:\xampp\php\php.exe`.
-2. Tanca i torna a obrir el terminal i comprova-ho: `composer -V`
-3. Instal·la les dependències:
+1. Descarrega **Composer-Setup.exe** des de <https://getcomposer.org/download/> i obre'l.
+2. Quan pregunti on és PHP, tria `C:\xampp\php\php.exe` i ves prement **Next** fins al final.
+3. Obre un terminal **nou** (si en tenies un d'obert, tanca'l primer) i enganxa aquestes dues ordres, una darrere l'altra:
    ```bat
    cd C:\xampp\htdocs\phplab
    composer install
    ```
+4. Quan acabi (pot trigar un minut), torna a **Diagnòstic**: «Dependències de Composer» ha de sortir en verd.
 
-> Sense Composer la app també funciona, però no llegirà PDF i el tutor anirà sempre en mode sense connexió.
+## Pas 7 (opcional) · Entrar des del mòbil o d'un altre ordinador
 
-### 1.4 Configura `config.php`
+PHPLab només deixa entrar aparells de **la teva xarxa de casa** (la mateixa Wi-Fi). Des de fora de casa no s'hi pot entrar,
+i és millor així.
 
-```bat
-copy config.example.php config.php
-```
+**1. Busca l'adreça del teu ordinador.** Obre el terminal, escriu `ipconfig` i prem Retorn. Busca la línia
+**Adreça IPv4** (o **IPv4 Address**) dins de l'apartat de la **Wi-Fi** o de l'**Ethernet**. Serà semblant a `192.168.1.72`.
 
-Obre `config.php` i revisa'l. Les opcions estan comentades. Les importants:
+> No facis cas de l'adreça `192.168.56.1`: és de VirtualBox, no de la teva xarxa.
 
-| Opció | Per a què serveix |
-|---|---|
-| `data_dir` | Carpeta de dades privades (base de dades, temari, sandbox). Per defecte és `C:\xampp\phplab-data`, **fora de htdocs**. |
-| `allowed_networks` | Xarxes que poden entrar. Per defecte: aquest PC i `192.168.1.0/24` (la teva xarxa de casa). |
-| `sandbox.php_cli` | El PHP que executa el teu codi: `C:\xampp\php\php.exe`. |
-| `sandbox.php_cgi` | El PHP dels laboratoris web: `C:\xampp\php\php-cgi.exe`. Si no hi és, es busca al costat de `php_cli`. |
-| `ai.api_key` | Clau de l'API de Claude (opcional, mira el punt següent). |
+**2. Obre-la des de l'altre aparell.** Connectat a la mateixa Wi-Fi, escriu al navegador `http://` seguit de l'adreça i `/phplab`.
+Per exemple: `http://192.168.1.72/phplab`. Fes servir **la teva** adreça, la que t'ha sortit al punt anterior.
 
-`config.php` no es puja mai a GitHub: és al `.gitignore` perquè hi ha la clau.
+**3. Si diu «Forbidden» o «Accés denegat»:** la teva xarxa no comença per `192.168.1.`, que és la que PHPLab deixa entrar per defecte.
+Mira els tres primers números de la teva adreça (per exemple, `192.168.0`) i canvia-ho a **dos llocs**:
 
-### 1.5 Clau de l'API de Claude (opcional)
+- A `C:\xampp\htdocs\phplab\.htaccess` (obre'l amb el Bloc de notes), a la línia `Require ip 192.168.1.0/24`.
+- A `C:\xampp\htdocs\phplab\config.php`, a la línia `'allowed_networks'`, on posa `'192.168.1.0/24'`.
 
-1. Entra a <https://console.anthropic.com/>, crea un compte i afegeix-hi crèdit.
-2. A **API Keys**, crea una clau i copia-la a `config.php` → `'api_key' => 'sk-ant-...'`.
-3. El model per defecte és `claude-haiku-5-5`, el més econòmic. Pots limitar la despesa amb
-   `max_requests_day`, `max_tokens_day` i `max_tokens`.
+En tots dos llocs, canvia només els tres primers números. Per exemple, `192.168.1.0/24` passa a ser `192.168.0.0/24`.
+Desa els dos fitxers.
 
-Si el tutor diu *«problema de certificats SSL»*, revisa que `ai.ca_bundle` apunti a
-`C:\xampp\apache\bin\curl-ca-bundle.crt`, que ja ve amb XAMPP.
+**4. Si no carrega gens (es queda pensant):** és el tallafoc de Windows. Ves a **Configuració** → **Privadesa i seguretat** →
+**Seguretat del Windows** → **Tallafoc i protecció de xarxa** → **Permet una aplicació a través del tallafoc**. Busca
+**Apache HTTP Server** i marca la casella **Privada**. Comprova també que la teva Wi-Fi està configurada com a xarxa **privada**
+(Configuració → Xarxa i Internet → la teva Wi-Fi → Tipus de perfil de xarxa: **Privada**).
 
-### 1.6 Primer accés
+**5. Si un dia deixa de funcionar:** potser el teu ordinador ha canviat d'adreça (passa quan canvies de Wi-Fi o reinicies el
+router). Torna a fer el punt 1 i fes servir l'adreça nova.
 
-1. Des del **PC servidor**, obre <http://localhost/phplab>.
-2. Crea el teu usuari i la contrasenya (mínim 10 caràcters). Aquesta pantalla només surt la primera
-   vegada i **només des de localhost**.
-3. Ves a **Diagnòstic** i comprova que tot surt en verd.
+## Pas 8 (opcional) · Tutor amb intel·ligència artificial
 
-### 1.7 Accés des del portàtil o el mòbil
+Sense aquest pas, el tutor dels laboratoris funciona en mode **sense connexió**: et fa preguntes i et dona pistes, però no
+entén el que li escrius. Amb una clau de l'API de Claude, respon de veritat a les teves preguntes. **És de pagament**
+(la teva compte fa una petita despesa per cada pregunta) i necessita el pas 6.
 
-- Obre `http://192.168.1.72/phplab`, amb la IP del PC servidor (la veus amb `ipconfig`).
-- Si no carrega, cal obrir el tallafoc del Windows: *Tallafoc de Windows Defender → Permet una aplicació* →
-  marca **Apache HTTP Server** a les xarxes **privades**. Comprova també que la xarxa de casa
-  estigui configurada com a «Privada».
-- La IP `192.168.56.1` que surt a `ipconfig` és l'adaptador de VirtualBox. No és la teva xarxa de casa.
-- Si et canvia la IP, pots reservar-la al router (DHCP estàtic).
+1. Crea un compte a <https://console.anthropic.com/> i afegeix-hi crèdit.
+2. A l'apartat **API Keys**, crea una clau i copia-la. Comença per `sk-ant-`.
+3. Obre `C:\xampp\htdocs\phplab\config.php` amb el Bloc de notes, busca `'api_key' => ''` i enganxa la clau entre les
+   dues cometes: `'api_key' => 'sk-ant-...'`. Desa el fitxer.
+4. A **Diagnòstic**, «Clau de l'API de Claude» ha de sortir en verd.
 
-### 1.8 Actualitzar a una versió nova
+> No comparteixis mai aquesta clau ni la pugis a Internet: qui la tingui pot gastar el teu crèdit.
+
+---
+
+## Cada dia: com engegar PHPLab
+
+1. Obre el **XAMPP Control Panel** i prem **Start** a la fila **Apache**.
+2. Al navegador, ves a <http://localhost/phplab> (o a l'adreça del pas 7 des d'un altre aparell).
+
+Quan acabis, pots prémer **Stop**. El teu progrés es desa sol.
+
+## Afegir els apunts de classe (temari)
+
+1. A PHPLab, ves a **Temari** → **Pujar temari** i tria els fitxers (PDF, Word, ZIP...). Pots triar-ne molts alhora o un ZIP sencer.
+2. PHPLab els ordena per temes tot sol. Després els pots llegir des de la mateixa pàgina, i el tutor els fa servir per respondre't.
+
+Si un PDF surt com a «sense text», és un document escanejat (una foto): PHPLab només pot llegir PDF amb text.
+
+## Actualitzar PHPLab a una versió nova
+
+El teu progrés **no es perd**: es desa en una altra carpeta (`C:\xampp\phplab-data`).
+
+**Si el vas descarregar en ZIP (pas 3):**
+
+1. Copia el teu `config.php` (de `C:\xampp\htdocs\phplab`) a l'Escriptori, perquè no es perdi.
+2. Esborra la carpeta `C:\xampp\htdocs\phplab`.
+3. Torna a fer el **pas 3** amb la versió nova.
+4. Torna a posar el teu `config.php` dins de la carpeta `C:\xampp\htdocs\phplab`.
+5. Si havies fet el pas 6, torna a fer-ne el punt 3 (`composer install`).
+6. Si havies canviat el `.htaccess` (pas 7), torna a fer aquest canvi.
+
+**Si el vas descarregar amb Git:** obre el terminal i enganxa:
 
 ```bat
 cd C:\xampp\htdocs\phplab
 git pull
-composer install
 ```
 
-La base de dades s'actualitza sola: les taules noves es creen automàticament.
+Després, al navegador, prem **Ctrl + F5** per carregar la versió nova.
 
-### Si has oblidat la contrasenya
+## He oblidat la contrasenya
+
+Obre el terminal i enganxa aquestes dues ordres, una darrere l'altra. Et demanarà la contrasenya nova:
 
 ```bat
 cd C:\xampp\htdocs\phplab
 C:\xampp\php\php.exe eines\canvia-contrasenya.php
 ```
 
----
+## Si alguna cosa no funciona
 
-## 2. Com afegir temari nou
-
-1. Ves a **Temari** → **Pujar temari** i tria els fitxers. Pots pujar-ne diversos alhora o un ZIP sencer.
-2. La app guarda els fitxers a `data_dir\temari`, n'extreu el text i detecta el tema llegint la
-   capçalera dels PDF del professor («Tema 2 – Fonaments PHP»). Si no la troba, fa servir el nom
-   del fitxer o de la carpeta.
-3. En acabar, et diu quins fitxers són nous i si han aparegut **temes nous**.
-4. Si un fitxer ja existia amb el mateix contingut, no es duplica (es compara el hash SHA-256).
-
-Des de la pàgina d'**Inici** o de **Temari**, fes clic en un tema per **llegir-ne el text** dins de l'app.
-
-El botó **Actualitzar temari** torna a revisar la carpeta i només processa els fitxers nous o modificats.
-També pots copiar fitxers directament a `C:\xampp\phplab-data\temari` i després prémer aquest botó.
-
-> **Avís:** quan s'extreu el text d'un PDF, el codi perd la indentació. Per això els laboratoris
-> estan escrits a mà a partir dels enunciats.
-
----
-
-## 3. Com funciona (estructura del projecte)
-
-```
-phplab/
-├── index.php              ← pàgines (index.php?p=inici, leccio, lab, temari, diagnostic)
-├── api.php                ← API JSON per al JavaScript (executar, comprovar, pistes, tutor)
-├── config.example.php     ← plantilla de configuració (copia-la a config.php)
-├── .htaccess              ← qui pot entrar i què no es pot descarregar
-├── src/                   ← la lògica, una classe per fitxer
-│   ├── bootstrap.php      ← arrencada: config, autoload, control d'IP, sessió
-│   ├── Auth.php           ← login, sessions, CSRF i límit d'intents
-│   ├── Db.php             ← SQLite amb PDO i creació automàtica de taules
-│   ├── Sandbox.php        ← executa el codi de l'alumne amb límits
-│   ├── ErrorExplainer.php ← tradueix els errors de PHP al català
-│   ├── Uploader.php       ← pujada de fitxers i extracció segura de ZIP
-│   ├── TextExtractor.php  ← text de PDF, DOCX, HTML...
-│   ├── Indexer.php        ← indexa el temari i busca fragments rellevants
-│   ├── Labs.php           ← motor dels laboratoris (proves, pistes, solució, XP)
-│   ├── Lessons.php        ← lliçons i correcció de preguntes
-│   ├── Tutor.php          ← tutor socràtic (Claude o sense connexió)
-│   ├── Progress.php       ← XP, nivells i ratxa
-│   └── View.php           ← plantilles
-├── templates/             ← HTML de cada pàgina
-├── content/
-│   ├── lessons/           ← lliçons (un fitxer PHP que retorna un array)
-│   └── labs/              ← laboratoris (un fitxer PHP que retorna un array)
-├── assets/                ← CSS, JS i CodeMirror (l'editor, copiat aquí perquè funcioni sense Internet)
-└── eines/                 ← scripts de terminal
-```
-
-I fora de htdocs, a `C:\xampp\phplab-data\`:
-
-```
-phplab-data/
-├── phplab.sqlite          ← progrés, XP, temari indexat, xat del tutor
-├── temari/                ← els fitxers que has pujat
-└── sandbox/
-    ├── jobs/              ← carpetes temporals on s'executa el teu codi (s'esborren soles)
-    └── workspaces/        ← fitxers que creen els programes de cada laboratori
-```
-
-**Flux d'un «Comprova» al laboratori:**
-`lab.js` → `api.php?a=lab_check` → `Labs::check()` → per a cada prova, `Sandbox::run()` executa el
-teu codi amb uns arguments → es compara la sortida amb l'esperada → es guarda l'intent i, si
-l'has superat, l'XP.
-
-**Comprovar el contingut:** després de crear o modificar lliçons i laboratoris, executa
-`C:\xampp\php\php.exe eines\verifica-contingut.php`. Comprova que la solució de cada pas supera les
-seves proves i que les respostes de les preguntes «què imprimeix?» són correctes.
-
-**Afegir un laboratori nou a mà:** copia `content/labs/permisos.php` amb un altre nom, canvia
-`id`, `fitxer` i els passos. Cada pas té `proves` amb `args` i el que ha de sortir (`conte`,
-`no_conte` o `exacte`). A la fase 2, la IA en generarà a partir del temari.
-
----
-
-## 4. Seguretat (què fa la app i per què)
-
-### Execució del teu codi (sandbox)
-
-Executar codi escrit per l'usuari és el més perillós d'una app com aquesta. Aquestes són les capes de protecció:
-
-| Mesura | Què fa | Contra què protegeix |
-|---|---|---|
-| **Procés separat** (`proc_open`) | El codi s'executa amb `php.exe` en un procés a part, no dins d'Apache. | Si peta, l'app continua funcionant. |
-| **Timeout de 5 s** | Si el procés no acaba, es mata (`proc_terminate`). | Bucles infinits. |
-| **`memory_limit=64M`** | El procés no pot fer servir més memòria. | Programes que s'ho mengen tot. |
-| **`open_basedir`** | PHP només pot obrir fitxers dins de la carpeta temporal de l'execució. | Llegir `config.php`, la base de dades o fitxers del sistema. |
-| **`disable_functions`** | Desactiva `exec`, `shell_exec`, `system`, `proc_open`, sockets, `curl`, `ini_set`... | Executar ordres del Windows, connectar-se a la xarxa o treure's els límits. |
-| **`allow_url_fopen=Off`** | `file_get_contents("http://...")` no funciona. | Descarregar coses d'Internet. |
-| **Entorn net** | El procés no rep les variables d'entorn d'Apache. | Filtrar informació del servidor. |
-| **Màxim 2 execucions alhora** | Bloquejos amb `flock`. | Saturar el PC amb moltes execucions. |
-| **Límit de sortida** | Si escriu més de 100 KB, s'atura. | Omplir la memòria o el disc. |
-| **Fitxers limitats** | Cada laboratori té la seva carpeta (`phplab-data\sandbox\workspaces\<laboratori>`), on es conserven els fitxers entre execucions (com a molt 1 MB). | Que un programa ompli el disc o toqui fitxers d'un altre laboratori. |
-
-Totes les directives es passen amb `-d` a `php.exe` (mira `Sandbox::iniSettings()`).
-`ini_set()` està desactivada (si no, el codi es podria treure els límits); `ini_get()` i `error_reporting()` funcionen.
-`error_log()` escriu al fitxer `php_errors.log` de la carpeta del programa, com el log d'un servidor real.
-No és un aïllament perfecte com el d'un contenidor o una màquina virtual, però per a ús personal
-a la xarxa de casa és raonable. Per això **no s'ha d'obrir mai l'app a Internet**.
-
-### Accés i sessió
-
-- **Només xarxa local:** ho limita el `.htaccess` (`Require local` + `Require ip 192.168.1.0/24`) i,
-  per si el `.htaccess` no s'aplica, també el PHP (`allowed_networks`). Això és *defensa en profunditat*.
-- **Contrasenya amb `password_hash()`:** a la base de dades només hi ha el hash (bcrypt), mai la contrasenya.
-- **Límit d'intents:** amb 5 errors en 15 minuts, aquella IP queda bloquejada una estona (contra la força bruta).
-- **Cookie de sessió `HttpOnly` i `SameSite=Strict`:** el JavaScript no la pot llegir (contra XSS)
-  i el navegador no l'envia des d'altres webs (contra CSRF). En entrar es regenera l'ID de sessió (contra la fixació de sessió).
-- **Tokens CSRF:** cada formulari i cada crida a l'API porten un token aleatori que es comprova amb `hash_equals()`.
-- **Escapament amb `htmlspecialchars()`** (funció `e()`) a totes les dades que es mostren (contra XSS).
-- **Consultes preparades amb PDO:** mai es concatenen dades a l'SQL (contra la injecció SQL).
-
-### Fitxers pujats
-
-- Es guarden **fora del webroot** (`C:\xampp\phplab-data`): encara que pugessis un `.php`, Apache no el podria executar.
-- **Llista blanca d'extensions:** pdf, zip, docx, php, html, htm, txt i md.
-- **Zip slip:** cap entrada d'un ZIP pot sortir de la carpeta. Es rebutgen les rutes amb `..`, les absolutes i les que porten lletra d'unitat.
-- **Zip bomb:** es limiten el nombre de fitxers i la mida descomprimida, comptant els bytes reals.
-- La clau de l'API només és a `config.php`, que el `.htaccess` impedeix descarregar. Les crides a Claude
-  es fan des del servidor: la clau no arriba mai al navegador.
-
----
-
-## 5. Problemes freqüents
-
-| Problema | Solució |
+| Què veus | Què vol dir i què has de fer |
 |---|---|
-| «Falta config.php» | `copy config.example.php config.php` |
-| 403 des del mòbil | La IP del mòbil no és a `192.168.1.x`. Revisa el `.htaccess` i `allowed_networks`. |
-| No es pot entrar des d'un altre PC | Tallafoc del Windows (punt 1.7). |
-| «cal activar extension=zip» | Punt 1.1 i reinicia Apache. |
-| Els PDF surten com a «pendent» | Executa `composer install` i després prem «Actualitzar temari». |
-| PDF «sense text» | És un PDF escanejat (una imatge). Cal un PDF amb text. |
-| La pujada falla sense cap missatge | Augmenta `post_max_size` i `upload_max_filesize` al `php.ini`. |
-| El tutor diu «problema de certificats SSL» | Revisa `ai.ca_bundle` (punt 1.5). |
-| `readline()` | Al sandbox, `readline()` llegeix de la caixa «Entrada» (una resposta per línia) i mostra el que respons, com faria el terminal. |
+| «No es pot accedir a aquest lloc» a `localhost/phplab` | Apache no està engegat. Obre el XAMPP Control Panel i prem **Start** a la fila Apache. |
+| «Not Found» | La carpeta no és al lloc correcte o té un altre nom. Ha de ser exactament `C:\xampp\htdocs\phplab` (pas 3). |
+| «Falta config.php» | No has fet el pas 4. |
+| «Forbidden» des del mòbil o des d'un altre ordinador | La teva xarxa no és `192.168.1.x`. Mira el pas 7, punt 3. |
+| Des d'un altre aparell es queda carregant i no obre res | El tallafoc de Windows. Mira el pas 7, punt 4. |
+| «cal activar extension=zip» | No has fet el pas 2, o no has reiniciat Apache (Stop i Start). |
+| Els PDF del temari surten com a «pendent» | Fes el pas 6 i després, a **Temari**, prem **Actualitzar temari**. |
+| No veig les animacions | Windows té els efectes d'animació desactivats. A **Diagnòstic** hi ha un botó per veure-les igualment. |
+| El tutor diu «problema de certificats SSL» | A `config.php`, la línia `'ca_bundle'` ha de ser `C:\\xampp\\apache\\bin\\curl-ca-bundle.crt`. |
+| La pàgina es veu antiga després d'actualitzar | Prem **Ctrl + F5** al navegador. |
 
-Si alguna cosa falla, mira el log d'Apache: `C:\xampp\apache\logs\error.log`.
+Si res d'això ho arregla, PHPLab apunta els errors en aquest fitxer, que pots obrir amb el Bloc de notes:
+`C:\xampp\apache\logs\error.log`. Els errors més recents són al final.
 
 ---
 
-## 6. Reptes i repàs espaciat
+### Una nota de seguretat
 
-A la pàgina **Reptes** hi ha quatre modes: ⏱ Contrarellotge (10 preguntes en 150 s), 🐞 Troba l'error (amb errates reals del temari),
-🖨️ Què imprimeix? i ↕️ Ordena el codi (s'accepta qualsevol ordre que funcioni: s'executa al sandbox). Es poden filtrar per tema.
-
-**Repàs espaciat (sistema Leitner):** cada pregunta que falles (de les lliçons o dels reptes) entra a la caixa 1 i torna a sortir
-l'endemà. Cada encert al repàs la fa pujar de caixa i s'espera més: 1, 3, 7, 14 i 30 dies. Si la falles, torna a la caixa 1.
-Quan l'encertes a la caixa 5, surt del repàs. Inici avisa quan tens preguntes per repassar.
-
-Els reptes donen com a molt 80 XP al dia (el repàs no té límit). Les preguntes són a `content/reptes/temaN.php` i
-`eines/verifica-contingut.php` les comprova totes.
-
-## 7. Progrés: mapa de temes, insígnies i estadístiques
-
-La pàgina **Progrés** té tres parts:
-
-- **Mapa de temes:** cada tema amb les lliçons i els laboratoris en ordre (fet, en curs o per començar), el percentatge
-  d'encerts als reptes del tema i el domini de cada concepte: ● dominat (80 % d'encerts o més), ◐ practicant, ◔ per reforçar.
-- **Insígnies:** 22 fites (acabar lliçons i laboratoris, un laboratori sense pistes, trobar les errates del temari, una
-  contrarellotge perfecta, ratxes de dies, superar cada tema...). Les que encara no tens mostren quant et falta. Quan n'aconsegueixes
-  una, surt un avís a qualsevol pàgina. Una insígnia aconseguida no es perd mai. Les definicions són a `src/Badges.php`.
-- **Estadístiques:** XP de cada dia dels últims 30 dies, d'on ve l'XP, partides i encert per mode de repte, i els conceptes que més costen.
-
-## 8. Laboratoris web (Tema 5)
-
-Als laboratoris web escrius diversos fitxers (`index.php`, `processa.php`, `estil.css`...) i els proves en un **navegador integrat**
-a la dreta de la pàgina: els formularis s'envien, les imatges es pugen i les redireccions i sessions funcionen com a XAMPP.
-
-- **Laboratoris:** formulari de salutació amb GET, la **Carta als Reis Mags** (l'Activitat de Nadal: POST, validació i pujada de fins a 3
-  imatges a `uploads/`) i una zona privada amb inici de sessió, `$_SESSION` i `password_verify()`.
-- **Inspector:** a cada petició mostra el mètode, el codi HTTP, `$_GET`, `$_POST`, `$_FILES`, les galetes, el contingut de la sessió,
-  els fitxers del «servidor» i els errors de PHP explicats.
-- **Lliçons:** formularis GET i POST, pujar fitxers amb `$_FILES` i galetes, sessions i contrasenyes (aquesta última és ampliació:
-  els apartats 5.10–5.12 del mòdul encara no tenen apunts de classe).
-
-**Com funciona per dins:** el navegador és un `<iframe>` que carrega `web.php/<testimoni>/<laboratori>/<fitxer>`. `web.php` executa
-el fitxer amb `php-cgi.exe` (el mateix sandbox: temps límit, memòria, `open_basedir`, funcions desactivades) i en retorna la resposta.
-
-| Mesura | Per què |
-|---|---|
-| L'iframe porta `sandbox` i `web.php` envia `Content-Security-Policy: sandbox` | El codi de la teva web (HTML i JavaScript) s'executa en un origen aïllat: no pot llegir les galetes de PHPLab ni tocar la pàgina del laboratori, encara que obris la URL directament. |
-| Testimoni signat a la URL (caduca en 12 h) | Un iframe aïllat no envia la sessió de la app; el testimoni prova que l'has obert tu des del laboratori. |
-| Galetes i sessions de la teva web desades al servidor (`phplab-data\sandbox\web`) | No es barregen amb les de PHPLab, i l'inspector les pot ensenyar. |
-| Fitxers del «servidor» a la carpeta del laboratori (com a molt 8 MB) | Les imatges pujades es conserven entre peticions, sense sortir de la carpeta del sandbox. |
-
-Si a **Diagnòstic** surt «php-cgi per als laboratoris web» en vermell, revisa `sandbox.php_cgi` a `config.php`.
-
-## 9. Properes fases
-
-- Accés a bases de dades amb PDO i MySQL (apartat 6 del mòdul).
-- Més exercicis d'Exercicis 01 com a laboratoris.
+PHPLab executa el codi que hi escrius al teu ordinador. Està protegit perquè aquest codi no pugui tocar res més, però
+**no l'obris mai a Internet** (no el publiquis en un servidor ni obris ports al router). Està pensat per fer-lo servir a casa,
+a la teva xarxa. Tots els detalls són a [PHPLab per dins](TECNIC.md#2-seguretat-què-fa-la-app-i-per-què).
