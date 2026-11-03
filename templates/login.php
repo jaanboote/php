@@ -30,14 +30,19 @@ $xifres = [
   </ul>
 
   <main class="auth-card login">
-    <!-- Arrencada: les línies apareixen una darrere l'altra (només CSS). El formulari ja es pot fer servir des del principi -->
-    <div class="boot" aria-hidden="true">
-      <p>PHPLab · M0376 · ASIX2</p>
-      <p><b>[ OK ]</b> Intèrpret de PHP carregat</p>
-      <p><b>[ OK ]</b> Sandbox preparat</p>
-      <p><b>[ OK ]</b> Base de dades connectada</p>
-      <p class="boot-prompt">&gt; Identifica't per continuar<span class="cursor"></span></p>
-    </div>
+    <!-- Un exemple real del producte: el laboratori «Codis d'estat HTTP» del Tema 1 i les seves proves.
+         Les línies apareixen una darrere l'altra (només CSS); el formulari ja es pot fer servir des del principi -->
+    <figure class="boot-finestra">
+      <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>codi_http.php · laboratori del Tema 1</span></div>
+      <div class="boot" aria-hidden="true">
+        <p>$ php codi_http.php 404</p>
+        <p>Codi: 404</p>
+        <p>Família: 4xx Error del client</p>
+        <p>Nom: Not Found</p>
+        <p class="boot-prompt"><b>✓</b> 7 de 7 proves superades · +10 XP<span class="cursor"></span></p>
+      </div>
+      <figcaption class="sr-only">Exemple d'un laboratori: el programa codi_http.php supera les 7 proves del pas.</figcaption>
+    </figure>
     <h2>Inicia la sessió</h2>
     <?php if ($error): ?><p class="alert error" role="alert"><?= e($error) ?></p><?php endif; ?>
     <form method="post" action="index.php?p=login" class="form">

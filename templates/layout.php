@@ -9,7 +9,9 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#000000">
-  <script>try { var t = localStorage.getItem('phplab-tema'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
+  <meta name="description" content="PHPLab: aprèn PHP amb lliçons, laboratoris, reptes i exàmens fets a partir del temari de M0376 (ASIX2).">
+  <script>try { var t = localStorage.getItem('phplab-tema'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    if (localStorage.getItem('phplab-moviment') === 'tot') document.documentElement.dataset.moviment = 'tot'; } catch (e) {}</script>
   <meta name="csrf" content="<?= e(Auth::csrfToken()) ?>">
   <title><?= e($title) ?> · PHPLab</title>
   <link rel="icon" href="assets/img/icon.svg" type="image/svg+xml">
@@ -18,7 +20,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=17">
+  <link rel="stylesheet" href="assets/css/app.css?v=18">
 </head>
 <body>
 <?= icones_sprite() ?>
@@ -71,10 +73,10 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
 <script src="assets/vendor/codemirror/addon/edit/matchbrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/edit/closebrackets.js"></script>
 <script src="assets/vendor/codemirror/addon/hint/show-hint.js"></script>
-<script src="assets/js/app.js?v=12"></script>
+<script src="assets/js/app.js?v=13"></script>
 <?php if ($page === 'leccio'): ?><script src="assets/js/lesson.js?v=8"></script><?php endif; ?>
 <?php if ($page === 'lab'): ?><script src="assets/js/lab.js?v=7"></script><?php endif; ?>
-<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=10"></script><?php endif; ?>
+<?php if ($page === 'repte'): ?><script src="assets/js/repte.js?v=11"></script><?php endif; ?>
 <?php if ($page === 'examen'): ?><script src="assets/js/examen.js?v=1"></script><?php endif; ?>
 </body>
 </html>
