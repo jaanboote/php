@@ -52,7 +52,7 @@ const PHPLab = (() => {
     t._timer = setTimeout(() => t.classList.remove('show'), 2600);
   }
 
-  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.documentElement.dataset.moviment !== 'tot';
 
   /**
    * Actualitza la barra d'XP de la capçalera.
@@ -311,6 +311,29 @@ const PHPLab = (() => {
         revela.observe(el);
       }
     });
+  }
+
+  // Diagnòstic: diu si el sistema demana menys moviment i permet mostrar les animacions igualment en aquest navegador
+  const movEstat = document.getElementById('moviment-estat');
+  if (movEstat) {
+    const sistema = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const forcat = document.documentElement.dataset.moviment === 'tot';
+    const boto = document.getElementById('moviment-boto');
+    if (!sistema) {
+      movEstat.textContent = 'Les animacions estan actives: el teu sistema no demana menys moviment.';
+    } else {
+      movEstat.textContent = forcat
+        ? 'El teu sistema demana menys moviment, però has triat veure les animacions igualment.'
+        : 'El teu sistema demana menys moviment, i per això PHPLab no mostra cap animació.';
+      boto.textContent = forcat ? 'Torna a seguir la configuració del sistema' : 'Mostra les animacions igualment';
+      boto.hidden = false;
+      boto.addEventListener('click', () => {
+        try {
+          if (forcat) localStorage.removeItem('phplab-moviment'); else localStorage.setItem('phplab-moviment', 'tot');
+        } catch (e) { /* sense emmagatzematge no es pot recordar */ }
+        location.reload();
+      });
+    }
   }
 
   // Tema fosc (per defecte) o clar: es recorda al navegador i el script del <head> l'aplica abans de pintar

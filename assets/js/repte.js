@@ -8,7 +8,7 @@
 
   const card = document.getElementById('r-card');
   const st = { session: null, items: [], idx: 0, encerts: 0, combo: 0, temps: null, deadline: null, timer: null, finished: false, resultats: [] };
-  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.documentElement.dataset.moviment !== 'tot';
 
   /** Compte enrere «3, 2, 1, Som-hi!» abans de començar (no al repàs, que és tranquil). */
   function countdown() {

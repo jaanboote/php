@@ -661,7 +661,7 @@ li.CodeMirror-hint-active { background: var(--accent); color: var(--on-accent); 
 .badge-pop small { color: var(--accent-2); font-weight: 600; font-size: var(--fs-sm); }
 .badge-pop span:last-child { color: var(--muted); font-size: var(--fs-md); }
 @keyframes badge-spin { from { transform: scale(.3) rotate(-30deg); } 70% { transform: scale(1.2) rotate(8deg); } to { transform: none; } }
-@media (prefers-reduced-motion: reduce) { .badge-pop.show .badge-pop-icon { animation: none; } }
+@media (prefers-reduced-motion: reduce) { :root:not([data-moviment="tot"]) .badge-pop.show .badge-pop-icon { animation: none; } }
 
 .chart-title { margin: 0 0 .6em; }
 .chart-title + .chart-title, .hbars + .chart-title { margin-top: 1.4em; }
@@ -1403,7 +1403,7 @@ pre.resposta.ko { border-color: color-mix(in srgb, var(--err) 45%, transparent);
 .per-revelar { opacity: 0; transform: translateY(10px); }
 .per-revelar.revelat { opacity: 1; transform: none;
   transition: opacity .35s var(--ease-out-quint) var(--rd, 0ms), transform .45s var(--ease-out-quint) var(--rd, 0ms); }
-@media (prefers-reduced-motion: reduce) { .per-revelar { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { :root:not([data-moviment="tot"]) .per-revelar { opacity: 1; transform: none; } }
 
 /* Botons: la tecla puja 1 px en passar-hi el ratolí i s'enfonsa en prémer; desactivats no reaccionen a res */
 @media (hover: hover) and (pointer: fine) {
@@ -1422,9 +1422,18 @@ input, textarea, select { transition: border-color .15s ease, box-shadow .15s ea
   .btn:not(:disabled):hover > .ic:last-child:not(:first-child) { transform: translateX(2px); }
 }
 
-/* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment) */
+/* Portada: l'exemple del laboratori dins d'una finestra de terminal, com a l'editor */
+.boot-finestra { margin: 0 0 var(--sp-5); border-radius: var(--r-md); overflow: hidden; background: var(--code-bg); border: 1px solid var(--border-strong); }
+.boot-finestra .term-bar { padding: 8px 12px; font-size: var(--fs-xs); }   /* la barra és la de les altres finestres (.term-bar) */
+.boot-finestra .term-bar span { margin-left: 4px; }
+.boot-finestra .boot { margin: 0; border: 0; border-radius: 0; }
+.boot-finestra .boot p:first-child { color: #c9ccec; }
+
+/* Qui ha demanat menys moviment al sistema: sense animacions (els canvis d'estat es veuen igualment), tret que hagi
+   triat «Mostra les animacions igualment» a Diagnòstic (data-moviment="tot"). Les transicions entre pàgines no es poden
+   reactivar així: @view-transition no admet selectors */
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
+  :root:not([data-moviment="tot"]) *, :root:not([data-moviment="tot"]) *::before, :root:not([data-moviment="tot"]) *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
     transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

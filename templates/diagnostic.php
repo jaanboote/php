@@ -59,3 +59,11 @@ $errors = count(array_filter($checks, fn($c) => !$c[1] && empty($c[3])));
   <?php endforeach; ?>
 </div>
 <p class="small muted">PHP del sandbox: <code><?= e($phpCli) ?></code> · Accés permès des de: <?= e(implode(', ', (array) Config::get('allowed_networks'))) ?></p>
+
+<section class="card moviment" id="moviment" aria-labelledby="moviment-titol">
+  <h2 id="moviment-titol"><?= icona('estrelles', 'h-ic') ?> Animacions en aquest navegador</h2>
+  <p id="moviment-estat">Comprovant…</p>
+  <p class="small muted">Si Windows té desactivats els efectes d'animació (Configuració › Accessibilitat › Efectes visuals ›
+    Efectes d'animació), el navegador demana a les webs que no es moguin, i PHPLab ho respecta. Ho pots canviar a Windows o només aquí.</p>
+  <button class="btn" id="moviment-boto" type="button" hidden></button>
+</section>
