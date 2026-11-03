@@ -17,7 +17,8 @@
   <a href="#com-funciona">Com funciona</a> ·
   <a href="#seguretat">Seguretat</a> ·
   <a href="#installacio">Instal·lació</a> ·
-  <a href="docs/GUIA.md">Guia completa</a>
+  <a href="docs/GUIA.md">Guia d'instal·lació</a> ·
+  <a href="docs/TECNIC.md">PHPLab per dins</a>
 </p>
 
 ---
@@ -210,14 +211,15 @@ La app està pensada per a ús personal **a la xarxa de casa**, no per publicar-
 | **Temari pujat** | Es guarda fora de `htdocs`, amb protecció contra *zip slip* i *zip bomb*, i sense duplicats (hash SHA-256). |
 | **Clau de l'API** | A `config.php`, que no es puja mai al repositori i no arriba mai al navegador. |
 
-Els detalls de cada mesura, i per què hi és, són a la [guia completa](docs/GUIA.md#4-seguretat-què-fa-la-app-i-per-què).
+Els detalls de cada mesura, i per què hi és, són a [PHPLab per dins](docs/TECNIC.md#2-seguretat-què-fa-la-app-i-per-què).
 
 <a id="installacio"></a>
 
 ## 🚀 Instal·lació ràpida
 
-Necessites **XAMPP** (PHP 8.2 o superior) a Windows. A la [guia completa](docs/GUIA.md) hi ha cada pas explicat, amb captures
-dels problemes més habituals.
+Necessites **XAMPP** (PHP 8.2 o superior) a Windows. Si no has instal·lat mai res d'això, segueix la
+[guia d'instal·lació](docs/GUIA.md): explica cada pas amb paraules senzilles i què fer si alguna cosa falla.
+El resum, per a qui ja coneix XAMPP i Git:
 
 ```bat
 :: 1. Descarrega el projecte dins de htdocs
