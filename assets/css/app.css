@@ -331,8 +331,11 @@ table.files .path { font-family: var(--mono); font-size: var(--fs-sm); word-brea
 /* ---------- Codi i terminal ---------- */
 pre.term, pre.code { background: var(--code-bg); color: var(--code-text); font-family: var(--mono); font-size: var(--fs-md); padding: 12px 14px; border-radius: var(--r-md);
   margin: .7em 0; white-space: pre; line-height: 1.55; }
-.CodeMirror { height: auto; min-height: 120px; font-family: var(--mono); font-size: 14px; line-height: 1.6; border: 1px solid var(--border-strong); border-radius: var(--r-md);
+.CodeMirror { height: auto; font-family: var(--mono); font-size: 14px; line-height: 1.6; border: 1px solid var(--border-strong); border-radius: var(--r-md);
   background: var(--code-bg); color: var(--code-text); transition: border-color .15s, box-shadow .15s; }
+/* L'alçada mínima va a .CodeMirror-scroll i no a .CodeMirror: si l'editor és més alt que el contingut, es veu la barra
+   de desplaçament nativa que CodeMirror amaga a sota (la franja grisa) */
+.CodeMirror-scroll { min-height: 120px; }
 .CodeMirror-focused { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
 .CodeMirror-gutters { background: var(--code-bar); border-right: 1px solid rgba(255, 255, 255, .06); border-radius: 12px 0 0 12px; }
 .CodeMirror-linenumber { color: #6f7290; padding: 0 8px 0 5px; }
@@ -510,7 +513,7 @@ li.CodeMirror-hint-active { background: var(--accent); color: var(--on-accent); 
 .step-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .editor-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .filename { font-family: var(--mono); font-weight: 600; font-size: var(--fs-md); }
-.lab-editor .CodeMirror { min-height: 340px; }
+.lab-editor .CodeMirror-scroll { min-height: 340px; }
 .results { margin-top: 14px; }
 .results h3 { margin: .4em 0; }
 .test { border: 1px solid var(--border); border-radius: var(--r-md); margin-bottom: 8px; animation: rise .35s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
@@ -1436,4 +1439,7 @@ input, textarea, select { transition: border-color .15s ease, box-shadow .15s ea
   @view-transition { navigation: none; }
   :root:not([data-moviment="tot"]) *, :root:not([data-moviment="tot"]) *::before, :root:not([data-moviment="tot"]) *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
     transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  /* Dins de CodeMirror, cap transició: la regla d'abans anima totes les propietats (també amplades i posicions) i
+     l'editor mesura el marge dels números de línia a mig canvi, de manera que el codi queda tapat a l'esquerra */
+  :root:not([data-moviment="tot"]) .CodeMirror * { transition: none !important; }
 }
