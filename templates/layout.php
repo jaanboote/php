@@ -20,7 +20,7 @@ $pct = $progress['needed'] > 0 ? (int) round($progress['into'] * 100 / $progress
   <link rel="stylesheet" href="assets/vendor/codemirror/addon/hint/show-hint.css">
   <link rel="preload" href="assets/vendor/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/vendor/fonts/lexend-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/app.css?v=18">
+  <link rel="stylesheet" href="assets/css/app.css?v=19">
 </head>
 <body>
 <?= icones_sprite() ?>
